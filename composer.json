@@ -16,6 +16,12 @@
         "laravel/framework": "^12.0",
         "laravel/tinker": "^2.10.1"
     },
+    "repositories": [
+        {
+            "type": "composer",
+            "url": "https://repo.backpackforlaravel.com/"
+        }
+    ],
     "require-dev": {
         "backpack/generators": "^4.0",
         "fakerphp/faker": "^1.23",
