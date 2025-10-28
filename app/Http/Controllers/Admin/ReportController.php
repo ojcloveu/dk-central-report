@@ -18,6 +18,6 @@ class ReportController extends Controller
         return Inertia::render('Report', [
             'message' => 'Hello from the Laravel Backend!',
             'user' => User::find(1),
-        ])->rootView('admin.report');
+        ]);
     }
 }
