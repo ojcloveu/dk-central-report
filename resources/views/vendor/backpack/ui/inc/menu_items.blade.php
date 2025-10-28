@@ -12,4 +12,4 @@
 </x-backpack::menu-dropdown>
 
 <x-backpack::menu-item title="Bets" icon="la la-question" :link="backpack_url('bet')" />
-<x-backpack::menu-item title="Report" icon="la la-question" :link="backpack_url('report')" />
+<x-backpack::menu-item title="Bet Report" icon="la la-question" :link="backpack_url('report')" />
