@@ -17,8 +17,7 @@ Route::group([
     'namespace' => 'App\Http\Controllers\Admin',
 ], function () { // custom admin routes
     Route::crud('bet', 'BetCrudController');
-}); // this should be the absolute last line of this file
 
-/**
- * DO NOT ADD ANYTHING HERE.
- */
+    // Initial route
+    Route::get('report', 'ReportController@index')->name('page.report.index');
+});
