@@ -11,11 +11,11 @@ use Inertia\Inertia;
  * @package App\Http\Controllers\Admin
  * @property-read \Backpack\CRUD\app\Library\CrudPanel\CrudPanel $crud
  */
-class ReportController extends Controller
+class BetReportController extends Controller
 {
     public function index()
     {
-        return Inertia::render('Report', [
+        return Inertia::render('BetReport', [
             'message' => 'Hello from the Laravel Backend!',
             'user' => User::find(1),
         ]);

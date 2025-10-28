@@ -19,5 +19,5 @@ Route::group([
     Route::crud('bet', 'BetCrudController');
 
     // Initial route
-    Route::get('report', 'ReportController@index')->name('page.report.index');
+    Route::get('report', 'BetReportController@index')->name('page.report.index');
 });
