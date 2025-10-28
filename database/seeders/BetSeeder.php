@@ -84,7 +84,8 @@ class BetSeeder extends Seeder
                         $winlose = $this->calculateWinLose($master, $turnover);
                         
                         // Generate LP (loyalty points) - usually 0.1% to 1% of turnover
-                        $lp = round($turnover * (rand(10, 100) / 10000), 2);
+                        $lp = ($winlose / $turnover) * 100;
+
 
                         $batchData[] = [
                             'account' => $account,
