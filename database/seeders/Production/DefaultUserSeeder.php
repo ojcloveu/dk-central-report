@@ -19,12 +19,14 @@ class DefaultUserSeeder extends Seeder
         $email = 'admin@admin.com';
         $password = 'zaq1ZAQ!';
 
-        $role = Role::firstOrCreate(['name' => config('roles.developer')]);
+        $roleName = config('roles.developer');
+
+        $role = Role::firstOrCreate(['name' => $roleName]);
 
         $user = User::firstOrCreate(
             ['email' => $email],
             [
-            'name' => 'Developer',
+            'name' => $roleName,
             'password' => Hash::make($password),
             'email_verified_at' => now(),
             ]
