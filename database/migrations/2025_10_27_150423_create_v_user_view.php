@@ -5,16 +5,16 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
 
-return new class extends Migration
-{
+return new class () extends Migration {
     /**
      * Run the migrations.
      */
     public function up(): void
     {
+        DB::statement("DROP VIEW IF EXISTS v_user");
         DB::statement("
             CREATE VIEW v_user AS
-            SELECT 
+            SELECT
                 id,
                 name as fullusername,
                 email,
