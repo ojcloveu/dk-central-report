@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\HasRoleHelpers;
 use Laravel\Passport\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Notifications\Notifiable;
@@ -18,6 +19,7 @@ class User extends Authenticatable implements OAuthenticatable
     use HasFactory;
     use Notifiable;
     use HasApiTokens;
+    use HasRoleHelpers;
 
     /*
     |--------------------------------------------------------------------------

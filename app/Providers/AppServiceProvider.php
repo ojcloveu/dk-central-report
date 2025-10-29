@@ -25,8 +25,8 @@ class AppServiceProvider extends ServiceProvider
     {
         URL::forceHttps(app()->isProduction());
 
-        LogViewer::auth(function ($request) {
-            return true; // TODO: Implement proper authentication
+        LogViewer::auth(function () {
+            return backpack_user()?->isDeveloper();
         });
 
         // Passport settings
