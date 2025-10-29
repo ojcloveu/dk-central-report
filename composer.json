@@ -12,6 +12,7 @@
         "php": "^8.4",
         "backpack/crud": "^6.8",
         "backpack/logmanager": "^5.0",
+        "backpack/permissionmanager": "^7.2",
         "backpack/pro": "2.2.14",
         "backpack/settings": "^3.1",
         "backpack/theme-tabler": "*",
