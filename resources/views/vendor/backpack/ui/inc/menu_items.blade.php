@@ -10,3 +10,5 @@
         <x-backpack::menu-dropdown-item title="Log Viewers" icon='la la-clock' :link="backpack_url('log-viewer')" />
     </x-theme-tabler::menu-dropdown-column>
 </x-backpack::menu-dropdown>
+
+<x-backpack::menu-item title="Bets" icon="la la-question" :link="backpack_url('bet')" />
