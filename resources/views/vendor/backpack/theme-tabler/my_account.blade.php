@@ -47,7 +47,6 @@
             </div>
         @endif
 
-        {{-- UPDATE INFO FORM --}}
         <div class="col-lg-8 mb-4">
             <form class="form" action="{{ route('backpack.account.info.store') }}" method="post">
 
@@ -97,7 +96,6 @@
             </form>
         </div>
 
-        {{-- CHANGE PASSWORD FORM --}}
         <div class="col-lg-8 mb-4">
             <form class="form" action="{{ route('backpack.account.password') }}" method="post">
 
