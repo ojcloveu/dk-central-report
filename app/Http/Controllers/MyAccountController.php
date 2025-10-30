@@ -87,4 +87,12 @@ class MyAccountController extends Controller
     {
         return backpack_auth();
     }
+
+    public function getPasskeysForm()
+    {
+        $this->data['title'] = trans('backpack::base.my_account');
+        $this->data['user'] = $this->guard()->user();
+
+        return view(backpack_view('passkeys'), $this->data);
+    }
 }
