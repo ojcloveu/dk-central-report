@@ -1,10 +1,16 @@
 <script setup>
-import { ref, computed, watch, nextTick } from 'vue';
+import { ref, computed, watch } from 'vue';
+import Pagination from './Pagination.vue';
+import RangeTable from './RangeTable.vue';
+import FilterBar from './FilterBar.vue';
+import TableHeader from './TableHeader.vue';
+import TableRow from './TableRow.vue';
 
 /* -------------------------
    Dummy server data (original)
    ------------------------- */
 const originalData = [
+    /* ... keep your original array items unchanged ... */
     {
         id: 1,
         account: 'THB7686',
@@ -150,16 +156,37 @@ const originalData = [
     },
 ];
 
+const columns = [
+    { field: 'account', label: 'ACCOUNT' },
+    { field: 'channel', label: 'CHANNEL' },
+    { field: 'trandate', label: 'TRANDATE' },
+    { field: 'master', label: 'MASTER' },
+    { field: 'min', label: 'MIN' },
+    { field: 'max', label: 'MAX' },
+    { field: 'count', label: 'COUNT' },
+    { field: 'turnover', label: 'TURNOVER' },
+    { field: 'winlose', label: 'WINLOSE' },
+    { field: 'lp', label: 'LP' },
+];
+
 /* -------------------------
    Reactive state
    ------------------------- */
 // main table (what API1 returns)
 const mainData = ref([]);
 
-// selection (persist across pages)
-const selectedIds = ref([]); // array of selected item ids
+// meta for main (Laravel style)
+const mainMeta = ref({
+    total: 0,
+    per_page: 10,
+    current_page: 1,
+    last_page: 1,
+});
 
-// pagination & sorting
+// selection (persist across pages)
+const selectedIds = ref([]);
+
+// pagination & sorting (we keep these as reactive controls that map to API params)
 const currentPage = ref(1);
 const itemsPerPage = ref(20);
 const sortBy = ref('');
@@ -177,14 +204,28 @@ const accountSearch = ref('');
 const channelSearch = ref('');
 
 /* -------------------------
-   Range tables (API2 results)
-   - three separate tables for 7d, 1m, 3m
+   Range tables (API2 results) - now server paginated per range
+   structure:
+   rangesTables.value = {
+      '7d': { data: [], meta: { total, per_page, current_page, last_page } },
+      '1m': { ... },
+      '3m': { ... }
+   }
+   and rangeState per-range controls (page, perPage)
    ------------------------- */
 const rangesTables = ref({
-    '7d': [],
-    '1m': [],
-    '3m': [],
+    '7d': { data: [], meta: { total: 0, per_page: 10, current_page: 1, last_page: 1 } },
+    '1m': { data: [], meta: { total: 0, per_page: 10, current_page: 1, last_page: 1 } },
+    '3m': { data: [], meta: { total: 0, per_page: 10, current_page: 1, last_page: 1 } },
 });
+
+// per-range state convenience accessors
+function rangePage(rangeKey) {
+    return rangesTables.value[rangeKey].meta.current_page || 1;
+}
+function rangePerPage(rangeKey) {
+    return rangesTables.value[rangeKey].meta.per_page || 10;
+}
 
 /* -------------------------
    Utility: unique option lists (from original data)
@@ -204,8 +245,9 @@ const channelOptions = computed(() => {
 
 /* -------------------------
    Simulated API 1 (main table)
+   - returns { data, meta } where meta follows Laravel pagination:
+     { total, per_page, current_page, last_page }
    - accepts params: filters, sort, page, perPage
-   - returns Promise that resolves with filtered+sorted slice
    ------------------------- */
 function simulateApi1({
     date,
@@ -221,61 +263,55 @@ function simulateApi1({
         setTimeout(() => {
             let data = [...originalData];
 
-            // filter (simple contains / equality logic)
-            if (date) {
-                // date is string; server usually filters by date range; we just equal-match for now
-                data = data.filter(r => r.trandate === date);
-            }
-            if (master) {
-                data = data.filter(r => r.master === master);
-            }
-            if (account) {
-                data = data.filter(r => r.account === account);
-            }
-            if (channel) {
-                data = data.filter(r => r.channel === channel);
-            }
+            // filters
+            if (date) data = data.filter(r => r.trandate === date);
+            if (master) data = data.filter(r => r.master === master);
+            if (account) data = data.filter(r => r.account === account);
+            if (channel) data = data.filter(r => r.channel === channel);
 
-            // sort
+            // sorting
             if (sBy) {
                 data.sort((a, b) => {
                     let aVal = a[sBy];
                     let bVal = b[sBy];
 
-                    // normalize numbers if field likely numeric
-                    if (typeof aVal === 'string' && aVal.match(/^\$?[\d,]+$/)) {
-                        aVal = Number(aVal.replace(/[^0-9.-]+/g, ''));
-                        bVal = Number(bVal.replace(/[^0-9.-]+/g, ''));
+                    if (typeof aVal === 'string' && aVal.match(/^\$?[\d,]+/)) {
+                        aVal = Number(String(aVal).replace(/[^0-9.-]+/g, ''));
+                        bVal = Number(String(bVal).replace(/[^0-9.-]+/g, ''));
                     }
                     if (sOrder === 'asc') return aVal > bVal ? 1 : aVal < bVal ? -1 : 0;
                     return aVal < bVal ? 1 : aVal > bVal ? -1 : 0;
                 });
             }
 
-            // pagination slice
             const total = data.length;
-            const start = (page - 1) * perPage;
+            const last_page = Math.max(1, Math.ceil(total / perPage));
+            const safePage = Math.min(Math.max(1, page), last_page);
+            const start = (safePage - 1) * perPage;
             const slice = data.slice(start, start + perPage);
 
-            resolve({ data: slice, total });
-        }, 200); // simulate small latency
+            resolve({
+                data: slice,
+                meta: {
+                    total,
+                    per_page: perPage,
+                    current_page: safePage,
+                    last_page,
+                },
+            });
+        }, 250);
     });
 }
 
 /* -------------------------
-   Simulated API 2 (range summaries)
-   - accepts list of accounts and range key
-   - returns Promise with aggregated rows (one per account)
-   - IMPORTANT: this is only called when selection changes
+   Simulated API 2 (range summaries) - now returns { data, meta }
+   - accepts list of accounts and rangeKey and page/perPage
    ------------------------- */
-function simulateApi2(accounts = [], rangeKey = '7d') {
+function simulateApi2(accounts = [], rangeKey = '7d', page = 1, perPage = 10) {
     return new Promise(resolve => {
         setTimeout(() => {
-            // produce dummy aggregation per account
-            // apply a simple multiplier depending on range to vary numbers
             const multiplier = rangeKey === '7d' ? 1 : rangeKey === '1m' ? 4 : 12;
             const rows = accounts.map(acc => {
-                // base find in originalData (first match)
                 const base = originalData.find(d => d.account === acc) || {
                     account: acc,
                     channel: 'N/A',
@@ -314,16 +350,24 @@ function simulateApi2(accounts = [], rangeKey = '7d') {
                 };
             });
 
-            resolve(rows);
-        }, 250); // slightly longer response
+            const total = rows.length;
+            const last_page = Math.max(1, Math.ceil(total / perPage));
+            const safePage = Math.min(Math.max(1, page), last_page);
+            const start = (safePage - 1) * perPage;
+            const slice = rows.slice(start, start + perPage);
+
+            resolve({
+                data: slice,
+                meta: { total, per_page: perPage, current_page: safePage, last_page },
+            });
+        }, 300);
     });
 }
 
 /* -------------------------
    Fetch main table (calls simulateApi1)
-   - called on filter / sort / page / perPage change
+   - reads and stores meta
    ------------------------- */
-const totalMainRows = ref(0);
 async function fetchMainTable() {
     const params = {
         date: dateFilter.value,
@@ -337,16 +381,59 @@ async function fetchMainTable() {
     };
 
     const res = await simulateApi1(params);
-    mainData.value = res.data.map(d => ({ ...d })); // copy
-    totalMainRows.value = res.total;
+    mainData.value = res.data.map(d => ({ ...d }));
+    mainMeta.value = { ...res.meta };
 
-    // ensure the checkboxes are in sync (persist selected)
-    // we don't touch selectedIds here because selection persists overall
+    // sync paging control (if server changed current_page or per_page)
+    currentPage.value = mainMeta.value.current_page;
+    itemsPerPage.value = mainMeta.value.per_page;
+}
+
+/* -------------------------
+   Range fetch helpers
+   - fetchRange(rangeKey, page?, perPage?)
+   - fetchAllRanges()
+   ------------------------- */
+let lastRangeFetchKey = 0;
+async function fetchRange(rangeKey, page = null, perPage = null) {
+    const accounts = selectedAccounts.value.slice();
+    if (accounts.length === 0) {
+        rangesTables.value[rangeKey] = {
+            data: [],
+            meta: {
+                total: 0,
+                per_page: rangesTables.value[rangeKey].meta.per_page || 10,
+                current_page: 1,
+                last_page: 1,
+            },
+        };
+        return;
+    }
+
+    // use existing meta paging if not provided
+    const usePage = page ?? rangesTables.value[rangeKey].meta.current_page ?? 1;
+    const usePerPage = perPage ?? rangesTables.value[rangeKey].meta.per_page ?? 10;
+
+    const requestKey = ++lastRangeFetchKey;
+    const res = await simulateApi2(accounts, rangeKey, usePage, usePerPage);
+
+    // avoid race conditions
+    if (requestKey === lastRangeFetchKey) {
+        rangesTables.value[rangeKey] = {
+            data: res.data.map(r => ({ ...r })),
+            meta: { ...res.meta },
+        };
+    }
+}
+
+async function fetchAllRanges() {
+    await Promise.all(
+        ['7d', '1m', '3m'].map(k => fetchRange(k, 1, rangesTables.value[k].meta.per_page))
+    );
 }
 
 /* -------------------------
    Watchers to trigger fetchMainTable when user changes filters/sort/pagination
-   (this mimics server-driven main table usage)
    ------------------------- */
 watch(
     [
@@ -360,7 +447,6 @@ watch(
         itemsPerPage,
     ],
     () => {
-        // whenever these change, call API1
         fetchMainTable();
     },
     { immediate: true }
@@ -368,18 +454,12 @@ watch(
 
 /* -------------------------
    Selection handling
-   - toggling checkboxes updates selectedIds
-   - watch selectedIds to call API2 for ranges
    ------------------------- */
 function toggleSelect(id) {
     const idx = selectedIds.value.indexOf(id);
-    if (idx === -1) {
-        selectedIds.value.push(id);
-    } else {
-        selectedIds.value.splice(idx, 1);
-    }
+    if (idx === -1) selectedIds.value.push(id);
+    else selectedIds.value.splice(idx, 1);
 }
-
 function isSelected(id) {
     return selectedIds.value.includes(id);
 }
@@ -395,50 +475,22 @@ const selectedAccounts = computed(() => {
 });
 
 /* -------------------------
-   Build / refresh 3 range tables whenever selection changes
-   - only depends on selectedAccounts, not filters/sort
+   When selection changes -> refresh range tables (server side)
    ------------------------- */
-let lastRangeRequestKey = 0;
-async function refreshRangeTables() {
-    const accounts = selectedAccounts.value.slice();
-
-    // quick short-circuit if no selection
-    if (accounts.length === 0) {
-        rangesTables.value['7d'] = [];
-        rangesTables.value['1m'] = [];
-        rangesTables.value['3m'] = [];
-        return;
-    }
-
-    const requestKey = ++lastRangeRequestKey;
-
-    // fetch them in parallel
-    const [r7, r1m, r3m] = await Promise.all([
-        simulateApi2(accounts, '7d'),
-        simulateApi2(accounts, '1m'),
-        simulateApi2(accounts, '3m'),
-    ]);
-
-    // only set results if this is the latest request (avoid race)
-    if (requestKey === lastRangeRequestKey) {
-        rangesTables.value['7d'] = r7;
-        rangesTables.value['1m'] = r1m;
-        rangesTables.value['3m'] = r3m;
-    }
-}
-
 watch(
     selectedIds,
     () => {
-        // whenever selection changes, regenerate the 3 tables
-        refreshRangeTables();
+        // reset range pages to 1 for better UX
+        for (const k of ['7d', '1m', '3m']) {
+            rangesTables.value[k].meta.current_page = 1;
+        }
+        fetchAllRanges();
     },
     { deep: true }
 );
 
 /* -------------------------
    Sorting helper invoked by UI
-   - updates sortBy & sortOrder (which triggers fetchMainTable watcher)
    ------------------------- */
 function sortTable(field) {
     if (sortBy.value === field) {
@@ -450,54 +502,36 @@ function sortTable(field) {
 }
 
 /* -------------------------
-   Pagination helpers
+   Pagination helpers for main
    ------------------------- */
-function setItemsPerPage(count) {
-    itemsPerPage.value = count;
-    currentPage.value = 1;
-}
-
-function goToPage(page) {
-    if (page >= 1 && page <= totalPages.value) {
-        currentPage.value = page;
-    }
-}
-
 const totalPages = computed(() => {
-    return Math.max(1, Math.ceil(totalMainRows.value / itemsPerPage.value));
+    return (
+        mainMeta.value.last_page ||
+        Math.max(
+            1,
+            Math.ceil((mainMeta.value.total || 0) / (mainMeta.value.per_page || itemsPerPage.value))
+        )
+    );
 });
+
+/* -------------------------
+   Pagination helpers for ranges
+   ------------------------- */
+function setRangeItemsPerPage(rangeKey, count) {
+    rangesTables.value[rangeKey].meta.per_page = count;
+    rangesTables.value[rangeKey].meta.current_page = 1;
+    fetchRange(rangeKey, 1, count);
+}
+function goToRangePage(rangeKey, page) {
+    const last = rangesTables.value[rangeKey].meta.last_page || 1;
+    if (page >= 1 && page <= last)
+        fetchRange(rangeKey, page, rangesTables.value[rangeKey].meta.per_page);
+}
 
 /* -------------------------
    Computed: paginatedData is provided by the server (mainData)
    ------------------------- */
 const paginatedData = computed(() => mainData.value);
-
-/* -------------------------
-   Utility classes (copied from your original)
-   ------------------------- */
-function getLpClass(lp) {
-    const value = parseFloat(String(lp).replace('%', '').replace('$', '').replace(',', '')) || 0;
-    if (value < 0) return 'text-danger';
-    if (value > 0) return 'text-success';
-    return '';
-}
-
-function getMasterBadgeClass(master) {
-    switch (master) {
-        case 'VIRTUAL':
-            return 'bg-primary-lt';
-        case 'ESPORTS':
-            return 'bg-success-lt';
-        case 'LOTTERY':
-            return 'bg-warning-lt';
-        case 'POKER':
-            return 'bg-info-lt';
-        case 'SLOTS':
-            return 'bg-purple-lt';
-        default:
-            return 'bg-secondary-lt';
-    }
-}
 
 /* -------------------------
    Small helpers for filter selects (searchable)
@@ -512,7 +546,27 @@ const filteredChannelOptions = computed(() =>
     channelOptions.value.filter(c => c.toLowerCase().includes(channelSearch.value.toLowerCase()))
 );
 
-/* initial fetch (already triggered by the watch with immediate: true) */
+/* -------------------------
+   Clear filters
+   ------------------------- */
+function clearFilters() {
+    dateFilter.value = '';
+    masterFilter.value = '';
+    accountFilter.value = '';
+    channelFilter.value = '';
+    masterSearch.value = '';
+    accountSearch.value = '';
+    channelSearch.value = '';
+}
+
+/* -------------------------
+   Refresh helper (used by Refresh button)
+   ------------------------- */
+function refreshAll() {
+    // keep selection; just re-fetch main and ranges
+    fetchMainTable();
+    fetchAllRanges();
+}
 </script>
 
 <template>
@@ -524,317 +578,81 @@ const filteredChannelOptions = computed(() =>
                     <h3 class="card-title mb-0">Betting Report</h3>
                     <p class="text-secondary m-0">View all betting transactions and statistics.</p>
                 </div>
+
                 <div class="col-md-auto col-sm-12">
                     <div class="ms-auto d-flex flex-wrap btn-list">
+                        <!-- small contextual button (kept) -->
                         <a href="#" class="btn btn-icon" aria-label="Button">...</a>
-                        <div class="dropdown">
-                            <a href="#" class="btn dropdown-toggle" data-bs-toggle="dropdown"
-                                >Download</a
-                            >
-                            <div class="dropdown-menu">
-                                <a class="dropdown-item" href="#">Export CSV</a>
-                                <a class="dropdown-item" href="#">Export Excel</a>
-                                <a class="dropdown-item" href="#">Export PDF</a>
-                            </div>
-                        </div>
+
+                        <!-- REPLACED download + settings with single Refresh button -->
+                        <button class="btn btn-primary" @click="refreshAll" type="button">
+                            Refresh
+                        </button>
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- Filters row (date, master, account, channel) -->
-        <div class="p-3">
-            <div class="row g-2 align-items-end">
-                <div class="col-md-2">
-                    <label class="form-label small">Date</label>
-                    <input type="date" class="form-control form-control-sm" v-model="dateFilter" />
-                </div>
-
-                <div class="col-md-3">
-                    <label class="form-label small">Master</label>
-                    <input
-                        class="form-control form-control-sm mb-1"
-                        placeholder="Search master..."
-                        v-model="masterSearch"
-                    />
-                    <select class="form-select form-select-sm" v-model="masterFilter">
-                        <option value="">All masters</option>
-                        <option v-for="m in filteredMasterOptions" :key="m" :value="m">
-                            {{ m }}
-                        </option>
-                    </select>
-                </div>
-
-                <div class="col-md-3">
-                    <label class="form-label small">Account</label>
-                    <input
-                        class="form-control form-control-sm mb-1"
-                        placeholder="Search account..."
-                        v-model="accountSearch"
-                    />
-                    <select class="form-select form-select-sm" v-model="accountFilter">
-                        <option value="">All accounts</option>
-                        <option v-for="a in filteredAccountOptions" :key="a" :value="a">
-                            {{ a }}
-                        </option>
-                    </select>
-                </div>
-
-                <div class="col-md-2">
-                    <label class="form-label small">Channel</label>
-                    <input
-                        class="form-control form-control-sm mb-1"
-                        placeholder="Search channel..."
-                        v-model="channelSearch"
-                    />
-                    <select class="form-select form-select-sm" v-model="channelFilter">
-                        <option value="">All channels</option>
-                        <option v-for="c in filteredChannelOptions" :key="c" :value="c">
-                            {{ c }}
-                        </option>
-                    </select>
-                </div>
-
-                <div class="col-md-2 text-end">
-                    <button
-                        class="btn btn-sm btn-secondary"
-                        @click="
-                            () => {
-                                dateFilter = '';
-                                masterFilter = '';
-                                accountFilter = '';
-                                channelFilter = '';
-                                masterSearch = '';
-                                accountSearch = '';
-                                channelSearch = '';
-                            }
-                        "
-                    >
-                        Clear
-                    </button>
-                </div>
-            </div>
-        </div>
-
+        <FilterBar
+            v-model:dateFilter="dateFilter"
+            v-model:masterFilter="masterFilter"
+            v-model:accountFilter="accountFilter"
+            v-model:channelFilter="channelFilter"
+            v-model:masterSearch="masterSearch"
+            v-model:accountSearch="accountSearch"
+            v-model:channelSearch="channelSearch"
+            :masterOptions="filteredMasterOptions"
+            :accountOptions="filteredAccountOptions"
+            :channelOptions="filteredChannelOptions"
+            @clear="clearFilters"
+        />
         <!-- Table -->
         <div id="betting-table">
             <div class="table-responsive">
                 <table class="table table-vcenter table-hover">
                     <thead>
-                        <tr class="text-muted">
-                            <th class="w-1"></th>
-
-                            <th>
-                                <button
-                                    class="table-sort d-flex justify-content-between w-100 border-0 bg-transparent text-start"
-                                    @click="sortTable('account')"
-                                >
-                                    ACCOUNT
-                                    <span v-if="sortBy === 'account'">{{
-                                        sortOrder === 'asc' ? '↑' : '↓'
-                                    }}</span>
-                                </button>
-                            </th>
-
-                            <th>
-                                <button
-                                    class="table-sort d-flex justify-content-between w-100 border-0 bg-transparent text-start"
-                                    @click="sortTable('channel')"
-                                >
-                                    CHANNEL
-                                    <span v-if="sortBy === 'channel'">{{
-                                        sortOrder === 'asc' ? '↑' : '↓'
-                                    }}</span>
-                                </button>
-                            </th>
-
-                            <th>
-                                <button
-                                    class="table-sort d-flex justify-content-between w-100 border-0 bg-transparent text-start"
-                                    @click="sortTable('trandate')"
-                                >
-                                    TRANDATE
-                                    <span v-if="sortBy === 'trandate'">{{
-                                        sortOrder === 'asc' ? '↑' : '↓'
-                                    }}</span>
-                                </button>
-                            </th>
-
-                            <th>
-                                <button
-                                    class="table-sort d-flex justify-content-between w-100 border-0 bg-transparent text-start"
-                                    @click="sortTable('master')"
-                                >
-                                    MASTER
-                                    <span v-if="sortBy === 'master'">{{
-                                        sortOrder === 'asc' ? '↑' : '↓'
-                                    }}</span>
-                                </button>
-                            </th>
-
-                            <th>
-                                <button
-                                    class="table-sort d-flex justify-content-between w-100 border-0 bg-transparent text-start"
-                                    @click="sortTable('min')"
-                                >
-                                    MIN
-                                    <span v-if="sortBy === 'min'">{{
-                                        sortOrder === 'asc' ? '↑' : '↓'
-                                    }}</span>
-                                </button>
-                            </th>
-
-                            <th>
-                                <button
-                                    class="table-sort d-flex justify-content-between w-100 border-0 bg-transparent text-start"
-                                    @click="sortTable('max')"
-                                >
-                                    MAX
-                                    <span v-if="sortBy === 'max'">{{
-                                        sortOrder === 'asc' ? '↑' : '↓'
-                                    }}</span>
-                                </button>
-                            </th>
-
-                            <th>
-                                <button
-                                    class="table-sort d-flex justify-content-between w-100 border-0 bg-transparent text-start"
-                                    @click="sortTable('count')"
-                                >
-                                    COUNT
-                                    <span v-if="sortBy === 'count'">{{
-                                        sortOrder === 'asc' ? '↑' : '↓'
-                                    }}</span>
-                                </button>
-                            </th>
-
-                            <th>TURNOVER</th>
-                            <th>WINLOSE</th>
-                            <th>LP</th>
+                        <tr>
+                            <th></th>
+                            <TableHeader
+                                v-for="col in columns"
+                                :key="col.field"
+                                v-bind="col"
+                                :sortBy="sortBy"
+                                :sortOrder="sortOrder"
+                                @sort="sortTable"
+                            />
                         </tr>
                     </thead>
 
                     <tbody class="table-tbody">
-                        <tr v-for="item in paginatedData" :key="item.id">
-                            <td>
-                                <input
-                                    :checked="isSelected(item.id)"
-                                    @change="() => toggleSelect(item.id)"
-                                    class="form-check-input m-0 align-middle"
-                                    type="checkbox"
-                                    :aria-label="`Select ${item.account}`"
-                                />
-                            </td>
-                            <td class="text-dark fw-bold">{{ item.account }}</td>
-                            <td>{{ item.channel }}</td>
-                            <td>{{ item.trandate }}</td>
-                            <td>
-                                <span class="badge" :class="getMasterBadgeClass(item.master)">{{
-                                    item.master
-                                }}</span>
-                            </td>
-                            <td>{{ item.min }}</td>
-                            <td>{{ item.max.toLocaleString() }}</td>
-                            <td>{{ item.count }}</td>
-                            <td class="fw-bold">{{ item.turnover }}</td>
-                            <td class="fw-bold" :class="getLpClass(item.winlose)">
-                                {{ item.winlose }}
-                            </td>
-                            <td class="fw-bold" :class="getLpClass(item.lp)">{{ item.lp }}</td>
-                        </tr>
+                        <TableRow
+                            v-for="item in paginatedData"
+                            :key="item.id"
+                            :item="item"
+                            :selected="isSelected(item.id)"
+                            @toggle="toggleSelect"
+                        />
                     </tbody>
                 </table>
             </div>
 
-            <!-- Footer with Pagination -->
-            <div class="card-footer d-flex align-items-center">
-                <div class="dropdown">
-                    <a class="btn dropdown-toggle" data-bs-toggle="dropdown">
-                        <span class="me-1">{{ itemsPerPage }}</span>
-                        <span>records</span>
-                    </a>
-                    <div class="dropdown-menu">
-                        <a class="dropdown-item" @click.prevent="setItemsPerPage(10)">10 records</a>
-                        <a class="dropdown-item" @click.prevent="setItemsPerPage(20)">20 records</a>
-                        <a class="dropdown-item" @click.prevent="setItemsPerPage(50)">50 records</a>
-                        <a class="dropdown-item" @click.prevent="setItemsPerPage(100)"
-                            >100 records</a
-                        >
-                    </div>
-                </div>
-
-                <ul class="pagination m-0 ms-auto">
-                    <li
-                        v-for="page in totalPages"
-                        :key="page"
-                        class="page-item"
-                        :class="{ active: currentPage === page }"
-                    >
-                        <a class="page-link cursor-pointer" @click.prevent="goToPage(page)">{{
-                            page
-                        }}</a>
-                    </li>
-                </ul>
-            </div>
+            <!-- Footer with Pagination (main uses meta from server) -->
+            <Pagination
+                v-model:itemsPerPage="itemsPerPage"
+                v-model:currentPage="currentPage"
+                :total-pages="totalPages"
+            />
         </div>
     </div>
-    <div>
-        <!-- Generated range tables (API2 results) -->
-        <div v-if="selectedAccounts.length" class="py-3">
-            <h3 class="">Selected Account Period Range</h3>
 
-            <div class="d-flex flex-column gap-3">
-                <div v-for="(rangeKey, idx) in ['7d', '1m', '3m']" :key="rangeKey">
-                    <div class="card">
-                        <div class="card-header">
-                            <strong>{{
-                                rangeKey === '7d'
-                                    ? 'Last 7 days'
-                                    : rangeKey === '1m'
-                                      ? 'Last 1 month'
-                                      : 'Last 3 months'
-                            }}</strong>
-                        </div>
-                        <div class="card-body py-0">
-                            <div
-                                v-if="rangesTables[rangeKey] && rangesTables[rangeKey].length"
-                                class="table-responsive"
-                            >
-                                <table class="table table-sm mb-0">
-                                    <thead>
-                                        <tr>
-                                            <th>Account</th>
-                                            <th>Count</th>
-                                            <th>Turnover</th>
-                                            <th>Win/Lose</th>
-                                            <th>LP</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr
-                                            v-for="row in rangesTables[rangeKey]"
-                                            :key="row.account"
-                                        >
-                                            <td>{{ row.account }}</td>
-                                            <td>{{ row.count }}</td>
-                                            <td>{{ row.turnover }}</td>
-                                            <td :class="getLpClass(row.winlose)">
-                                                {{ row.winlose }}
-                                            </td>
-                                            <td :class="getLpClass(row.lp)">{{ row.lp }}</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                            <div v-else class="p-3 text-muted">
-                                No data (select accounts to generate tables)
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+    <!-- Range tables -->
+    <RangeTable
+        :selectedAccounts="selectedAccounts"
+        :rangesTables="rangesTables"
+        @setRangeItemsPerPage="setRangeItemsPerPage"
+        @goToRangePage="goToRangePage"
+    />
 </template>
 
 <style scoped></style>
