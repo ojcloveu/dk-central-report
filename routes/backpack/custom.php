@@ -21,8 +21,8 @@ Route::group([
     // Initial route
     Route::get('report', 'BetReportController@index')->name('page.report.index');
     // API route
-    // Route::get('api/bets', 'BetReportController@betReports')->name('api.bets.index');
-    // Route::get('api/bet-period', 'BetReportController@betReportPeriod')->name('api.bets.period');
+    Route::get('api/bets', 'BetReportController@betReports')->name('api.bets.index');
+    Route::get('api/bet-period', 'BetReportController@betReportPeriod')->name('api.bets.period');
 });
 
 // TEST with public route
