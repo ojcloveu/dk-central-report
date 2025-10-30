@@ -1,14 +1,9 @@
 <script setup>
-import DataTable from '../components/DataTable.vue';
-import TestDataTable from '../components/TestDataTable.vue';
-import { useBetStore } from '../stores/betStore';
-
-const betStore = useBetStore();
+import BetDataTable from '../components/BetDataTable.vue';
 </script>
 
 <template>
     <div>
-        <!-- <DataTable /> -->
-        <TestDataTable />
+        <BetDataTable />
     </div>
 </template>
