@@ -19,7 +19,7 @@
 @section('header')
     <section class="content-header">
         <div class="container-fluid mb-3">
-            <h1>{{ trans('backpack::base.my_account') }}</h1>
+            <h1>Account Settings</h1>
         </div>
     </section>
 @endsection
