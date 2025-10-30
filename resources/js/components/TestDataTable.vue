@@ -2,12 +2,12 @@
 import { onMounted } from 'vue';
 import { useBetStore } from '../stores/betStore';
 import { storeToRefs } from 'pinia';
+import EmptyState from './EmptyState.vue';
 
 const betStore = useBetStore();
 
 // Fetch initial data when the component is mounted
 onMounted(() => {
-    // Check if data is already loaded to prevent refetching on component reuse
     if (!betStore.hasBets) {
         betStore.fetchBets();
     }
@@ -50,7 +50,7 @@ const getMasterBadgeClass = (master) => {
 };
 
 // Expose store state to the template
-const { data, meta, links, loading, error } = storeToRefs(betStore);
+// const { data, meta, links, loading, error } = storeToRefs(betStore);
 </script>
 
 <template>
@@ -288,30 +288,13 @@ const { data, meta, links, loading, error } = storeToRefs(betStore);
             </div>
 
             <!-- Empty State -->
-            <div v-else class="card-body text-center py-5">
-                <div class="empty">
-                    <div class="empty-icon">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon">
-                            <path d="M14 3v4a1 1 0 0 0 1 1h4"></path>
-                            <path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z"></path>
-                            <path d="M9 17l1.5 -1.5"></path>
-                            <path d="M14 12l-3 3"></path>
-                        </svg>
-                    </div>
-                    <p class="empty-title">No bet reports found</p>
-                    <p class="empty-subtitle text-muted">
-                        Try adjusting your search or filter to find what you're looking for.
-                    </p>
-                    <div class="empty-action">
-                        <button class="btn btn-primary" @click="betStore.fetchBets()">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon me-1">
-                                <path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4"></path>
-                                <path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4"></path>
-                            </svg>
-                            Refresh
-                        </button>
-                    </div>
-                </div>
+            <div v-else>
+                <EmptyState
+                    title="No bet reports found"
+                    subtitle="Try adjusting your search or filter to find what you're looking for."
+                    :refresh-action="betStore.fetchBets"
+                    :show-refresh-button="true"
+                />
             </div>
         </div>
     </div>
