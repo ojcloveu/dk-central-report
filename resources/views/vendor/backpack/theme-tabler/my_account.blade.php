@@ -9,13 +9,6 @@
     </style>
 @endsection
 
-@php
-    $breadcrumbs = [
-        trans('backpack::crud.admin') => url(config('backpack.base.route_prefix'), 'dashboard'),
-        trans('backpack::base.my_account') => false,
-    ];
-@endphp
-
 @section('header')
     <section class="content-header">
         <div class="container-fluid mb-3">
