@@ -1,10 +1,33 @@
 <script setup>
-import { onMounted } from 'vue';
+import { onMounted, ref, reactive } from 'vue';
 import { useBetStore } from '../stores/betStore';
-import { storeToRefs } from 'pinia';
 import EmptyState from './EmptyState.vue';
 
 const betStore = useBetStore();
+
+// Reactive Local Filter State
+const localFilters = reactive({
+    trandate: betStore.filters.trandate,
+    master: betStore.filters.master,
+    account: betStore.filters.account,
+    channel: betStore.filters.channel,
+});
+
+// Filter Submission Logic
+const submitFilters = () => {
+    betStore.applyFilters(localFilters);
+};
+
+// Filter Reset Logic
+const resetFilters = () => {
+    // Reset local state
+    localFilters.trandate = '';
+    localFilters.master = '';
+    localFilters.account = '';
+    localFilters.channel = '';
+    
+    submitFilters();
+};
 
 // Fetch initial data when the component is mounted
 onMounted(() => {
@@ -62,6 +85,7 @@ const getMasterBadgeClass = (master) => {
                     <h2 class="page-title">TEST Bet Report</h2>
                     <div class="text-muted mt-1">View and manage all betting transactions</div>
                 </div>
+
                 <div class="col-auto ms-auto">
                     <div class="btn-list">
                         <button class="btn btn-icon" aria-label="Refresh" @click="betStore.fetchBets()">
@@ -105,6 +129,47 @@ const getMasterBadgeClass = (master) => {
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+
+        <!-- Filter -->
+        <div class="card mb-3">
+            <div class="card-header">
+                <h3 class="card-title">Filter Transactions</h3>
+            </div>
+
+            <div class="card-body">
+                <form @submit.prevent="submitFilters" class="row g-3 align-items-end">
+                    
+                    <div class="col-md-3 col-sm-6">
+                        <label class="form-label">Date</label>
+                        <input type="date" class="form-control" v-model="localFilters.trandate" />
+                    </div>
+
+                    <div class="col-md-3 col-sm-6">
+                        <label class="form-label">Master (Partial Match)</label>
+                        <input type="text" class="form-control" placeholder="e.g., VIRTUAL" v-model="localFilters.master" />
+                    </div>
+
+                    <div class="col-md-3 col-sm-6">
+                        <label class="form-label">Account (Partial Match)</label>
+                        <input type="text" class="form-control" placeholder="e.g., THB7686" v-model="localFilters.account" />
+                    </div>
+
+                    <div class="col-md-2 col-sm-6">
+                        <label class="form-label">Channel (Exact Match)</label>
+                        <input type="text" class="form-control" placeholder="e.g., TH" v-model="localFilters.channel" />
+                    </div>
+
+                    <div class="d-flex justify-content-end">
+                      <button type="submit" class="btn btn-primary w-100 me-2">
+                          <i class="las la-search fs-2"></i>
+                      </button>
+                      <button type="button" class="btn btn-secondary w-100" @click="resetFilters">
+                          <i class="las la-eraser fs-2"></i>
+                      </button>
+                  </div>
+                </form>
             </div>
         </div>
 
