@@ -18,8 +18,8 @@ return Application::configure(basePath: dirname(__DIR__))
             CheckAdminIp::class,
         ]);
         $middleware->web(append: [
-        HandleInertiaRequests::class,
-    ]);
+            HandleInertiaRequests::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
