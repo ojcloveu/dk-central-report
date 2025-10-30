@@ -1,15 +1,14 @@
 <script setup>
 import DataTable from '../components/DataTable.vue';
+import TestDataTable from '../components/TestDataTable.vue';
+import { useBetStore } from '../stores/betStore';
 
-// Props automatically passed from Laravel
-defineProps({
-    message: String,
-    user: Object,
-});
+const betStore = useBetStore();
 </script>
 
 <template>
     <div>
-        <DataTable />
+        <!-- <DataTable /> -->
+        <TestDataTable />
     </div>
 </template>
