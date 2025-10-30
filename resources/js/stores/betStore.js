@@ -3,25 +3,29 @@ import { defineStore } from 'pinia';
 import axios from 'axios';
 
 export const useBetStore = defineStore('bet', {
-    state: () => ({
-        data: [],
-        meta: {},
-        links: [],
+    state: () => {
+        const today = new Date().toISOString().split('T')[0];
 
-        loading: false,
-        error: null,
+        return {
+            data: [],
+            meta: {},
+            links: [],
 
-        filters: {
-            page: 1,
-            per_page: 10,
-            sort_by: 'trandate',
-            sort_dir: 'desc',
-            account: '',
-            trandate: '',
-            master: '',
-            channel: '',
-        },
-    }),
+            loading: false,
+            error: null,
+
+            filters: {
+                page: 1,
+                per_page: 10,
+                sort_by: 'trandate',
+                sort_dir: 'desc',
+                account: '',
+                trandate: today,
+                master: '',
+                channel: '',
+            },
+        };
+    },
 
     getters: {
         // Getter to check if we have data
@@ -29,11 +33,10 @@ export const useBetStore = defineStore('bet', {
 
         // Getter to prepare URL for current state
         currentApiUrl: state => {
-            
             // Create a clean object with only non-empty filters
             const cleanFilters = Object.keys(state.filters).reduce((acc, key) => {
                 const value = state.filters[key];
-                
+
                 // Keep the value if it's not an empty string and not null
                 if (value !== '' && value !== null) {
                     acc[key] = value;

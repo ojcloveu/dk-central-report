@@ -13,8 +13,6 @@ const betStore = useBetStore();
 const localFilters = reactive({ ...betStore.filters });
 
 const submitFilters = filters => betStore.applyFilters(filters);
-const resetFilters = () =>
-    betStore.applyFilters({ trandate: '', master: '', account: '', channel: '' });
 
 onMounted(() => {
     if (!betStore.hasBets) betStore.fetchBets();
@@ -65,7 +63,6 @@ const sortableColumns = [
         <BetFilterForm
             :initialFilters="localFilters"
             :onSubmit="submitFilters"
-            :onReset="resetFilters"
         />
 
         <div class="card">

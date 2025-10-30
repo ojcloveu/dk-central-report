@@ -4,10 +4,10 @@ import { reactive, watch } from 'vue';
 const props = defineProps({
     initialFilters: Object,
     onSubmit: Function,
-    onReset: Function,
 });
 
 const localFilters = reactive({ ...props.initialFilters });
+const today = new Date().toISOString().split('T')[0];
 
 let debounceTimer = null;
 
@@ -15,7 +15,7 @@ const triggerFilter = () => {
     clearTimeout(debounceTimer);
     debounceTimer = setTimeout(() => {
         props.onSubmit(localFilters);
-    }, 500);
+    }, 700);
 };
 
 watch(localFilters, () => {
@@ -23,11 +23,10 @@ watch(localFilters, () => {
 });
 
 const handleReset = () => {
-    localFilters.trandate = '';
+    localFilters.trandate = today;
     localFilters.master = '';
     localFilters.account = '';
     localFilters.channel = '';
-    props.onReset(localFilters);
 };
 </script>
 
