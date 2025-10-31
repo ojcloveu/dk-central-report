@@ -1,6 +1,6 @@
 <script setup>
 import { useBetStore } from '../stores/betStore';
-import { getLpClass } from '../utils/getStatusClass';
+import { amountColor, lpBgColor } from '../utils/getStatusClass';
 
 const betStore = useBetStore();
 
@@ -87,11 +87,15 @@ const handleChangePerPage = (rangeKey, count) => {
                                 >
                                     <td>{{ row?.account }}</td>
                                     <td>{{ row?.total_count }}</td>
-                                    <td>{{ row?.total_turnover }}</td>
-                                    <td :class="getLpClass(row?.total_winlose)">
+                                    <td :class="amountColor(row?.total_turnover)">
+                                        {{ row?.total_turnover }}
+                                    </td>
+                                    <td :class="amountColor(row?.total_winlose)">
                                         {{ row?.total_winlose }}
                                     </td>
-                                    <td :class="getLpClass(row?.total_lp)">{{ row?.total_lp }}</td>
+                                    <td :class="lpBgColor(row?.total_lp)">
+                                        {{ row?.total_lp.percentage }}
+                                    </td>
                                 </tr>
                             </tbody>
                         </table>
@@ -127,7 +131,7 @@ const handleChangePerPage = (rangeKey, count) => {
 
                     <ul class="pagination m-0 ms-auto">
                         <li
-                            v-for="link in getRangeData(period?.key).links"
+                            v-for="link in getRangeData(period?.key).meta?.links"
                             :key="link?.label"
                             class="page-item"
                             :class="{ active: link?.active, disabled: !link.url }"

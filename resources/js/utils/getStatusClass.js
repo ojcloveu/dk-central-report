@@ -15,9 +15,12 @@ export const getMasterBadgeClass = master => {
     }
 };
 
-export const getLpClass = lp => {
-    const value = parseFloat(String(lp).replace('%', '').replace('$', '').replace(',', '')) || 0;
-    if (value < 0) return 'text-danger';
-    if (value > 0) return 'text-success';
-    return '';
+export const lpBgColor = lp => {
+    const color = lp && lp?.color ? lp.color.toLowerCase() : 'secondary';
+    return `bg-${color}-lt`;
+};
+
+export const amountColor = amount => {
+    if (String(amount).startsWith('-')) return 'text-danger';
+    else return 'text-success';
 };

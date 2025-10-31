@@ -51,7 +51,7 @@ class Bet extends Model
     {
         return Attribute::make(
             get: function () {
-                $lp = $this->lp;
+                $lp = $this->lp ?? $this->total_lp;
                 $lpJson = config('settings.lp_color') ?? [];
                 $lps = json_decode($lpJson, true);
 
