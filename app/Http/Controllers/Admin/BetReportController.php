@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Resources\BetReportResource;
 use App\Models\Bet;
 use Illuminate\Routing\Controller;
 use Inertia\Inertia;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Class ReportController
@@ -50,7 +52,11 @@ class BetReportController extends Controller
 
         $query->orderBy($sortBy, $sortDir);
 
-        return $query->paginate($perPage);
+        $bets = $query->paginate($perPage);
+
+        return BetReportResource::collection($bets)
+            ->response()
+            ->setStatusCode(Response::HTTP_OK);
     }
 
     /**
@@ -63,7 +69,7 @@ class BetReportController extends Controller
 
         $startDate = null;
         $period = $request->get('period');
-        
+
         switch ($period) {
             case '7d':
                 $startDate = Carbon::now()->subDays(7);
@@ -77,9 +83,9 @@ class BetReportController extends Controller
             default:
                 // If no valid period is provided, return an empty
                 return response()->json([
-                    'data' => [], 
-                    'current_page' => 1, 
-                    'per_page' => $perPage, 
+                    'data' => [],
+                    'current_page' => 1,
+                    'per_page' => $perPage,
                     'total' => 0
                 ], 200);
         }
@@ -94,7 +100,7 @@ class BetReportController extends Controller
         if ($request->filled('accounts')) {
             $accountsString = $request->get('accounts');
             $accountsArray = array_map('trim', explode(',', $accountsString));
-            
+
             if (!empty($accountsArray)) {
                 $query->whereIn('account', $accountsArray);
             }
@@ -108,7 +114,7 @@ class BetReportController extends Controller
             ->selectRaw('SUM(lp) as total_lp')
             ->groupBy('account')
             ->orderBy('total_turnover', 'DESC');
-        
+
         return $query->paginate($perPage);
     }
 }

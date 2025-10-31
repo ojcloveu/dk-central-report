@@ -16,7 +16,6 @@ export const useBetStore = defineStore('bet', {
         return {
             data: [],
             meta: {},
-            links: [],
 
             loading: false,
             error: null,
@@ -81,12 +80,12 @@ export const useBetStore = defineStore('bet', {
                 // Update state with API response
                 this.data = paginationData.data;
                 this.meta = {
-                    current_page: paginationData.current_page,
-                    last_page: paginationData.last_page,
-                    per_page: paginationData.per_page,
-                    total: paginationData.total,
+                    current_page: paginationData.meta.current_page,
+                    last_page: paginationData.meta.last_page,
+                    per_page: paginationData.meta.per_page,
+                    total: paginationData.meta.total,
+                    links: paginationData.meta.links,
                 };
-                this.links = paginationData.links;
             } catch (error) {
                 console.error('Failed to fetch bet reports:', error);
                 this.error = 'Failed to load data. Please check network and permissions.';
@@ -194,6 +193,12 @@ export const useBetStore = defineStore('bet', {
          */
         setRangeItemsPerPage(period, count, page = 1) {
             this.fetchRangeData(period, page, count);
+        },
+
+        setPerPage(perPage) {
+            this.filters.per_page = perPage;
+            this.filters.page = 1; // reset to first page
+            this.fetchBets();
         },
     },
 });

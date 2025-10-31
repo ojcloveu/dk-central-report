@@ -2,6 +2,8 @@
 import { useBetStore } from '../stores/betStore';
 import { computed } from 'vue';
 
+import { computed } from 'vue';
+
 const props = defineProps({
     bet: Object,
     getMasterBadgeClass: Function,
@@ -18,6 +20,13 @@ const isSelected = computed(() =>
 const handleCheckboxChange = (event) => {
     betStore.toggleAccountSelection(props.bet.account, event.target.checked);
 };
+
+const lpBgColor = computed(() => `bg-${props.bet.lp.color.toLowerCase()}-lt`);
+
+const amountColor = computed(() => amount => {
+    if (String(amount).startsWith('-')) return 'text-danger';
+    else return 'text-success';
+});
 </script>
 
 <template>
@@ -51,30 +60,12 @@ const handleCheckboxChange = (event) => {
         <td class="text-end">{{ bet.min }}</td>
         <td class="text-end">{{ bet.max.toLocaleString() }}</td>
         <td class="text-end">{{ bet.count }}</td>
-        <td class="text-end fw-bold">
-            ${{ parseFloat(bet.turnover).toLocaleString('en-US', { minimumFractionDigits: 2 }) }}
+        <td class="text-end fw-bold">{{ bet.turnover }}</td>
+        <td class="text-end fw-bold" :class="amountColor(bet.winlose)">
+            {{ bet.winlose }}
         </td>
-        <td
-            class="text-end fw-bold"
-            :class="{
-                'text-success': parseFloat(bet.winlose) > 0,
-                'text-danger': parseFloat(bet.winlose) < 0,
-                'text-muted': parseFloat(bet.winlose) === 0,
-            }"
-        >
-            {{ parseFloat(bet.winlose) > 0 ? '+' : '' }}${{
-                parseFloat(bet.winlose).toLocaleString('en-US', { minimumFractionDigits: 2 })
-            }}
-        </td>
-        <td
-            class="text-end fw-bold"
-            :class="{
-                'text-success': parseFloat(bet.lp) > 0,
-                'text-danger': parseFloat(bet.lp) < 0,
-                'text-muted': parseFloat(bet.lp) === 0,
-            }"
-        >
-            {{ parseFloat(bet.lp) > 0 ? '+' : '' }}{{ parseFloat(bet.lp).toFixed(2) }}%
+        <td class="text-end fw-bold" :class="lpBgColor">
+            {{ parseFloat(bet.lp.percentage).toFixed(2) }}%
         </td>
     </tr>
 </template>

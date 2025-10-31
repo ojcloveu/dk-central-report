@@ -1,13 +1,30 @@
 <script setup>
 const props = defineProps({
     meta: Object,
-    links: Array,
     onPageClick: Function,
+    onPerPageChange: Function,
 });
+
+const handlePerPageChange = event => {
+    const newPerPage = parseInt(event.target.value);
+    props.onPerPageChange?.(newPerPage);
+};
 </script>
 
 <template>
     <div class="card-footer d-flex align-items-center">
+        <div class="me-2">
+            <select
+                class="form-select form-select-sm"
+                :value="meta.per_page"
+                @change="handlePerPageChange"
+            >
+                <option value="10">10</option>
+                <option value="20">20</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+            </select>
+        </div>
         <p class="m-0 text-muted">
             Showing
             <span class="fw-bold">{{ meta.current_page * meta.per_page - meta.per_page + 1 }}</span>
@@ -21,7 +38,7 @@ const props = defineProps({
         </p>
         <ul class="pagination m-0 ms-auto">
             <li
-                v-for="link in links"
+                v-for="link in meta.links"
                 :key="link.label"
                 class="page-item"
                 :class="{ active: link.active, disabled: !link.url }"
