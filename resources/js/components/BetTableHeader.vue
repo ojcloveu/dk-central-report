@@ -16,10 +16,7 @@ const props = defineProps({
                 @click="onSort(col.key)"
                 class="cursor-pointer"
             >
-                <div
-                    class="d-flex align-items-center"
-                    :class="col.key === 'min' || col.key === 'max' ? 'justify-content-end' : ''"
-                >
+                <div class="d-flex align-items-center">
                     {{ col.label }}
                     <i
                         v-if="filters.sort_by === col.key"
