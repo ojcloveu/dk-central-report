@@ -23,7 +23,7 @@ watch(localFilters, () => {
 });
 
 const handleReset = () => {
-    localFilters.trandate = today;
+    localFilters.trandate = '';
     localFilters.master = '';
     localFilters.account = '';
     localFilters.channel = '';
