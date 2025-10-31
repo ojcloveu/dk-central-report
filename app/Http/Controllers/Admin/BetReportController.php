@@ -117,28 +117,4 @@ class BetReportController extends Controller
 
         return $query->paginate($perPage);
     }
-
-    public function getLpColor($lp): string
-    {
-        $lpJson = config('settings.lp_color') ?? [];
-        $lps = json_decode($lpJson, true);
-
-        $defaultColor = 'white';
-
-        if (empty($lps) || !is_array($lps)) {
-            return $defaultColor;
-        }
-
-        foreach ($lps as $range) {
-            $from = (float) ($range['from'] ?? 0);
-            $to = (float) ($range['to'] ?? 0);
-            $color = $range['color'] ?? $defaultColor;
-
-            if ($lp >= $from && $lp <= $to) {
-                return $color;
-            }
-        }
-
-        return $defaultColor;
-    }
 }
