@@ -1,6 +1,7 @@
 <script setup>
-import { useBetStore } from '../stores/betStore';
+import { useBetStore } from '../../stores/betStore';
 import { computed } from 'vue';
+import { amountColor, lpBgColor } from '../../utils/getStatusClass';
 
 const props = defineProps({
     bet: Object,
@@ -10,35 +11,33 @@ const props = defineProps({
 const betStore = useBetStore();
 
 // Check if the current account is selected
-const isSelected = computed(() => 
-    betStore.selectedAccounts.includes(props.bet.account)
-);
+const isSelected = computed(() => betStore.selectedAccounts.includes(props.bet.account));
 
 // Handler to call the store action
-const handleCheckboxChange = (event) => {
+const handleCheckboxChange = event => {
     betStore.toggleAccountSelection(props.bet.account, event.target.checked);
 };
 </script>
 
 <template>
-    <tr :class="{'table-primary-light': isSelected}">
+    <tr :class="{ 'table-primary-light': isSelected }">
         <td>
-            <input 
-                class="form-check-input m-0" 
+            <input
+                class="form-check-input m-0"
                 type="checkbox"
                 :checked="isSelected"
-                @change="handleCheckboxChange" 
+                @change="handleCheckboxChange"
             />
         </td>
         <td>
-            <div class="fw-bold">{{ bet.account }}</div>
+            <div class="fw-bold">{{ bet?.account }}</div>
         </td>
         <td>
-            <span class="badge bg-azure-lt">{{ bet.channel }}</span>
+            <span class="badge bg-azure-lt">{{ bet?.channel }}</span>
         </td>
-        <td>
+        <td class="text-nowrap">
             {{
-                new Date(bet.trandate).toLocaleDateString('en-US', {
+                new Date(bet?.trandate).toLocaleDateString('en-US', {
                     month: 'short',
                     day: 'numeric',
                     year: 'numeric',
@@ -46,35 +45,17 @@ const handleCheckboxChange = (event) => {
             }}
         </td>
         <td>
-            <span class="badge" :class="getMasterBadgeClass(bet.master)">{{ bet.master }}</span>
+            <span class="badge" :class="getMasterBadgeClass(bet?.master)">{{ bet?.master }}</span>
         </td>
-        <td class="text-end">{{ bet.min }}</td>
-        <td class="text-end">{{ bet.max.toLocaleString() }}</td>
-        <td class="text-end">{{ bet.count }}</td>
-        <td class="text-end fw-bold">
-            ${{ parseFloat(bet.turnover).toLocaleString('en-US', { minimumFractionDigits: 2 }) }}
+        <td class="text-start">{{ bet?.min }}</td>
+        <td class="text-start">{{ bet?.max.toLocaleString() }}</td>
+        <td class="text-start">{{ bet?.count }}</td>
+        <td class="text-start fw-bold">{{ bet?.turnover }}</td>
+        <td class="text-start fw-bold" :class="amountColor(bet?.winlose)">
+            {{ bet?.winlose }}
         </td>
-        <td
-            class="text-end fw-bold"
-            :class="{
-                'text-success': parseFloat(bet.winlose) > 0,
-                'text-danger': parseFloat(bet.winlose) < 0,
-                'text-muted': parseFloat(bet.winlose) === 0,
-            }"
-        >
-            {{ parseFloat(bet.winlose) > 0 ? '+' : '' }}${{
-                parseFloat(bet.winlose).toLocaleString('en-US', { minimumFractionDigits: 2 })
-            }}
-        </td>
-        <td
-            class="text-end fw-bold"
-            :class="{
-                'text-success': parseFloat(bet.lp) > 0,
-                'text-danger': parseFloat(bet.lp) < 0,
-                'text-muted': parseFloat(bet.lp) === 0,
-            }"
-        >
-            {{ parseFloat(bet.lp) > 0 ? '+' : '' }}{{ parseFloat(bet.lp).toFixed(2) }}%
+        <td class="text-start fw-bold" :class="lpBgColor(bet?.lp)">
+            {{ parseFloat(bet?.lp?.percentage).toFixed(2) }}%
         </td>
     </tr>
 </template>
