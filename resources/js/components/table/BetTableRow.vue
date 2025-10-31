@@ -1,7 +1,7 @@
 <script setup>
-import { useBetStore } from '../stores/betStore';
+import { useBetStore } from '../../stores/betStore';
 import { computed } from 'vue';
-import { amountColor, lpBgColor } from '../utils/getStatusClass';
+import { amountColor, lpBgColor } from '../../utils/getStatusClass';
 
 const props = defineProps({
     bet: Object,
