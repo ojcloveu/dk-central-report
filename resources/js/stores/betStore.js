@@ -101,5 +101,11 @@ export const useBetStore = defineStore('bet', {
             this.filters = { ...this.filters, ...newFilters };
             this.fetchBets();
         },
+
+        setPerPage(perPage) {
+            this.filters.per_page = perPage;
+            this.filters.page = 1; // reset to first page
+            this.fetchBets();
+        },
     },
 });

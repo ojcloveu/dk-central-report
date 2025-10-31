@@ -25,6 +25,10 @@ const handlePaginationClick = page => {
         betStore.setPage(page);
 };
 
+const handlePerPageChange = perPage => {
+    betStore.setPerPage(perPage);
+};
+
 const handleSort = column => {
     let sortDir = 'asc';
     if (betStore.filters.sort_by === column)
@@ -60,10 +64,7 @@ const sortableColumns = [
 <template>
     <div>
         <BetPageHeader :onRefresh="betStore.fetchBets" />
-        <BetFilterForm
-            :initialFilters="localFilters"
-            :onSubmit="submitFilters"
-        />
+        <BetFilterForm :initialFilters="localFilters" :onSubmit="submitFilters" />
 
         <div class="card">
             <div v-if="betStore.loading" class="card-body text-center py-5">
@@ -97,6 +98,7 @@ const sortableColumns = [
                 <Pagination
                     :meta="betStore.meta"
                     :onPageClick="handlePaginationClick"
+                    :onPerPageChange="handlePerPageChange"
                 />
             </div>
 
