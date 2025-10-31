@@ -54,6 +54,7 @@ const handleChangePerPage = (rangeKey, count) => {
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <strong>{{ period?.label }}</strong>
 
+                    <!-- Show record options -->
                     <div v-if="getRangeData(period?.key)?.meta">
                         <select
                             class="form-select form-select-sm"
@@ -68,6 +69,7 @@ const handleChangePerPage = (rangeKey, count) => {
                     </div>
                 </div>
 
+                <!-- Table body -->
                 <div class="card-body py-0">
                     <div v-if="getRangeData(period.key)?.data?.length" class="table-responsive">
                         <table class="table table-sm mb-0">
