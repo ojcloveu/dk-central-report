@@ -65,13 +65,13 @@ class BetReportController extends Controller
         $period = $request->get('period');
         
         switch ($period) {
-            case '7days':
+            case '7d':
                 $startDate = Carbon::now()->subDays(7);
                 break;
-            case '1month':
+            case '1m':
                 $startDate = Carbon::now()->subMonth();
                 break;
-            case '3months':
+            case '3m':
                 $startDate = Carbon::now()->subMonths(3);
                 break;
             default:
