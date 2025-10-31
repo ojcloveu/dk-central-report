@@ -1,6 +1,6 @@
 // resources/js/stores/betStore.js
 import { defineStore } from 'pinia';
-import axios from 'axios';
+import betServices from '../services/betServices';
 
 // Initial state range data
 const initialRangeState = {
@@ -71,12 +71,10 @@ export const useBetStore = defineStore('bet', {
             this.error = null;
 
             // Build query string from current filters state
-            const url = this.currentApiUrl;
+            const queryString = this.currentApiUrl.split('?')[1];
 
             try {
-                const response = await axios.get(url);
-                const paginationData = response.data;
-
+                const paginationData = await betServices.fetchBets(queryString);
                 // Update state with API response
                 this.data = paginationData.data;
                 this.meta = {
@@ -150,28 +148,25 @@ export const useBetStore = defineStore('bet', {
 
             for (const p of periods) {
                 const currentPerPage = per_page || this.rangesTables[p].meta?.per_page;
+                const params = {
+                    accounts: this.selectedAccounts.join(','),
+                    period: p,
+                    page: page,
+                    per_page: currentPerPage,
+                };
 
                 try {
-                    const response = await axios.get('/admin/api/bet-period', { 
-                        params: {
-                            accounts: this.selectedAccounts.join(','),
-                            period: p,
-                            page: page,
-                            per_page: currentPerPage,
-                        },
-                    });
+                    const paginationData = await betServices.fetchRangePeriodData(params);
 
-                    // Update the state for the specific period
-                    const paginationData = response.data;
                     this.rangesTables[p] = {
                         data: paginationData.data,
                         meta: {
-                            current_page: paginationData.current_page,
-                            last_page: paginationData.last_page,
-                            per_page: paginationData.per_page,
-                            total: paginationData.total,
+                            current_page: paginationData.meta.current_page,
+                            last_page: paginationData.meta.last_page,
+                            per_page: paginationData.meta.per_page,
+                            total: paginationData.meta.total,
+                            links: paginationData.meta.links || [],
                         },
-                        links: paginationData.links || [],
                     };
                 } catch (error) {
                     console.error(`Error fetching range data for ${p}:`, error);
@@ -193,6 +188,12 @@ export const useBetStore = defineStore('bet', {
          */
         setRangeItemsPerPage(period, count, page = 1) {
             this.fetchRangeData(period, page, count);
+        },
+
+        setPerPage(perPage) {
+            this.filters.per_page = perPage;
+            this.filters.page = 1; // reset to first page
+            this.fetchBets();
         },
     },
 });

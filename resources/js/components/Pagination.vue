@@ -2,11 +2,29 @@
 const props = defineProps({
     meta: Object,
     onPageClick: Function,
+    onPerPageChange: Function,
 });
+
+const handlePerPageChange = event => {
+    const newPerPage = parseInt(event.target.value);
+    props.onPerPageChange?.(newPerPage);
+};
 </script>
 
 <template>
     <div class="card-footer d-flex align-items-center">
+        <div class="me-2">
+            <select
+                class="form-select form-select-sm"
+                :value="meta.per_page"
+                @change="handlePerPageChange"
+            >
+                <option value="10">10</option>
+                <option value="20">20</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+            </select>
+        </div>
         <p class="m-0 text-muted">
             Showing
             <span class="fw-bold">{{ meta.current_page * meta.per_page - meta.per_page + 1 }}</span>
