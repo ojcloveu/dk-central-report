@@ -1,7 +1,6 @@
 <script setup>
 const props = defineProps({
     meta: Object,
-    links: Array,
     onPageClick: Function,
 });
 </script>
@@ -21,7 +20,7 @@ const props = defineProps({
         </p>
         <ul class="pagination m-0 ms-auto">
             <li
-                v-for="link in links"
+                v-for="link in meta.links"
                 :key="link.label"
                 class="page-item"
                 :class="{ active: link.active, disabled: !link.url }"

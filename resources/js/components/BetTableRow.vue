@@ -1,8 +1,12 @@
 <script setup>
+import { computed } from 'vue';
+
 const props = defineProps({
     bet: Object,
     getMasterBadgeClass: Function,
 });
+
+const lpBgColor = computed(() => `bg-${props.bet.lp.color}-lt`);
 </script>
 
 <template>
@@ -46,13 +50,9 @@ const props = defineProps({
         </td>
         <td
             class="text-end fw-bold"
-            :class="{
-                'text-success': parseFloat(bet.lp) > 0,
-                'text-danger': parseFloat(bet.lp) < 0,
-                'text-muted': parseFloat(bet.lp) === 0,
-            }"
+            :class="lpBgColor"
         >
-            {{ parseFloat(bet.lp) > 0 ? '+' : '' }}{{ parseFloat(bet.lp).toFixed(2) }}%
+            {{ parseFloat(bet.lp.percentage).toFixed(2) }}%
         </td>
     </tr>
 </template>

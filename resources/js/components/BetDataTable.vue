@@ -96,7 +96,6 @@ const sortableColumns = [
 
                 <Pagination
                     :meta="betStore.meta"
-                    :links="betStore.links"
                     :onPageClick="handlePaginationClick"
                 />
             </div>
