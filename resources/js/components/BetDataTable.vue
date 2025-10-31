@@ -4,9 +4,9 @@ import { onMounted, reactive } from 'vue';
 import { useBetStore } from '../stores/betStore';
 import BetPageHeader from './BetPageHeader.vue';
 import BetFilterForm from './BetFilterForm.vue';
-import BetTableHeader from './BetTableHeader.vue';
-import BetTableRow from './BetTableRow.vue';
-import Pagination from './Pagination.vue';
+import BetTableHeader from './table/BetTableHeader.vue';
+import BetTableRow from './table/BetTableRow.vue';
+import Pagination from './table/Pagination.vue';
 import EmptyState from './EmptyState.vue';
 import RangeTable from './RangeTable.vue';
 
