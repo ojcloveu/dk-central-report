@@ -1,3 +1,4 @@
+<!-- BetDataTable.vue -->
 <script setup>
 import { onMounted, reactive } from 'vue';
 import { useBetStore } from '../stores/betStore';
@@ -7,6 +8,7 @@ import BetTableHeader from './BetTableHeader.vue';
 import BetTableRow from './BetTableRow.vue';
 import Pagination from './Pagination.vue';
 import EmptyState from './EmptyState.vue';
+import RangeTable from './RangeTable.vue';
 
 const betStore = useBetStore();
 
@@ -110,5 +112,7 @@ const sortableColumns = [
                 :show-refresh-button="true"
             />
         </div>
+
+        <RangeTable v-if="betStore.hasSelectedAccounts" class="mt-4" />
     </div>
 </template>

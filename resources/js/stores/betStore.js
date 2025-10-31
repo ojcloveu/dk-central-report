@@ -2,6 +2,13 @@
 import { defineStore } from 'pinia';
 import axios from 'axios';
 
+// Initial state range data
+const initialRangeState = {
+    '7d': { data: [], meta: { current_page: 1, last_page: 1, per_page: 10 } },
+    '1m': { data: [], meta: { current_page: 1, last_page: 1, per_page: 10 } },
+    '3m': { data: [], meta: { current_page: 1, last_page: 1, per_page: 10 } },
+};
+
 export const useBetStore = defineStore('bet', {
     state: () => {
         const today = new Date().toISOString().split('T')[0];
@@ -12,6 +19,11 @@ export const useBetStore = defineStore('bet', {
 
             loading: false,
             error: null,
+
+            // State account select and range data
+            selectedAccounts: [],
+            rangesTables: initialRangeState,
+            rangeLoading: false,
 
             filters: {
                 page: 1,
@@ -32,11 +44,10 @@ export const useBetStore = defineStore('bet', {
 
         // Getter to prepare URL for current state
         currentApiUrl: state => {
-            // Create a clean object with only non-empty filters
             const cleanFilters = Object.keys(state.filters).reduce((acc, key) => {
                 const value = state.filters[key];
 
-                // Keep the value if it's not an empty string and not null
+                // Keep the value if not an empty string and not null
                 if (value !== '' && value !== null) {
                     acc[key] = value;
                 }
@@ -47,10 +58,14 @@ export const useBetStore = defineStore('bet', {
             const params = new URLSearchParams(cleanFilters);
             return `/admin/api/bets?${params.toString()}`;
         },
+
+        hasSelectedAccounts: (state) => state.selectedAccounts.length > 0,
     },
 
     actions: {
-        // Main action to fetch data from the API
+        /**
+         * Action to fetch bet reports
+         */
         async fetchBets() {
             this.loading = true;
             this.error = null;
@@ -79,27 +94,105 @@ export const useBetStore = defineStore('bet', {
             }
         },
 
-        // Action to handle page changes
+        /**
+         * Action to handle page changes
+         */
         setPage(page) {
             this.filters.page = page;
             this.fetchBets();
         },
 
-        // Action to handle sorting
+        /**
+         * Action to handle sorting
+         */
         setSort(sortBy, sortDir) {
             this.filters.sort_by = sortBy;
             this.filters.sort_dir = sortDir;
             this.fetchBets();
         },
 
-        // Action to apply filters
+        /**
+         * Action to apply filters
+         */
         applyFilters(newFilters) {
-            // Reset to page 1 when new filters are applied
             this.filters.page = 1;
-
-            // Merge new filters with existing ones
             this.filters = { ...this.filters, ...newFilters };
             this.fetchBets();
+        },
+
+        /**
+         * Adds or removes an account from the selected list
+         */
+        toggleAccountSelection(account, isChecked) {
+            if (isChecked) {
+                if (!this.selectedAccounts.includes(account)) {
+                    this.selectedAccounts.push(account);
+                }
+            } else {
+                this.selectedAccounts = this.selectedAccounts.filter(a => a !== account);
+            }
+            // Trigger the range data fetch immediately after selection changes
+            this.fetchRangeData();
+        },
+
+        /**
+         * Action fetches data for Range Table based on selected accounts and periods
+         */
+        async fetchRangeData(period = null, page = 1, per_page = null) {
+            if (this.selectedAccounts.length === 0) {
+                this.rangesTables = initialRangeState;
+                return;
+            }
+
+            this.rangeLoading = true;
+
+            const periods = period ? [period] : ['7d', '1m', '3m'];
+
+            for (const p of periods) {
+                const currentPerPage = per_page || this.rangesTables[p].meta?.per_page;
+
+                try {
+                    const response = await axios.get('/admin/api/bet-period', { 
+                        params: {
+                            accounts: this.selectedAccounts.join(','),
+                            period: p,
+                            page: page,
+                            per_page: currentPerPage,
+                        },
+                    });
+
+                    // Update the state for the specific period
+                    const paginationData = response.data;
+                    this.rangesTables[p] = {
+                        data: paginationData.data,
+                        meta: {
+                            current_page: paginationData.current_page,
+                            last_page: paginationData.last_page,
+                            per_page: paginationData.per_page,
+                            total: paginationData.total,
+                        },
+                        links: paginationData.links || [],
+                    };
+                } catch (error) {
+                    console.error(`Error fetching range data for ${p}:`, error);
+                }
+            }
+
+            this.rangeLoading = false;
+        },
+
+        /**
+         * Action to handle pagination
+         */
+        setRangePage(period, page) {
+            this.fetchRangeData(period, page, this.rangesTables[period].meta.per_page);
+        },
+
+        /**
+         * Action to handle per-page change
+         */
+        setRangeItemsPerPage(period, count, page = 1) {
+            this.fetchRangeData(period, page, count);
         },
 
         setPerPage(perPage) {
