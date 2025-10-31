@@ -1,6 +1,6 @@
 // resources/js/stores/betStore.js
 import { defineStore } from 'pinia';
-import axios from 'axios';
+import betServices from '../services/betServices';
 
 // Initial state range data
 const initialRangeState = {
@@ -71,12 +71,10 @@ export const useBetStore = defineStore('bet', {
             this.error = null;
 
             // Build query string from current filters state
-            const url = this.currentApiUrl;
+            const queryString = this.currentApiUrl.split('?')[1];
 
             try {
-                const response = await axios.get(url);
-                const paginationData = response.data;
-
+                const paginationData = await betServices.fetchBets(queryString);
                 // Update state with API response
                 this.data = paginationData.data;
                 this.meta = {
@@ -150,19 +148,16 @@ export const useBetStore = defineStore('bet', {
 
             for (const p of periods) {
                 const currentPerPage = per_page || this.rangesTables[p].meta?.per_page;
+                const params = {
+                    accounts: this.selectedAccounts.join(','),
+                    period: p,
+                    page: page,
+                    per_page: currentPerPage,
+                };
 
                 try {
-                    const response = await axios.get('/admin/api/bet-period', { 
-                        params: {
-                            accounts: this.selectedAccounts.join(','),
-                            period: p,
-                            page: page,
-                            per_page: currentPerPage,
-                        },
-                    });
+                    const paginationData = await betServices.fetchRangePeriodData(params);
 
-                    // Update the state for the specific period
-                    const paginationData = response.data;
                     this.rangesTables[p] = {
                         data: paginationData.data,
                         meta: {
