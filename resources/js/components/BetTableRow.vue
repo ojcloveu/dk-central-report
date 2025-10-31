@@ -23,7 +23,7 @@ const amountColor = computed(() => amount => {
         <td>
             <span class="badge bg-azure-lt">{{ bet.channel }}</span>
         </td>
-        <td>
+        <td class="text-nowrap">
             {{
                 new Date(bet.trandate).toLocaleDateString('en-US', {
                     month: 'short',
