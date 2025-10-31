@@ -161,12 +161,12 @@ export const useBetStore = defineStore('bet', {
                     this.rangesTables[p] = {
                         data: paginationData.data,
                         meta: {
-                            current_page: paginationData.current_page,
-                            last_page: paginationData.last_page,
-                            per_page: paginationData.per_page,
-                            total: paginationData.total,
+                            current_page: paginationData.meta.current_page,
+                            last_page: paginationData.meta.last_page,
+                            per_page: paginationData.meta.per_page,
+                            total: paginationData.meta.total,
+                            links: paginationData.meta.links || [],
                         },
-                        links: paginationData.links || [],
                     };
                 } catch (error) {
                     console.error(`Error fetching range data for ${p}:`, error);

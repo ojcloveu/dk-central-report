@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Resources\BetReportPeriodResource;
 use App\Http\Resources\BetReportResource;
 use App\Models\Bet;
 use Illuminate\Routing\Controller;
@@ -115,6 +116,10 @@ class BetReportController extends Controller
             ->groupBy('account')
             ->orderBy('total_turnover', 'DESC');
 
-        return $query->paginate($perPage);
+        $betPeriod = $query->paginate($perPage);
+
+        return BetReportPeriodResource::collection($betPeriod)
+            ->response()
+            ->setStatusCode(Response::HTTP_OK);
     }
 }
