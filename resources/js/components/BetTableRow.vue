@@ -1,13 +1,35 @@
 <script setup>
+import { useBetStore } from '../stores/betStore';
+import { computed } from 'vue';
+
 const props = defineProps({
     bet: Object,
     getMasterBadgeClass: Function,
 });
+
+const betStore = useBetStore();
+
+// Check if the current account is selected
+const isSelected = computed(() => 
+    betStore.selectedAccounts.includes(props.bet.account)
+);
+
+// Handler to call the store action
+const handleCheckboxChange = (event) => {
+    betStore.toggleAccountSelection(props.bet.account, event.target.checked);
+};
 </script>
 
 <template>
-    <tr>
-        <td><input class="form-check-input m-0" type="checkbox" /></td>
+    <tr :class="{'table-primary-light': isSelected}">
+        <td>
+            <input 
+                class="form-check-input m-0" 
+                type="checkbox"
+                :checked="isSelected"
+                @change="handleCheckboxChange" 
+            />
+        </td>
         <td>
             <div class="fw-bold">{{ bet.account }}</div>
         </td>
