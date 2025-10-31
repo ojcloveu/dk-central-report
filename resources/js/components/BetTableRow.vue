@@ -2,8 +2,6 @@
 import { useBetStore } from '../stores/betStore';
 import { computed } from 'vue';
 
-import { computed } from 'vue';
-
 const props = defineProps({
     bet: Object,
     getMasterBadgeClass: Function,
