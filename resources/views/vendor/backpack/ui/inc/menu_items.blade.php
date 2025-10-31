@@ -1,7 +1,7 @@
 <x-backpack::menu-item title="{{ trans('backpack::base.dashboard') }}" icon='la la-home' :link="backpack_url('dashboard')" />
 
 <x-backpack::menu-item title="Bets" icon="la la-dice" :link="backpack_url('bet')" />
-<x-backpack::menu-item title="Report" icon="la la-question" :link="backpack_url('report')" />
+<x-backpack::menu-item title="Bet Report" icon="las la-clipboard" :link="backpack_url('report')" />
 
 <x-backpack::menu-dropdown title="User Management" icon="la la-user">
     <x-backpack::menu-dropdown-header title="User Management" />
