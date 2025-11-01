@@ -35,12 +35,12 @@ const toggleDropdown = () => {
     isDropdownOpen.value = !isDropdownOpen.value;
 };
 
-watch(isDropdownOpen, async (open) => {
+watch(isDropdownOpen, async open => {
     if (open) {
         if (props?.items.length === 0) {
             props.fetchItems();
         }
-        
+
         await nextTick();
         searchInputRef.value?.focus();
     } else {
@@ -54,6 +54,14 @@ const selectItem = item => {
     isDropdownOpen.value = false;
 };
 
+const clearSelection = event => {
+    event.stopPropagation();
+    selectedValue.value = null;
+    emit('update:modelValue', null);
+    isDropdownOpen.value = false;
+    searchQuery.value = '';
+};
+
 const getSelectedText = computed(() => {
     return selectedValue.value || props.placeholder;
 });
@@ -62,7 +70,7 @@ const getSelectedText = computed(() => {
 const resolvingSelected = ref(false);
 
 // Handle the global click
-const handleClickOutside = (event) => {
+const handleClickOutside = event => {
     if (selectRef.value && !selectRef.value.contains(event.target)) {
         isDropdownOpen.value = false;
     }
@@ -106,14 +114,28 @@ onUnmounted(() => {
 
             <div v-if="isDropdownOpen" class="dropdown-menu-list">
                 <div class="p-2">
-                    <input
-                        ref="searchInputRef"
-                        type="text"
-                        class="form-control"
-                        placeholder="Search..."
-                        v-model="searchQuery"
-                        @keydown.enter.prevent
-                    />
+                    <div style="position: relative;">
+                        <input
+                            ref="searchInputRef"
+                            type="text"
+                            class="form-control"
+                            placeholder="Search..."
+                            v-model="searchQuery"
+                            @keydown.enter.prevent
+                            style="padding-right: 2.25rem;"
+                        />
+
+                        <!-- Remove filter value -->
+                        <i
+                            v-if="selectedValue && !loading"
+                            class="la la-times-circle text-muted"
+                            @click.stop="clearSelection"
+                            role="button"
+                            title="Clear"
+                            style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); cursor: pointer;"
+                        ></i>
+                    </div>
+
                     <div v-if="false" class="d-flex justify-content-center mt-1">
                         <small class="text-muted">
                             <i class="la la-spinner la-spin"></i>
