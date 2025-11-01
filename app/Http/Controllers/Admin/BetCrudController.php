@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Requests\BetRequest;
+use App\Models\Bet;
 use Backpack\CRUD\app\Http\Controllers\CrudController;
 use Backpack\CRUD\app\Library\CrudPanel\CrudPanelFacade as CRUD;
 
@@ -18,6 +19,7 @@ class BetCrudController extends CrudController
     use \Backpack\CRUD\app\Http\Controllers\Operations\UpdateOperation;
     use \Backpack\CRUD\app\Http\Controllers\Operations\DeleteOperation;
     use \Backpack\CRUD\app\Http\Controllers\Operations\ShowOperation;
+    use \Backpack\CRUD\app\Http\Controllers\Operations\FetchOperation;
 
     /**
      * Configure the CrudPanel object. Apply settings to all operations.
@@ -92,5 +94,53 @@ class BetCrudController extends CrudController
     protected function setupUpdateOperation()
     {
         $this->setupCreateOperation();
+    }
+
+    // -----------------------------------------------------------------
+    //  BACKPACK FETCH OPERATION METHODS
+    // -----------------------------------------------------------------
+    /**
+     * Fetches masters for selection.
+     */
+    public function fetchMasters()
+    {
+        return $this->fetch([
+            'model' => Bet::class, 
+            'query' => function ($query) {
+                return $query->select('master')->distinct()->orderBy('master', 'asc');
+            },
+            'paginate' => 5,
+            'select' => ['master'],
+        ]);
+    }
+
+    /**
+     * Fetches channels for selection.
+     */
+    public function fetchChannels()
+    {
+        return $this->fetch([
+            'model' => Bet::class,
+            'query' => function ($query) {
+                return $query->select('channel')->distinct()->orderBy('channel', 'asc');
+            },
+            'paginate' => 5,
+            'select' => ['channel'],
+        ]);
+    }
+
+    /**
+     * Fetches accounts for selection.
+     */
+    public function fetchAccounts()
+    {
+        return $this->fetch([
+            'model' => Bet::class,
+            'query' => function ($query) {
+                return $query->select('account')->distinct()->orderBy('account', 'asc');
+            },
+            'paginate' => 5,
+            'select' => ['account'],
+        ]);
     }
 }
