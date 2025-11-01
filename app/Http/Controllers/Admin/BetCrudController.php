@@ -105,12 +105,15 @@ class BetCrudController extends CrudController
     public function fetchMasters()
     {
         return $this->fetch([
-            'model' => Bet::class, 
-            'query' => function ($query) {
-                return $query->select('master')->distinct()->orderBy('master', 'asc');
-            },
+            'model' => Bet::class,
+            'searchable_attributes' => ['master'], 
             'paginate' => 5,
             'select' => ['master'],
+            'query' => function ($query) {
+                return $query->select('master')
+                    ->groupBy('master')
+                    ->orderBy('master', 'asc');
+            },
         ]);
     }
 
@@ -121,11 +124,14 @@ class BetCrudController extends CrudController
     {
         return $this->fetch([
             'model' => Bet::class,
-            'query' => function ($query) {
-                return $query->select('channel')->distinct()->orderBy('channel', 'asc');
-            },
+            'searchable_attributes' => ['channel'], 
             'paginate' => 5,
             'select' => ['channel'],
+            'query' => function ($query) {
+                return $query->select('channel')
+                    ->groupBy('channel')
+                    ->orderBy('channel', 'asc');
+            },
         ]);
     }
 
@@ -136,11 +142,14 @@ class BetCrudController extends CrudController
     {
         return $this->fetch([
             'model' => Bet::class,
-            'query' => function ($query) {
-                return $query->select('account')->distinct()->orderBy('account', 'asc');
-            },
+            'searchable_attributes' => ['account'], 
             'paginate' => 5,
             'select' => ['account'],
+            'query' => function ($query) {
+                return $query->select('account')
+                    ->groupBy('account')
+                    ->orderBy('account', 'asc');
+            },
         ]);
     }
 }
