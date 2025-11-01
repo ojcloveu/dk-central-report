@@ -114,29 +114,27 @@ onUnmounted(() => {
 
             <div v-if="isDropdownOpen" class="dropdown-menu-list">
                 <div class="p-2">
-                    <div style="position: relative;">
+                    <div class="position-relative">
                         <input
                             ref="searchInputRef"
                             type="text"
-                            class="form-control"
+                            class="form-control pe-1"
                             placeholder="Search..."
                             v-model="searchQuery"
                             @keydown.enter.prevent
-                            style="padding-right: 2.25rem;"
                         />
 
                         <!-- Remove filter value -->
                         <i
                             v-if="selectedValue && !loading"
-                            class="la la-times-circle text-muted"
+                            class="la la-times-circle remove-filter text-muted"
                             @click.stop="clearSelection"
                             role="button"
                             title="Clear"
-                            style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); cursor: pointer;"
                         ></i>
                     </div>
 
-                    <div v-if="false" class="d-flex justify-content-center mt-1">
+                    <div v-if="loading" class="d-flex justify-content-center mt-2">
                         <small class="text-muted">
                             <i class="la la-spinner la-spin"></i>
                             Fetching data...
@@ -156,7 +154,10 @@ onUnmounted(() => {
                         <i v-if="selectedValue === item" class="la la-check text-success"></i>
                     </a>
 
-                    <div v-if="filteredItems.length === 0" class="text-center text-muted p-2">
+                    <div
+                        v-if="filteredItems.length === 0 && !loading"
+                        class="text-center text-muted p-2"
+                    >
                         No results
                     </div>
                 </div>
@@ -213,6 +214,14 @@ onUnmounted(() => {
 
 .dropdown-selector .dropdown-menu-list .list-group-item:hover {
     background-color: var(--tblr-secondary-bg);
+}
+
+.remove-filter {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
 }
 
 /* Dark theme variant for list items */
