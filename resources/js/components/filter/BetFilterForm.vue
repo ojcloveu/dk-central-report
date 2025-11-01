@@ -1,5 +1,7 @@
+<!-- BetFilterForm.vue -->
 <script setup>
-import { reactive, watch } from 'vue';
+import { reactive, watch, onMounted } from 'vue';
+import { useFilterStore } from '@/stores/filterStore';
 import SingleSelectFilter from './SingleSelectFilter.vue';
 
 const props = defineProps({
@@ -8,10 +10,16 @@ const props = defineProps({
 });
 
 const localFilters = reactive({ ...props.initialFilters });
+const filterStore = useFilterStore();
+
 const today = new Date().toISOString().split('T')[0];
 
-let debounceTimer = null;
+// Fetch filter options on mount
+onMounted(() => {
+    filterStore.fetchAllFilters();
+});
 
+let debounceTimer = null;
 const triggerFilter = () => {
     clearTimeout(debounceTimer);
     debounceTimer = setTimeout(() => {
@@ -19,10 +27,12 @@ const triggerFilter = () => {
     }, 700);
 };
 
+// Watch for changes in filter form
 watch(localFilters, () => {
     triggerFilter();
 });
 
+// Reset filters
 const handleReset = () => {
     localFilters.trandate = '';
     localFilters.master = '';
@@ -50,46 +60,31 @@ const handleReset = () => {
                     <input type="date" class="form-control" v-model="localFilters.trandate" />
                 </div>
 
-                <!-- <div class="col-md-3 col-sm-6">
+                <div class="col-md-3 col-sm-6">
                     <label class="form-label">Master</label>
-                    <input
-                        type="text"
-                        class="form-control"
-                        placeholder="e.g., VIRTUAL"
+                    <SingleSelectFilter
                         v-model="localFilters.master"
+                        :items="filterStore.masters"
+                        :placeholder="'Select Master'"
                     />
-                </div> -->
-                <div class="col-md-3 col-sm-6">
-                    <label class="form-label">Master</label>
-                    <SingleSelectFilter placeholder="Master" />
                 </div>
 
-                <!-- <div class="col-md-3 col-sm-6">
+                <div class="col-md-3 col-sm-6">
                     <label class="form-label">Account</label>
-                    <input
-                        type="text"
-                        class="form-control"
-                        placeholder="e.g., THB7686"
+                    <SingleSelectFilter
                         v-model="localFilters.account"
+                        :items="filterStore.accounts"
+                        :placeholder="'Select Account'"
                     />
-                </div> -->
-                <div class="col-md-3 col-sm-6">
-                    <label class="form-label">Account</label>
-                    <SingleSelectFilter placeholder="Account" />
                 </div>
 
-                <!-- <div class="col-md-2 col-sm-6">
-                    <label class="form-label">Channel</label>
-                    <input
-                        type="text"
-                        class="form-control"
-                        placeholder="e.g., TH"
-                        v-model="localFilters.channel"
-                    />
-                </div> -->
                 <div class="col-md-3 col-sm-6">
                     <label class="form-label">Channel</label>
-                    <SingleSelectFilter placeholder="Channel" />
+                    <SingleSelectFilter
+                        v-model="localFilters.channel"
+                        :items="filterStore.channels"
+                        :placeholder="'Select Channel'"
+                    />
                 </div>
             </form>
         </div>
