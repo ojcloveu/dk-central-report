@@ -14,11 +14,6 @@ const filterStore = useFilterStore();
 
 const today = new Date().toISOString().split('T')[0];
 
-// Fetch filter options on mount
-onMounted(() => {
-    filterStore.fetchAllFilters();
-});
-
 let debounceTimer = null;
 const triggerFilter = () => {
     clearTimeout(debounceTimer);
@@ -66,6 +61,8 @@ const handleReset = () => {
                         v-model="localFilters.master"
                         :items="filterStore.masters"
                         :placeholder="'Select Master'"
+                        :loading="filterStore.loading.masters"
+                        :fetch-items="filterStore.fetchMasters"
                     />
                 </div>
 
@@ -75,6 +72,8 @@ const handleReset = () => {
                         v-model="localFilters.account"
                         :items="filterStore.accounts"
                         :placeholder="'Select Account'"
+                        :loading="filterStore.loading.accounts"
+                        :fetch-items="filterStore.fetchAccounts"
                     />
                 </div>
 
@@ -84,6 +83,8 @@ const handleReset = () => {
                         v-model="localFilters.channel"
                         :items="filterStore.channels"
                         :placeholder="'Select Channel'"
+                        :loading="filterStore.loading.channels"
+                        :fetch-items="filterStore.fetchChannels"
                     />
                 </div>
             </form>

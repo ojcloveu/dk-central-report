@@ -5,12 +5,14 @@ import { ref, computed, onMounted, onUnmounted } from 'vue';
 
 const props = defineProps({
     // Value props
-    items: { type: Array, default: () => ['Option A', 'Option B', 'Option C', 'Option D'] },
+    items: { type: Array, default: () => [] },
     modelValue: { type: [String, Number, null], default: null },
 
     // Config props
     placeholder: { type: String, default: 'Select an Item' },
     error: { type: String, default: null },
+    loading: { type: Boolean, default: false },
+    fetchItems: { type: Function, default: () => {} },
 });
 const emit = defineEmits(['update:modelValue']);
 
@@ -35,8 +37,14 @@ const toggleDropdown = () => {
 
 watch(isDropdownOpen, async (open) => {
     if (open) {
+        if (props?.items.length === 0) {
+            props.fetchItems();
+        }
+        
         await nextTick();
         searchInputRef.value?.focus();
+    } else {
+        searchQuery.value = '';
     }
 });
 
