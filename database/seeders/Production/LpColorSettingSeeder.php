@@ -1,6 +1,6 @@
 <?php
 
-namespace Database\Seeders;
+namespace Database\Seeders\Production;
 
 use Illuminate\Database\Seeder;
 use Backpack\Settings\app\Models\Setting;
@@ -10,7 +10,7 @@ class LpColorSettingSeeder extends Seeder
     /**
      * Run the database seeds.
      * 
-     * php artisan db:seed --class="Database\\Seeders\\LpColorSettingSeeder"
+     * php artisan db:seed --class="Database\\Seeders\\Production\\LpColorSettingSeeder"
      * 
      * @return void
      */
