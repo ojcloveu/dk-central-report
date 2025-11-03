@@ -12,31 +12,25 @@ const handlePerPageChange = event => {
 </script>
 
 <template>
-    <div class="card-footer d-flex align-items-center">
-        <div class="me-2">
-            <select
-                class="form-select form-select-sm"
-                :value="meta.per_page"
-                @change="handlePerPageChange"
-            >
-                <option value="10">10</option>
-                <option value="20">20</option>
-                <option value="50">50</option>
-                <option value="100">100</option>
-            </select>
+    <div class="card-footer d-flex flex-column flex-sm-row align-items-center">
+        <!-- Pagination controls -->
+        <div class="d-flex align-items-center w-100 w-sm-auto">
+            <div>
+                <select
+                    class="form-select form-select-sm"
+                    :value="meta.per_page"
+                    @change="handlePerPageChange"
+                >
+                    <option value="10">10</option>
+                    <option value="20">20</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                </select>
+            </div>
+            <p class="m-0 text-muted text-center text-sm-start ms-1">entries per page</p>
         </div>
-        <p class="m-0 text-muted">
-            Showing
-            <span class="fw-bold">{{ meta.current_page * meta.per_page - meta.per_page + 1 }}</span>
-            to
-            <span class="fw-bold">{{
-                Math.min(meta.current_page * meta.per_page, meta.total)
-            }}</span>
-            of
-            <span class="fw-bold">{{ meta.total }}</span>
-            entries
-        </p>
-        <ul class="pagination m-0 ms-auto">
+        <!-- Pagination links -->
+        <ul class="pagination m-0 mt-2 mt-sm-0 w-100 w-sm-auto justify-content-center justify-content-sm-end">
             <li
                 v-for="link in meta.links"
                 :key="link.label"
@@ -45,7 +39,7 @@ const handlePerPageChange = event => {
             >
                 <a
                     href="#"
-                    class="page-link mx-1"
+                    class="page-link"
                     @click.prevent="onPageClick(link.page || link.label)"
                     v-html="link.label"
                 ></a>
