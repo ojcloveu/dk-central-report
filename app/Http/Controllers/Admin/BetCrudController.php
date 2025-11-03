@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Requests\BetRequest;
 use App\Models\Bet;
+use App\Models\Channel;
 use Backpack\CRUD\app\Http\Controllers\CrudController;
 use Backpack\CRUD\app\Library\CrudPanel\CrudPanelFacade as CRUD;
 
@@ -28,7 +29,7 @@ class BetCrudController extends CrudController
      */
     public function setup()
     {
-        CRUD::setModel(\App\Models\Bet::class);
+        CRUD::setModel(Bet::class);
         CRUD::setRoute(config('backpack.base.route_prefix') . '/bet');
         CRUD::setEntityNameStrings('bet', 'bets');
     }
@@ -123,14 +124,13 @@ class BetCrudController extends CrudController
     public function fetchChannels()
     {
         return $this->fetch([
-            'model' => Bet::class,
-            'searchable_attributes' => ['channel'], 
+            'model' => Channel::class,
+            'searchable_attributes' => ['channel_name'],
             'paginate' => 5,
-            'select' => ['channel'],
+            'select' => ['channel_name'],
             'query' => function ($query) {
-                return $query->select('channel')
-                    ->groupBy('channel')
-                    ->orderBy('channel', 'asc');
+                return $query->where('is_active', true) 
+                    ->orderBy('channel_name', 'asc');
             },
         ]);
     }
