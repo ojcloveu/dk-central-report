@@ -17,6 +17,7 @@ Route::group([
     'namespace' => 'App\Http\Controllers\Admin',
 ], function () { // custom admin routes
     Route::crud('bet', 'BetCrudController');
+    Route::crud('channel', 'ChannelCrudController');
     Route::crud('masters', 'MasterCrudController');
 
     // Initial route
