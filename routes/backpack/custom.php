@@ -24,7 +24,3 @@ Route::group([
     Route::get('api/bets', 'BetReportController@betReports')->name('api.bets.index');
     Route::get('api/bet-period', 'BetReportController@betReportPeriod')->name('api.bets.period');
 });
-
-// TEST with public route
-Route::get('api/bets', 'App\Http\Controllers\Admin\BetReportController@betReports')->name('api.bets.index');
-Route::get('api/bet-period', 'App\Http\Controllers\Admin\BetReportController@betReportPeriod')->name('api.bets.period');
