@@ -2,6 +2,7 @@
 <script setup>
 import { reactive, watch, onMounted } from 'vue';
 import { useFilterStore } from '@/stores/filterStore';
+import { storeToRefs } from 'pinia';
 import SingleSelectFilter from './SingleSelectFilter.vue';
 
 const props = defineProps({
@@ -12,7 +13,8 @@ const props = defineProps({
 const localFilters = reactive({ ...props.initialFilters });
 const filterStore = useFilterStore();
 
-const today = new Date().toISOString().split('T')[0];
+// Get pagination refs from store
+const { pagination, loading } = storeToRefs(filterStore);
 
 let debounceTimer = null;
 const triggerFilter = () => {
@@ -33,6 +35,32 @@ const handleReset = () => {
     localFilters.master = '';
     localFilters.account = '';
     localFilters.channel = '';
+};
+
+// Handle search for each filter type
+const handleSearchMasters = query => {
+    filterStore.fetchMasters({ q: query, page: 1 }, false);
+};
+
+const handleSearchAccounts = query => {
+    filterStore.fetchAccounts({ q: query, page: 1 }, false);
+};
+
+const handleSearchChannels = query => {
+    filterStore.fetchChannels({ q: query, page: 1 }, false);
+};
+
+// Handle load more for each filter type
+const handleLoadMoreMasters = (page, query) => {
+    filterStore.loadMoreMasters(page, query); 
+};
+
+const handleLoadMoreAccounts = (page, query) => {
+    filterStore.loadMoreAccounts(page, query);
+};
+
+const handleLoadMoreChannels = (page, query) => {
+    filterStore.loadMoreChannels(page, query);
 };
 </script>
 
@@ -61,8 +89,12 @@ const handleReset = () => {
                         v-model="localFilters.master"
                         :items="filterStore.masters"
                         :placeholder="'Select Master'"
-                        :loading="filterStore.loading.masters"
-                        :fetch-items="filterStore.fetchMasters"
+                        :loading="loading.masters"
+                        :fetch-items="() => filterStore.fetchMasters({ page: 1 })"
+                        :has-next-page="pagination.masters.hasNextPage"
+                        :current-page="pagination.masters.currentPage"
+                        @search="handleSearchMasters"
+                        @load-more="handleLoadMoreMasters"
                     />
                 </div>
 
@@ -72,8 +104,12 @@ const handleReset = () => {
                         v-model="localFilters.account"
                         :items="filterStore.accounts"
                         :placeholder="'Select Account'"
-                        :loading="filterStore.loading.accounts"
-                        :fetch-items="filterStore.fetchAccounts"
+                        :loading="loading.accounts"
+                        :fetch-items="() => filterStore.fetchAccounts({ page: 1 })"
+                        :has-next-page="pagination.accounts.hasNextPage"
+                        :current-page="pagination.accounts.currentPage"
+                        @search="handleSearchAccounts"
+                        @load-more="handleLoadMoreAccounts"
                     />
                 </div>
 
@@ -83,8 +119,12 @@ const handleReset = () => {
                         v-model="localFilters.channel"
                         :items="filterStore.channels"
                         :placeholder="'Select Channel'"
-                        :loading="filterStore.loading.channels"
-                        :fetch-items="filterStore.fetchChannels"
+                        :loading="loading.channels"
+                        :fetch-items="() => filterStore.fetchChannels({ page: 1 })"
+                        :has-next-page="pagination.channels.hasNextPage"
+                        :current-page="pagination.channels.currentPage"
+                        @search="handleSearchChannels"
+                        @load-more="handleLoadMoreChannels"
                     />
                 </div>
             </form>
