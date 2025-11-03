@@ -110,7 +110,7 @@ const handleChangePerPage = (rangeKey, count) => {
                     v-if="getRangeData(period.key)?.meta"
                     class="card-footer d-flex flex-column flex-sm-row align-items-center"
                 >
-                    <ul class="pagination m-0 mt-2 mt-sm-0 w-100 w-sm-auto justify-content-center justify-content-sm-end">
+                    <ul class="pagination m-0 mt-2 mt-sm-0 w-auto w-sm-auto justify-content-center justify-content-md-end flex-grow-1">
                         <li
                             v-for="link in getRangeData(period?.key).meta?.links"
                             :key="link?.label"
