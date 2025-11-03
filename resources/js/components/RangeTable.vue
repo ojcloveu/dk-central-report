@@ -1,6 +1,7 @@
 <script setup>
 import { useBetStore } from '../stores/betStore';
 import { amountColor, lpBgColor } from '../utils/getStatusClass';
+import RangeTableSkeleton from './loading/RangeTableSkeleton.vue';
 
 const betStore = useBetStore();
 
@@ -44,10 +45,8 @@ const handleChangePerPage = (rangeKey, count) => {
             </div>
         </div>
 
-        <div v-if="betStore.rangeLoading" class="text-center py-5">
-            <div class="spinner-border text-primary mb-3"></div>
-            <p class="text-muted mb-0">Calculating range data...</p>
-        </div>
+        <!-- Skeleton Loading -->
+        <RangeTableSkeleton v-if="betStore.rangeLoading" :rangePeriods="rangePeriods" />
 
         <div v-else class="d-flex flex-column gap-3">
             <div v-for="period in rangePeriods" :key="period?.key" class="card">
