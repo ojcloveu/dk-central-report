@@ -9,6 +9,7 @@ import BetTableRow from './table/BetTableRow.vue';
 import Pagination from './table/Pagination.vue';
 import EmptyState from './EmptyState.vue';
 import RangeTable from './RangeTable.vue';
+import BetTableSkeleton from './loading/BetTableSkeleton.vue';
 
 const betStore = useBetStore();
 
@@ -69,9 +70,9 @@ const sortableColumns = [
         <BetFilterForm :initialFilters="localFilters" :onSubmit="submitFilters" />
 
         <div class="card">
-            <div v-if="betStore.loading" class="card-body text-center py-5">
-                <div class="spinner-border text-primary mb-3"></div>
-                <p class="text-muted mb-0">Loading bet reports...</p>
+            <!-- Main table loading -->
+            <div v-if="betStore.loading" class="card-body p-0">
+                <BetTableSkeleton />
             </div>
 
             <div v-else-if="betStore.error" class="card-body">
