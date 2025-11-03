@@ -192,8 +192,18 @@ export const useBetStore = defineStore('bet', {
 
         setPerPage(perPage) {
             this.filters.per_page = perPage;
-            this.filters.page = 1; // reset to first page
+            this.filters.page = 1;
             this.fetchBets();
+        },
+
+        /**
+         * Action clear selections and refresh the main table data
+         */
+        fetchBetsWithReset() {
+            this.selectedAccounts = [];
+            this.filters.page = 1;
+            this.fetchBets();
+            this.rangesTables = initialRangeState; 
         },
     },
 });

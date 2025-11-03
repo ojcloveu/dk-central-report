@@ -62,9 +62,7 @@ export const useFilterStore = defineStore('filter', {
 
                 // Handle Laravel pagination response
                 const results = response.data || [];
-                const mappedResults = results.map(
-                    item => item.account || item
-                );
+                const mappedResults = results.map(item => item.account || item);
 
                 // Append or replace items
                 if (append) {
@@ -100,9 +98,7 @@ export const useFilterStore = defineStore('filter', {
                 const response = await filterOptionsServices.fetchChannels({ ...payload, page });
 
                 const results = response.data || [];
-                const mappedResults = results.map(
-                    item => item.channel_name || item.id || item
-                );
+                const mappedResults = results.map(item => item.channel_name || item.id || item);
 
                 if (append) {
                     this.channels = [...this.channels, ...mappedResults];
@@ -136,9 +132,7 @@ export const useFilterStore = defineStore('filter', {
                 const response = await filterOptionsServices.fetchMasters({ ...payload, page });
 
                 const results = response.data || [];
-                const mappedResults = results.map(
-                    item => item.master || item
-                );
+                const mappedResults = results.map(item => item.master || item);
 
                 if (append) {
                     this.masters = [...this.masters, ...mappedResults];
@@ -234,7 +228,7 @@ export const useFilterStore = defineStore('filter', {
                 };
 
                 this.accounts = mapResults(accountsResp, 'account');
-                this.channels = mapResults(channelsResp, 'channel_name'); 
+                this.channels = mapResults(channelsResp, 'channel_name');
                 this.masters = mapResults(mastersResp, 'master');
 
                 // Update pagination metadata
