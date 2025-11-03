@@ -73,6 +73,16 @@ watch(isDropdownOpen, async open => {
     }
 });
 
+// Watch if modelValue changes from parent
+watch(() => props.modelValue, (newValue) => {
+    if (newValue === '' || newValue === null) {
+        selectedValue.value = null;
+        searchQuery.value = '';
+    } else {
+        selectedValue.value = newValue;
+    }
+});
+
 // Handle infinite scroll
 const handleScroll = () => {
     if (!listContainerRef.value || isLoadingMore.value || !props.hasNextPage) return;
