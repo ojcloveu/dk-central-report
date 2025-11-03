@@ -66,6 +66,7 @@ const handleChangePerPage = (rangeKey, count) => {
                             <option value="100">100</option>
                         </select>
                     </div>
+                    
                 </div>
 
                 <!-- Table body -->
@@ -107,30 +108,9 @@ const handleChangePerPage = (rangeKey, count) => {
                 <!-- Pagination -->
                 <div
                     v-if="getRangeData(period.key)?.meta"
-                    class="card-footer d-flex align-items-center"
+                    class="card-footer d-flex flex-column flex-sm-row align-items-center"
                 >
-                    <p class="m-0 text-muted">
-                        Showing
-                        <span class="fw-bold">{{
-                            getRangeData(period.key).meta?.current_page *
-                                getRangeData(period.key).meta.per_page -
-                            getRangeData(period.key).meta.per_page +
-                            1
-                        }}</span>
-                        to
-                        <span class="fw-bold">{{
-                            Math.min(
-                                getRangeData(period.key).meta?.current_page *
-                                    getRangeData(period.key).meta?.per_page,
-                                getRangeData(period.key).meta?.total
-                            )
-                        }}</span>
-                        of
-                        <span class="fw-bold">{{ getRangeData(period.key).meta?.total }}</span>
-                        entries
-                    </p>
-
-                    <ul class="pagination m-0 ms-auto">
+                    <ul class="pagination m-0 mt-2 mt-sm-0 w-100 w-sm-auto justify-content-center justify-content-sm-end">
                         <li
                             v-for="link in getRangeData(period?.key).meta?.links"
                             :key="link?.label"
