@@ -17,6 +17,7 @@ Route::group([
     'namespace' => 'App\Http\Controllers\Admin',
 ], function () { // custom admin routes
     Route::crud('bet', 'BetCrudController');
+    Route::crud('channel', 'ChannelCrudController');
 
     // Initial route
     Route::get('report', 'BetReportController@index')->name('page.report.index');
