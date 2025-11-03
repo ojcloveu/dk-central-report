@@ -12,9 +12,9 @@ const handlePerPageChange = event => {
 </script>
 
 <template>
-    <div class="card-footer d-flex flex-column flex-sm-row align-items-center">
+    <div class="card-footer d-flex gap-2 flex-column flex-md-row align-items-center">
         <!-- Pagination controls -->
-        <div class="d-flex align-items-center w-100 w-sm-auto">
+        <div class="d-inline-flex align-items-center">
             <div>
                 <select
                     class="form-select form-select-sm"
@@ -29,8 +29,11 @@ const handlePerPageChange = event => {
             </div>
             <p class="m-0 text-muted text-center text-sm-start ms-1">entries per page</p>
         </div>
+
         <!-- Pagination links -->
-        <ul class="pagination m-0 mt-2 mt-sm-0 w-100 w-sm-auto justify-content-center justify-content-sm-end">
+        <ul
+            class="pagination m-0 mt-2 mt-sm-0 w-auto w-sm-auto justify-content-center justify-content-md-end flex-grow-1"
+        >
             <li
                 v-for="link in meta.links"
                 :key="link.label"
