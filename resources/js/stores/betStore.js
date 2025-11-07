@@ -209,6 +209,7 @@ export const useBetStore = defineStore('bet', {
             this.filters = getInitialFilters();
             this.selectedAccounts = [];
             this.rangesTables = initialRangeState;
+            this.fetchBets();
         },
     },
 });
