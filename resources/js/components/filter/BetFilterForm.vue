@@ -1,5 +1,5 @@
 <script setup>
-import { reactive, watch, onMounted, ref, nextTick } from 'vue';
+import { reactive, watch, onMounted, ref, nextTick, computed } from 'vue';
 import { useFilterStore } from '@/stores/filterStore';
 import { storeToRefs } from 'pinia';
 import SingleSelectFilter from './SingleSelectFilter.vue';
@@ -60,6 +60,15 @@ const handleRefreshAndReset = () => {
     props.onRefresh();
 };
 
+const hasFiltersToReset = computed(() => {
+    return (
+        localFilters.trandate !== '' ||
+        localFilters.master !== '' ||
+        localFilters.account !== '' ||
+        localFilters.channel !== ''
+    );
+});
+
 /*
  * Filter search and pagination handlers
  */
@@ -97,9 +106,10 @@ const handleLoadMoreChannels = (page, query) => {
                 <!-- Reset Button -->
                 <button
                     type="button"
-                    class="btn btn-primary px-1"
+                    class="btn btn-primary px-2"
                     @click="handleReset"
                     title="Reset all filters to default"
+                    :disabled="!hasFiltersToReset"
                 >
                     <i class="las la-eraser fs-2"></i> Reset
                 </button>
