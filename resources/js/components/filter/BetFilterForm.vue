@@ -1,6 +1,6 @@
 <!-- BetFilterForm.vue -->
 <script setup>
-import { reactive, watch, onMounted } from 'vue';
+import { reactive, watch, onMounted, ref } from 'vue';
 import { useFilterStore } from '@/stores/filterStore';
 import { storeToRefs } from 'pinia';
 import SingleSelectFilter from './SingleSelectFilter.vue';
@@ -25,8 +25,14 @@ const triggerFilter = () => {
     }, 700);
 };
 
+let skipNextWatch = ref(false);
+
 // Watch for changes in filter form
 watch(localFilters, () => {
+    if (skipNextWatch) {
+        skipNextWatch = false;
+        return;
+    }
     triggerFilter();
 });
 
@@ -39,10 +45,10 @@ const handleReset = () => {
 };
 
 const handleRefreshAndReset = () => {
+    skipNextWatch = true;
+
     handleReset(); 
-    if (typeof props.onRefresh === 'function') {
-        props.onRefresh();
-    }
+    props.onRefresh();
 };
 
 // Handle search for each filter type
@@ -91,7 +97,7 @@ const handleLoadMoreChannels = (page, query) => {
                     @click="handleRefreshAndReset"
                     :disabled="loading.masters || loading.accounts || loading.channels"
                 >
-                    <i class="las la-sync-alt fs-2"></i>
+                    <i class="las la-sync-alt fs-2" :class="{ 'fa-spin': loading }"></i>
                 </button>
             </div>
         </div>
