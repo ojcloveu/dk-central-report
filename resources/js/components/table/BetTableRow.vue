@@ -3,6 +3,9 @@ import { useBetStore } from '../../stores/betStore';
 import { computed } from 'vue';
 import { amountColor, lpBgColor } from '../../utils/getStatusClass';
 
+/*
+ * Define the props this component accepts
+ */
 const props = defineProps({
     bet: Object,
     getMasterBadgeClass: Function,
@@ -10,10 +13,14 @@ const props = defineProps({
 
 const betStore = useBetStore();
 
-// Check if the current account is selected
+/*
+ * Check if the current account is selected
+ */
 const isSelected = computed(() => betStore.selectedAccounts.includes(props.bet.account));
 
-// Handler to call the store action
+/*
+ * Handler to call the store action
+ */
 const handleCheckboxChange = event => {
     betStore.toggleAccountSelection(props.bet.account, event.target.checked);
 };

@@ -1,4 +1,7 @@
 <script setup>
+/*
+ * Define the props this component accepts
+ */
 const props = defineProps({
     filters: Object,
     onSort: Function,

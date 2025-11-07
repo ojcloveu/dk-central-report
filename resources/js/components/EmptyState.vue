@@ -1,5 +1,7 @@
 <script setup>
-// Define the props this component accepts
+/*
+ * Define the props this component accepts
+ */
 const props = defineProps({
     title: {
         type: String,
@@ -21,7 +23,9 @@ const props = defineProps({
     },
 });
 
-// Wrapper function to call the refreshAction prop
+/*
+ * Wrapper function to call the refreshAction prop
+ */
 const handleRefresh = () => {
     if (props.refreshAction) {
         props.refreshAction();

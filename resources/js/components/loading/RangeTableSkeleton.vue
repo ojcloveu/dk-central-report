@@ -1,4 +1,7 @@
 <script setup>
+/*
+ * Define the props this component accepts
+ */
 const props = defineProps({
     // Prop to receive the list of periods
     rangePeriods: {
@@ -12,7 +15,9 @@ const props = defineProps({
     },
 });
 
-// The headers correspond to the columns in the actual Range Table
+/*
+ * The headers correspond to the columns in the actual Range Table
+ */
 const tableHeaders = ['Account', 'Count', 'Turnover', 'Win/Lose', 'LP'];
 </script>
 
