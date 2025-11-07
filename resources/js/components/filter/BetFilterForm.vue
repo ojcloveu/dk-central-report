@@ -38,8 +38,8 @@ let skipNextWatch = ref(false);
 
 // Watch for changes in filter form
 watch(localFilters, () => {
-    if (skipNextWatch) {
-        skipNextWatch = false;
+    if (skipNextWatch.value) { 
+        skipNextWatch.value = false; 
         return;
     }
     triggerFilter();
@@ -54,7 +54,7 @@ const handleReset = () => {
 };
 
 const handleRefreshAndReset = () => {
-    skipNextWatch = true;
+    skipNextWatch.value = true;
 
     handleReset();
     props.onRefresh();
