@@ -10,6 +10,8 @@ class ChannelSeeder extends Seeder
 {
     /**
      * Run the database seeds.
+     * 
+     * php artisan db:seed --class="Database\\Seeders\\ChannelSeeder"
      */
     public function run(): void
     {
