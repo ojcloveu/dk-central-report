@@ -1,22 +1,28 @@
-<!-- BetFilterForm.vue -->
 <script setup>
-import { reactive, watch, onMounted, ref } from 'vue';
+import { reactive, watch, onMounted, ref, nextTick } from 'vue';
 import { useFilterStore } from '@/stores/filterStore';
 import { storeToRefs } from 'pinia';
 import SingleSelectFilter from './SingleSelectFilter.vue';
 
+/*
+ * Props & emits
+ */
 const props = defineProps({
     initialFilters: Object,
     onSubmit: Function,
     onRefresh: Function,
 });
 
+/*
+ * Local reactive state
+ */
 const localFilters = reactive({ ...props.initialFilters });
 const filterStore = useFilterStore();
-
-// Get pagination refs from store
 const { pagination, loading } = storeToRefs(filterStore);
 
+/*
+ * Helpers: debounce for filter submission
+ */
 let debounceTimer = null;
 const triggerFilter = () => {
     clearTimeout(debounceTimer);
@@ -25,6 +31,9 @@ const triggerFilter = () => {
     }, 700);
 };
 
+/*
+ * Reset filter & Refresh
+ */
 let skipNextWatch = ref(false);
 
 // Watch for changes in filter form
@@ -51,7 +60,9 @@ const handleRefreshAndReset = () => {
     props.onRefresh();
 };
 
-// Handle search for each filter type
+/*
+ * Filter search and pagination handlers
+ */
 const handleSearchMasters = query => {
     filterStore.fetchMasters({ q: query, page: 1 }, false);
 };
@@ -64,9 +75,8 @@ const handleSearchChannels = query => {
     filterStore.fetchChannels({ q: query, page: 1 }, false);
 };
 
-// Handle load more for each filter type
 const handleLoadMoreMasters = (page, query) => {
-    filterStore.loadMoreMasters(page, query); 
+    filterStore.loadMoreMasters(page, query);
 };
 
 const handleLoadMoreAccounts = (page, query) => {
