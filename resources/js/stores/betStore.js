@@ -2,6 +2,21 @@
 import { defineStore } from 'pinia';
 import betServices from '../services/betServices';
 
+// Helper function to get the current date in YYYY-MM-DD format
+const getTodayDate = () => new Date().toISOString().split('T')[0];
+
+// Helper function to define and return the initial filter state
+const getInitialFilters = () => ({
+    page: 1,
+    per_page: 10,
+    sort_by: 'trandate',
+    sort_dir: 'desc',
+    account: '',
+    trandate: getTodayDate(),
+    master: '',
+    channel: '',
+});
+
 // Initial state range data
 const initialRangeState = {
     '7d': { data: [], meta: { current_page: 1, last_page: 1, per_page: 10 } },
@@ -25,16 +40,7 @@ export const useBetStore = defineStore('bet', {
             rangesTables: initialRangeState,
             rangeLoading: false,
 
-            filters: {
-                page: 1,
-                per_page: 10,
-                sort_by: 'trandate',
-                sort_dir: 'desc',
-                account: '',
-                trandate: today,
-                master: '',
-                channel: '',
-            },
+            filters: getInitialFilters(),
         };
     },
 
@@ -59,7 +65,7 @@ export const useBetStore = defineStore('bet', {
             return `/admin/api/bets?${params.toString()}`;
         },
 
-        hasSelectedAccounts: (state) => state.selectedAccounts.length > 0,
+        hasSelectedAccounts: state => state.selectedAccounts.length > 0,
     },
 
     actions: {
@@ -200,10 +206,9 @@ export const useBetStore = defineStore('bet', {
          * Action clear selections and refresh the main table data
          */
         fetchBetsWithReset() {
+            this.filters = getInitialFilters();
             this.selectedAccounts = [];
-            this.filters.page = 1;
-            this.fetchBets();
-            this.rangesTables = initialRangeState; 
+            this.rangesTables = initialRangeState;
         },
     },
 });
