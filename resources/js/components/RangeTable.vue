@@ -5,14 +5,18 @@ import RangeTableSkeleton from './loading/RangeTableSkeleton.vue';
 
 const betStore = useBetStore();
 
-// Define the keys and labels
+/*
+ * Define the keys and labels
+ */
 const rangePeriods = [
     { key: '7d', label: 'Last 7 days' },
     { key: '1m', label: 'Last 1 month' },
     { key: '3m', label: 'Last 3 months' },
 ];
 
-// Helper function to safely get the data for a given range key
+/*
+ * Helper function to safely get the data for a given range key
+ */
 const getRangeData = key => betStore.rangesTables[key];
 
 const handlePaginationClick = (rangeKey, linkLabel) => {
