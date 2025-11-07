@@ -13,18 +13,11 @@ class DatabaseSeeder extends Seeder
 
     /**
      * Seed the application's database.
-     * 
-     * php artisan db:seed --class="Database\\Seeders\\DatabaseSeeder"
+     *
+     * php artisan db:seed
      */
     public function run(): void
     {
-        // User::factory(10)->create();
-
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-        ]);
-
         $this->call([
             DefaultUserSeeder::class,
             ChannelSeeder::class,
