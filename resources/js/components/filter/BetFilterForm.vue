@@ -56,7 +56,7 @@ const handleReset = () => {
 const handleRefreshAndReset = () => {
     skipNextWatch = true;
 
-    handleReset(); 
+    handleReset();
     props.onRefresh();
 };
 
@@ -95,16 +95,22 @@ const handleLoadMoreChannels = (page, query) => {
 
             <div class="btn-list">
                 <!-- Reset Button -->
-                <button type="button" class="btn btn-primary px-1" @click="handleReset">
+                <button
+                    type="button"
+                    class="btn btn-primary px-1"
+                    @click="handleReset"
+                    title="Reset all filters to default"
+                >
                     <i class="las la-eraser fs-2"></i> Reset
                 </button>
 
                 <!-- Refresh Button -->
-                <button 
-                    type="button" 
-                    class="btn btn-icon btn-outline-secondary" 
-                    aria-label="Refresh" 
+                <button
+                    type="button"
+                    class="btn btn-icon btn-outline-secondary"
+                    aria-label="Refresh"
                     @click="handleRefreshAndReset"
+                    title="Refresh the data table and Reset filters"
                     :disabled="loading.masters || loading.accounts || loading.channels"
                 >
                     <i class="las la-sync-alt fs-2" :class="{ 'fa-spin': loading }"></i>
