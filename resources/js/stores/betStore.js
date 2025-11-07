@@ -12,7 +12,7 @@ const getInitialFilters = () => ({
     sort_by: 'trandate',
     sort_dir: 'desc',
     account: '',
-    trandate: getTodayDate(),
+    trandate: '',
     master: '',
     channel: '',
 });
@@ -26,8 +26,6 @@ const initialRangeState = {
 
 export const useBetStore = defineStore('bet', {
     state: () => {
-        const today = new Date().toISOString().split('T')[0];
-
         return {
             data: [],
             meta: {},
@@ -40,7 +38,10 @@ export const useBetStore = defineStore('bet', {
             rangesTables: initialRangeState,
             rangeLoading: false,
 
-            filters: getInitialFilters(),
+            filters: {
+                ...getInitialFilters(),
+                trandate: getTodayDate(),
+            },
         };
     },
 
