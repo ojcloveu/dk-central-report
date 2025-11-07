@@ -66,8 +66,12 @@ const sortableColumns = [
 
 <template>
     <div>
-        <BetPageHeader :onRefresh="betStore.fetchBetsWithReset" />
-        <BetFilterForm :initialFilters="localFilters" :onSubmit="submitFilters" />
+        <BetPageHeader />
+        <BetFilterForm
+            :initialFilters="localFilters"
+            :onSubmit="submitFilters"
+            :onRefresh="betStore.fetchBetsWithReset"
+        />
 
         <div class="card">
             <!-- Main table loading -->
