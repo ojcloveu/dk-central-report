@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\User;
+use Database\Seeders\Production\LpColorSettingSeeder;
 use Illuminate\Database\Seeder;
 use Database\Seeders\Production\DefaultUserSeeder;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
@@ -19,9 +20,15 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call([
+            // Default user
             DefaultUserSeeder::class,
+
+            // Data
             ChannelSeeder::class,
             BetSeeder::class,
+
+            // Setting
+            LpColorSettingSeeder::class,
         ]);
     }
 }
