@@ -11,16 +11,24 @@ import EmptyState from './EmptyState.vue';
 import RangeTable from './RangeTable.vue';
 import BetTableSkeleton from './loading/BetTableSkeleton.vue';
 
+/*
+ * State Management & Initialization
+ */
 const betStore = useBetStore();
-
 const localFilters = reactive({ ...betStore.filters });
-
-const submitFilters = filters => betStore.applyFilters(filters);
 
 onMounted(() => {
     if (!betStore.hasBets) betStore.fetchBets();
 });
 
+/*
+ * Filter Submission & Refresh
+ */
+const submitFilters = filters => betStore.applyFilters(filters);
+
+/*
+ * Pagination Handling
+ */
 const handlePaginationClick = page => {
     if (page === '&laquo; Previous') page = betStore.meta.current_page - 1;
     else if (page === 'Next &raquo;') page = betStore.meta.current_page + 1;
@@ -32,6 +40,9 @@ const handlePerPageChange = perPage => {
     betStore.setPerPage(perPage);
 };
 
+/*
+ * Sorting Logic
+ */
 const handleSort = column => {
     let sortDir = 'asc';
     if (betStore.filters.sort_by === column)
@@ -39,6 +50,9 @@ const handleSort = column => {
     betStore.setSort(column, sortDir);
 };
 
+/*
+ * Table Styling Helpers
+ */
 const getMasterBadgeClass = master => {
     const classes = {
         VIRTUAL: 'bg-primary-lt',
@@ -50,6 +64,9 @@ const getMasterBadgeClass = master => {
     return classes[master] || 'bg-secondary-lt';
 };
 
+/*
+ * Sortable Column Configuration
+ */
 const sortableColumns = [
     { key: 'account', label: 'Account' },
     { key: 'channel', label: 'Channel' },
@@ -66,23 +83,29 @@ const sortableColumns = [
 
 <template>
     <div>
+        <!-- Page Header -->
         <BetPageHeader />
+
+        <!-- Filter Form -->
         <BetFilterForm
             :initialFilters="localFilters"
             :onSubmit="submitFilters"
             :onRefresh="betStore.fetchBetsWithReset"
         />
 
+        <!-- Bet Data Table Section -->
         <div class="card">
-            <!-- Main table loading -->
+            <!-- Table Loading State -->
             <div v-if="betStore.loading" class="card-body p-0">
                 <BetTableSkeleton />
             </div>
 
+            <!-- Error State -->
             <div v-else-if="betStore.error" class="card-body">
                 <div class="alert alert-danger">{{ betStore.error }}</div>
             </div>
 
+            <!-- Table Data -->
             <div v-else-if="betStore.hasBets">
                 <div class="table-responsive">
                     <table class="table table-vcenter table-hover card-table">
@@ -102,6 +125,7 @@ const sortableColumns = [
                     </table>
                 </div>
 
+                <!-- Pagination Controls -->
                 <Pagination
                     :meta="betStore.meta"
                     :onPageClick="handlePaginationClick"
@@ -109,6 +133,7 @@ const sortableColumns = [
                 />
             </div>
 
+            <!-- Empty State -->
             <EmptyState
                 v-else
                 title="No bet reports found"
@@ -118,6 +143,7 @@ const sortableColumns = [
             />
         </div>
 
+        <!-- Range Table (Visible when accounts are selected) -->
         <RangeTable v-if="betStore.hasSelectedAccounts" class="mt-4" />
     </div>
 </template>
