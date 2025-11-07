@@ -8,6 +8,7 @@ import SingleSelectFilter from './SingleSelectFilter.vue';
 const props = defineProps({
     initialFilters: Object,
     onSubmit: Function,
+    onRefresh: Function,
 });
 
 const localFilters = reactive({ ...props.initialFilters });
@@ -35,6 +36,13 @@ const handleReset = () => {
     localFilters.master = '';
     localFilters.account = '';
     localFilters.channel = '';
+};
+
+const handleRefreshAndReset = () => {
+    handleReset(); 
+    if (typeof props.onRefresh === 'function') {
+        props.onRefresh();
+    }
 };
 
 // Handle search for each filter type
@@ -69,9 +77,21 @@ const handleLoadMoreChannels = (page, query) => {
         <div class="card-header d-flex justify-content-between align-items-center">
             <h3 class="card-title">Filter Transactions</h3>
 
-            <div>
-                <button type="button" class="btn btn-primary px-1 btn-sm" @click="handleReset">
+            <div class="btn-list">
+                <!-- Reset Button -->
+                <button type="button" class="btn btn-primary px-1" @click="handleReset">
                     <i class="las la-eraser fs-2"></i> Reset
+                </button>
+
+                <!-- Refresh Button -->
+                <button 
+                    type="button" 
+                    class="btn btn-icon btn-outline-secondary" 
+                    aria-label="Refresh" 
+                    @click="handleRefreshAndReset"
+                    :disabled="loading.masters || loading.accounts || loading.channels"
+                >
+                    <i class="las la-sync-alt fs-2"></i>
                 </button>
             </div>
         </div>
