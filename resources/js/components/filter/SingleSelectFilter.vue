@@ -3,6 +3,9 @@
 import { nextTick, watch } from 'vue';
 import { ref, computed, onMounted, onUnmounted } from 'vue';
 
+/*
+ * Props & Emits
+ */
 const props = defineProps({
     // Value props
     items: { type: Array, default: () => [] },
@@ -21,6 +24,9 @@ const props = defineProps({
 
 const emit = defineEmits(['update:modelValue', 'load-more', 'search']);
 
+/*
+ * Reactive State & References
+ */
 const isDropdownOpen = ref(false);
 const searchQuery = ref('');
 const selectedValue = ref(props.modelValue || null);
@@ -32,28 +38,33 @@ const listContainerRef = ref(null);
 
 const filteredItems = computed(() => props.items);
 
-// Toggle dropdown
+/*
+ * Dropdown Toggle
+ */
 const toggleDropdown = () => {
     isDropdownOpen.value = !isDropdownOpen.value;
 };
 
+/*
+ * Debounced Search
+ */
 let searchDebounce = null;
 watch(searchQuery, newQuery => {
     clearTimeout(searchDebounce);
 
     if (isDropdownOpen.value) {
-        // Debounce the search to prevent excessive requests while typing
         searchDebounce = setTimeout(() => {
-            // Emit the search event with the query. This must trigger page 1 fetch in the parent.
             emit('search', newQuery);
         }, 500);
     }
 });
 
-// Watch dropdown state
+/*
+ * Dropdown State Watcher
+ */
 watch(isDropdownOpen, async open => {
     if (open) {
-        // If items are empty (initial open) or there is a query (reopening with search history), fetch page 1.
+        // Fetch initial data or refresh results
         if (props?.items.length === 0 || searchQuery.value) {
             emit('search', searchQuery.value);
         }
@@ -61,20 +72,22 @@ watch(isDropdownOpen, async open => {
         await nextTick();
         searchInputRef.value?.focus();
 
-        // Setup scroll listener
+        // Attach scroll listener for infinite scroll
         if (listContainerRef.value) {
             listContainerRef.value.addEventListener('scroll', handleScroll);
         }
     } else {
-        // Remove scroll listener
+        // Remove scroll listener when dropdown closes
         if (listContainerRef.value) {
             listContainerRef.value.removeEventListener('scroll', handleScroll);
         }
     }
 });
 
-// Watch if modelValue changes from parent
-watch(() => props.modelValue, (newValue) => {
+/*
+ * Model Value Watcher
+ */
+watch(() => props.modelValue, newValue => {
     if (newValue === '' || newValue === null) {
         selectedValue.value = null;
         searchQuery.value = '';
@@ -83,20 +96,23 @@ watch(() => props.modelValue, (newValue) => {
     }
 });
 
-// Handle infinite scroll
+/*
+ * Infinite Scroll
+ */
 const handleScroll = () => {
     if (!listContainerRef.value || isLoadingMore.value || !props.hasNextPage) return;
 
     const { scrollTop, scrollHeight, clientHeight } = listContainerRef.value;
     const scrollPercentage = (scrollTop + clientHeight) / scrollHeight;
 
-    // Load more when scrolled 80% of the list
     if (scrollPercentage > 0.8) {
         loadMore();
     }
 };
 
-// Load more items
+/*
+ * Load More
+ */
 const loadMore = async () => {
     if (isLoadingMore.value || !props.hasNextPage || props.loading) return;
 
@@ -111,14 +127,15 @@ const loadMore = async () => {
     }
 };
 
-// Select item
+/*
+ * Selection Logic
+ */
 const selectItem = item => {
     selectedValue.value = item;
     emit('update:modelValue', item);
     isDropdownOpen.value = false;
 };
 
-// Clear selection
 const clearSelection = event => {
     event.stopPropagation();
     selectedValue.value = null;
@@ -127,22 +144,26 @@ const clearSelection = event => {
     searchQuery.value = '';
 };
 
-// Get selected text
+/*
+ * Display Computed
+ */
 const getSelectedText = computed(() => {
     return selectedValue.value || props.placeholder;
 });
 
-// Resolving selected state
+/*
+ * Outside Click Handling
+ */
 const resolvingSelected = ref(false);
-
-// Handle click outside
 const handleClickOutside = event => {
     if (selectRef.value && !selectRef.value.contains(event.target)) {
         isDropdownOpen.value = false;
     }
 };
 
-// Setup event listeners
+/*
+ * Lifecycle Hooks
+ */
 onMounted(() => {
     document.addEventListener('click', handleClickOutside);
 });
