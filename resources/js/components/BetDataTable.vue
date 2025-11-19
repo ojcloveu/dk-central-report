@@ -10,12 +10,15 @@ import Pagination from './table/Pagination.vue';
 import EmptyState from './EmptyState.vue';
 import RangeTable from './RangeTable.vue';
 import BetTableSkeleton from './loading/BetTableSkeleton.vue';
+import { storeToRefs } from 'pinia';
 
 /*
  * State Management & Initialization
  */
 const betStore = useBetStore();
 const localFilters = reactive({ ...betStore.filters });
+
+const { loading, rangeLoading } = storeToRefs(betStore);
 
 onMounted(() => {
     if (!betStore.hasBets) betStore.fetchBets();
@@ -88,6 +91,7 @@ const sortableColumns = [
             :initialFilters="localFilters"
             :onSubmit="submitFilters"
             :onRefresh="betStore.fetchBetsWithReset"
+            :rangeLoading="loading || rangeLoading"
         />
 
         <!-- Bet Data Table Section -->

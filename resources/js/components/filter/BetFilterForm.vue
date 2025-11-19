@@ -12,6 +12,10 @@ const props = defineProps({
     initialFilters: Object,
     onSubmit: Function,
     onRefresh: Function,
+    rangeLoading: {
+        type: Boolean,
+        default: false,
+    },
 });
 
 /*
@@ -39,8 +43,8 @@ let skipNextWatch = ref(false);
 
 // Watch for changes in filter form
 watch(localFilters, () => {
-    if (skipNextWatch.value) { 
-        skipNextWatch.value = false; 
+    if (skipNextWatch.value) {
+        skipNextWatch.value = false;
         return;
     }
     triggerFilter();
@@ -54,10 +58,8 @@ const handleReset = () => {
     localFilters.channel = '';
 };
 
-const handleRefreshAndReset = () => {
-    skipNextWatch.value = true;
-
-    handleReset();
+// Refetch bet and period data
+const handleRefetchBetAndPeriod = () => {
     props.onRefresh();
 };
 
@@ -112,7 +114,7 @@ const handleLoadMoreChannels = (page, query) => {
                     title="Reset all filters to default"
                     :disabled="!hasFiltersToReset"
                 >
-                    <i class="las la-sliders-h fs-2"></i> 
+                    <i class="las la-sliders-h fs-2"></i>
                     Reset Filter
                 </button>
 
@@ -121,9 +123,9 @@ const handleLoadMoreChannels = (page, query) => {
                     type="button"
                     class="btn btn-icon btn-outline-secondary"
                     aria-label="Refresh"
-                    @click="handleRefreshAndReset"
+                    @click="handleRefetchBetAndPeriod"
                     title="Refresh the data table and Reset filters"
-                    :disabled="loading.masters || loading.accounts || loading.channels"
+                    :disabled="rangeLoading"
                 >
                     <i class="las la-sync-alt fs-2" :class="{ 'fa-spin': loading }"></i>
                 </button>
@@ -140,7 +142,7 @@ const handleLoadMoreChannels = (page, query) => {
                 <div class="col-md-3 col-sm-6">
                     <label class="form-label">Master</label>
                     <MultiSelectFilter
-                        v-model="localFilters.master" 
+                        v-model="localFilters.master"
                         :items="filterStore.masters"
                         :placeholder="'Select Master(s)'"
                         :loading="loading.masters"

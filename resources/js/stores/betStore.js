@@ -212,5 +212,13 @@ export const useBetStore = defineStore('bet', {
             this.rangesTables = initialRangeState;
             this.fetchBets();
         },
+
+        /**
+         * Action to refetch bets and period data
+         */
+        refetchBetsAndPeriod() {
+            this.fetchBets();
+            this.fetchRangeData();
+        },
     },
 });
