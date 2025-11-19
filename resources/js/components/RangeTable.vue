@@ -1,9 +1,12 @@
 <script setup>
+import { storeToRefs } from 'pinia';
 import { useBetStore } from '../stores/betStore';
 import { amountColor, lpBgColor } from '../utils/getStatusClass';
 import RangeTableSkeleton from './loading/RangeTableSkeleton.vue';
 
 const betStore = useBetStore();
+
+const { loading, rangeLoading } = storeToRefs(betStore);
 
 /*
  * Define the keys and labels
@@ -38,15 +41,33 @@ const handlePaginationClick = (rangeKey, linkLabel) => {
 const handleChangePerPage = (rangeKey, count) => {
     betStore.setRangeItemsPerPage(rangeKey, +count);
 };
+
+const handleRefetchBetAndPeriod = () => {
+    betStore.fetchBetsWithReset();
+};
 </script>
 
 <template>
     <div class="py-3">
-        <div class="mb-3">
-            <h2 class="page-title">Selected Account Period</h2>
-            <div class="text-muted mt-1">
-                View last one week, one month and three months betting transactions
+        <div class="mb-3 d-flex justify-content-between align-items-end">
+            <div>
+                <h2 class="page-title">Selected Account Period</h2>
+                <div class="text-muted mt-1">
+                    View last one week, one month and three months betting transactions
+                </div>
             </div>
+
+            <!-- Refresh Button -->
+            <button
+                type="button"
+                class="btn btn-icon btn-outline-secondary"
+                aria-label="Refresh"
+                @click="handleRefetchBetAndPeriod"
+                title="Refresh the data table and Reset filters"
+                :disabled="loading || rangeLoading"
+            >
+                <i class="las la-sync-alt fs-2" :class="{ 'fa-spin': loading }"></i>
+            </button>
         </div>
 
         <!-- Skeleton Loading -->
@@ -70,7 +91,6 @@ const handleChangePerPage = (rangeKey, count) => {
                             <option value="100">100</option>
                         </select>
                     </div>
-                    
                 </div>
 
                 <!-- Table body -->
@@ -114,7 +134,9 @@ const handleChangePerPage = (rangeKey, count) => {
                     v-if="getRangeData(period.key)?.meta"
                     class="card-footer d-flex flex-column flex-sm-row align-items-center"
                 >
-                    <ul class="pagination m-0 mt-2 mt-sm-0 w-auto w-sm-auto justify-content-center justify-content-md-end flex-grow-1">
+                    <ul
+                        class="pagination m-0 mt-2 mt-sm-0 w-auto w-sm-auto justify-content-center justify-content-md-end flex-grow-1"
+                    >
                         <li
                             v-for="link in getRangeData(period?.key).meta?.links"
                             :key="link?.label"
