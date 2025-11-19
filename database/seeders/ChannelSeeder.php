@@ -17,23 +17,23 @@ class ChannelSeeder extends Seeder
     {
         $channels = [
             [
+                'channel_name' => 'DK',
+                'channel_description' => 'DK Channel',
+                'is_active' => true,
+            ],
+            [
                 'channel_name' => 'VN',
                 'channel_description' => 'Vietnam Channel',
                 'is_active' => true,
             ],
             [
-                'channel_name' => 'SG',
-                'channel_description' => 'Singapore Channel',
-                'is_active' => true,
-            ],
-            [
-                'channel_name' => 'MY',
-                'channel_description' => 'Malaysia Channel',
-                'is_active' => true,
-            ],
-            [
                 'channel_name' => 'TH',
                 'channel_description' => 'Thailand Channel',
+                'is_active' => true,
+            ],
+            [
+                'channel_name' => 'PH',
+                'channel_description' => 'Philippines Channel',
                 'is_active' => true,
             ],
         ];
