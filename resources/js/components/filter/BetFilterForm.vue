@@ -112,7 +112,8 @@ const handleLoadMoreChannels = (page, query) => {
                     title="Reset all filters to default"
                     :disabled="!hasFiltersToReset"
                 >
-                    <i class="las la-eraser fs-2"></i> Reset
+                    <i class="las la-sliders-h fs-2"></i> 
+                    Reset Filter
                 </button>
 
                 <!-- Refresh Button -->
