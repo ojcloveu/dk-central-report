@@ -6,7 +6,7 @@
 />
 
 {{-- CRUD --}}
-<x-backpack::menu-dropdown title="CRUD" icon="las la-folder-open">
+<x-backpack::menu-dropdown title="CRUD" icon="las la-list-ul">
     <x-backpack::menu-dropdown-header title="CRUD" />
     <x-backpack::menu-dropdown-item title="Bets" icon="la la-dice" :link="backpack_url('bet')" />
     <x-backpack::menu-dropdown-item title="Channels" icon="las la-tv" :link="backpack_url('channel')" />
