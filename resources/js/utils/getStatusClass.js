@@ -17,10 +17,10 @@ export const getMasterBadgeClass = master => {
 
 export const lpBgColor = lp => {
     const color = lp && lp?.color ? lp.color.toLowerCase() : 'secondary';
-    return `bg-${color}-lt`;
+    return `fw-bold bg-${color}-lt`;
 };
 
 export const amountColor = amount => {
-    if (String(amount).startsWith('-')) return 'text-danger';
-    else return 'text-success';
+    if (String(amount).startsWith('-')) return 'fw-bold text-danger';
+    else return 'fw-bold';
 };
