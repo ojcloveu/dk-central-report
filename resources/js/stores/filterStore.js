@@ -132,7 +132,7 @@ export const useFilterStore = defineStore('filter', {
                 const response = await filterOptionsServices.fetchMasters({ ...payload, page });
 
                 const results = response.data || [];
-                const mappedResults = results.map(item => item.master || item);
+                const mappedResults = results.map(item => item.name || item);
 
                 if (append) {
                     this.masters = [...this.masters, ...mappedResults];
