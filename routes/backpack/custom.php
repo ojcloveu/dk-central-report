@@ -18,6 +18,7 @@ Route::group([
 ], function () { // custom admin routes
     Route::crud('bet', 'BetCrudController');
     Route::crud('masters', 'MasterCrudController');
+    Route::crud('channel', 'ChannelCrudController');
 
     // Initial route
     Route::get('report', 'BetReportController@index')->name('page.report.index');
