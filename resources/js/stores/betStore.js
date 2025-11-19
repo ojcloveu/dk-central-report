@@ -13,7 +13,7 @@ const getInitialFilters = () => ({
     sort_dir: 'desc',
     account: '',
     trandate: '',
-    master: '',
+    master: [],
     channel: '',
 });
 
@@ -51,18 +51,18 @@ export const useBetStore = defineStore('bet', {
 
         // Getter to prepare URL for current state
         currentApiUrl: state => {
-            const cleanFilters = Object.keys(state.filters).reduce((acc, key) => {
-                const value = state.filters[key];
+            const params = new URLSearchParams();
 
-                // Keep the value if not an empty string and not null
-                if (value !== '' && value !== null) {
-                    acc[key] = value;
+            Object.entries(state.filters).forEach(([key, value]) => {
+                if (value === '' || value === null) return;
+
+                if (Array.isArray(value)) {
+                    value.forEach(v => params.append(key, v));
+                } else {
+                    params.append(key, value);
                 }
-                return acc;
-            }, {});
+            });
 
-            // Construct URLSearchParams from the clean object
-            const params = new URLSearchParams(cleanFilters);
             return `/admin/api/bets?${params.toString()}`;
         },
 
