@@ -55,11 +55,8 @@ const handleSort = column => {
  */
 const getMasterBadgeClass = master => {
     const classes = {
-        VIRTUAL: 'bg-primary-lt',
-        ESPORTS: 'bg-success-lt',
-        LOTTERY: 'bg-warning-lt',
-        POKER: 'bg-info-lt',
-        SLOTS: 'bg-purple-lt',
+        DKAO: 'bg-info-lt',
+        DKDK: 'bg-purple-lt',
     };
     return classes[master] || 'bg-secondary-lt';
 };
