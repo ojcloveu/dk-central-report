@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Requests\BetRequest;
 use App\Models\Bet;
 use App\Models\Channel;
+use App\Models\Master;
 use Backpack\CRUD\app\Http\Controllers\CrudController;
 use Backpack\CRUD\app\Library\CrudPanel\CrudPanelFacade as CRUD;
 
@@ -106,15 +107,14 @@ class BetCrudController extends CrudController
     public function fetchMasters()
     {
         return $this->fetch([
-            'model' => Bet::class,
-            'searchable_attributes' => ['master'], 
+            'model' => Master::class,
+            'searchable_attributes' => ['name'],
             'paginate' => 5,
-            'select' => ['master'],
+            'select' => ['name'],
             'query' => function ($query) {
-                return $query->select('master')
-                    ->groupBy('master')
-                    ->orderBy('master', 'asc');
-            },
+                return $query->where('is_active', true)
+                    ->orderBy('name', 'asc');
+            }
         ]);
     }
 
@@ -129,7 +129,7 @@ class BetCrudController extends CrudController
             'paginate' => 5,
             'select' => ['channel_name'],
             'query' => function ($query) {
-                return $query->where('is_active', true) 
+                return $query->where('is_active', true)
                     ->orderBy('channel_name', 'asc');
             },
         ]);
@@ -142,7 +142,7 @@ class BetCrudController extends CrudController
     {
         return $this->fetch([
             'model' => Bet::class,
-            'searchable_attributes' => ['account'], 
+            'searchable_attributes' => ['account'],
             'paginate' => 5,
             'select' => ['account'],
             'query' => function ($query) {
