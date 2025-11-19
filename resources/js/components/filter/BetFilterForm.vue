@@ -1,8 +1,9 @@
 <script setup>
 import { reactive, watch, onMounted, ref, nextTick, computed } from 'vue';
-import { useFilterStore } from '@/stores/filterStore';
 import { storeToRefs } from 'pinia';
+import { useFilterStore } from '@/stores/filterStore';
 import SingleSelectFilter from './SingleSelectFilter.vue';
+import MultiSelectFilter from './MultiSelectFilter.vue';
 
 /*
  * Props & emits
@@ -48,7 +49,7 @@ watch(localFilters, () => {
 // Reset filters
 const handleReset = () => {
     localFilters.trandate = '';
-    localFilters.master = '';
+    localFilters.master = [];
     localFilters.account = '';
     localFilters.channel = '';
 };
@@ -63,7 +64,7 @@ const handleRefreshAndReset = () => {
 const hasFiltersToReset = computed(() => {
     return (
         localFilters.trandate !== '' ||
-        localFilters.master !== '' ||
+        localFilters.master.length > 0 ||
         localFilters.account !== '' ||
         localFilters.channel !== ''
     );
@@ -137,10 +138,10 @@ const handleLoadMoreChannels = (page, query) => {
 
                 <div class="col-md-3 col-sm-6">
                     <label class="form-label">Master</label>
-                    <SingleSelectFilter
-                        v-model="localFilters.master"
+                    <MultiSelectFilter
+                        v-model="localFilters.master" 
                         :items="filterStore.masters"
-                        :placeholder="'Select Master'"
+                        :placeholder="'Select Master(s)'"
                         :loading="loading.masters"
                         :fetch-items="() => filterStore.fetchMasters({ page: 1 })"
                         :has-next-page="pagination.masters.hasNextPage"
