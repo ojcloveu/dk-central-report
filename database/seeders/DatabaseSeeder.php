@@ -26,6 +26,7 @@ class DatabaseSeeder extends Seeder
             // Data
             ChannelSeeder::class,
             BetSeeder::class,
+            MasterSeeder::class,
 
             // Setting
             LpColorSettingSeeder::class,
