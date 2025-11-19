@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class MasterRequest extends FormRequest
 {
@@ -21,8 +22,7 @@ class MasterRequest extends FormRequest
      */
     public function rules()
     {
-        // Rule for 'name' to be unique, ignoring the current ID when updating
-        $id = $this->route('master'); 
+        $id = $this->route('id');
 
         return [
             'name' => 'required|min:2|max:100|unique:masters,name,' . $id,
