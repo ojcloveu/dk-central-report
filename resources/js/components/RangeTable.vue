@@ -74,6 +74,26 @@ const handleRowCheckboxChange = (account, isChecked) => {
     betStore.toggleAccountSelection(account, isChecked);
 };
 
+// Sorting state for RangeTable
+const rangeSort = reactive({
+    sort_by: 'account',
+    sort_dir: 'asc',
+});
+
+// Handle sorting when click table column
+const handleRangeSort = column => {
+    if (rangeSort.sort_by === column) {
+        // toggle direction
+        rangeSort.sort_dir = rangeSort.sort_dir === 'asc' ? 'desc' : 'asc';
+    } else {
+        rangeSort.sort_by = column;
+        rangeSort.sort_dir = 'asc';
+    }
+
+    // Refetch all 7d, 1m, 3m tables with sort param
+    betStore.fetchRangeData(null, 1, null, rangeSort.sort_by, rangeSort.sort_dir);
+};
+
 /*
  * Checkbox select/unselect all accounts in a period
  */
@@ -110,7 +130,8 @@ const handleSelectAll = (periodKey, event) => {
             acc => !accounts.includes(acc)
         );
     }
-    betStore.fetchRangeData();
+    // Preserve current sort when refetch
+    betStore.fetchRangeData(null, 1, null, rangeSort.sort_by, rangeSort.sort_dir);
 };
 
 // Watch and update indeterminate state for ALL checkboxes
@@ -216,11 +237,40 @@ onMounted(async () => {
                                             @change="handleSelectAll(period.key, $event)"
                                         />
                                     </th>
-                                    <th>Account</th>
-                                    <th>Count</th>
-                                    <th>Turnover</th>
-                                    <th>Win/Lose</th>
-                                    <th>LP</th>
+                                    <th @click="handleRangeSort('account')" class="sortable">
+                                        Account
+                                        <span v-if="rangeSort.sort_by === 'account'">
+                                            {{ rangeSort.sort_dir === 'asc' ? '▲' : '▼' }}
+                                        </span>
+                                    </th>
+
+                                    <th @click="handleRangeSort('total_count')" class="sortable">
+                                        Count
+                                        <span v-if="rangeSort.sort_by === 'total_count'">
+                                            {{ rangeSort.sort_dir === 'asc' ? '▲' : '▼' }}
+                                        </span>
+                                    </th>
+
+                                    <th @click="handleRangeSort('total_turnover')" class="sortable">
+                                        Turnover
+                                        <span v-if="rangeSort.sort_by === 'total_turnover'">
+                                            {{ rangeSort.sort_dir === 'asc' ? '▲' : '▼' }}
+                                        </span>
+                                    </th>
+
+                                    <th @click="handleRangeSort('total_winlose')" class="sortable">
+                                        Win/Lose
+                                        <span v-if="rangeSort.sort_by === 'total_winlose'">
+                                            {{ rangeSort.sort_dir === 'asc' ? '▲' : '▼' }}
+                                        </span>
+                                    </th>
+
+                                    <th @click="handleRangeSort('total_lp')" class="sortable">
+                                        LP
+                                        <span v-if="rangeSort.sort_by === 'total_lp'">
+                                            {{ rangeSort.sort_dir === 'asc' ? '▲' : '▼' }}
+                                        </span>
+                                    </th>
                                 </tr>
                             </thead>
                             <tbody>
