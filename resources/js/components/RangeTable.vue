@@ -7,6 +7,7 @@ import RangeTableSkeleton from './loading/RangeTableSkeleton.vue';
 const betStore = useBetStore();
 
 const { loading, rangeLoading } = storeToRefs(betStore);
+const { hasSelectedAccounts } = storeToRefs(betStore);
 
 /*
  * Define the keys and labels
@@ -22,6 +23,9 @@ const rangePeriods = [
  */
 const getRangeData = key => betStore.rangesTables[key];
 
+/*
+ * Handle pagination click
+ */
 const handlePaginationClick = (rangeKey, linkLabel) => {
     if (typeof linkLabel === 'number') {
         betStore.setRangePage(rangeKey, linkLabel);
@@ -38,12 +42,25 @@ const handlePaginationClick = (rangeKey, linkLabel) => {
     }
 };
 
+/*
+ * Handle change per page
+ */
 const handleChangePerPage = (rangeKey, count) => {
     betStore.setRangeItemsPerPage(rangeKey, +count);
 };
 
+/*
+ * Handle refetch bet and period data
+ */
 const handleRefetchBetAndPeriod = () => {
     betStore.refetchBetsAndPeriod();
+};
+
+/*
+ * Handle remove all selected accounts
+ */
+const handleRemoveSelectedAccounts = () => {
+    betStore.clearAllSelectedAccounts();
 };
 </script>
 
@@ -57,17 +74,31 @@ const handleRefetchBetAndPeriod = () => {
                 </div>
             </div>
 
-            <!-- Refresh Button -->
-            <button
-                type="button"
-                class="btn btn-icon btn-outline-secondary"
-                aria-label="Refresh"
-                @click="handleRefetchBetAndPeriod"
-                title="Refresh the data table and Reset filters"
-                :disabled="loading || rangeLoading"
-            >
-                <i class="las la-sync-alt fs-2" :class="{ 'fa-spin': loading }"></i>
-            </button>
+            <div class="d-flex gap-2">
+                <!-- Remove selected accounts Button -->
+                <button
+                    type="button"
+                    class="btn btn-primary px-2"
+                    @click="handleRemoveSelectedAccounts"
+                    title="Remove all selected accounts"
+                    :disabled="!hasSelectedAccounts"
+                >
+                    <i class="las la-user-circle fs-2 pe-1"></i>
+                    Reset selected
+                </button>
+
+                <!-- Refresh Button -->
+                <button
+                    type="button"
+                    class="btn btn-icon btn-outline-secondary"
+                    aria-label="Refresh"
+                    @click="handleRefetchBetAndPeriod"
+                    title="Refresh the data table and Reset filters"
+                    :disabled="loading || rangeLoading"
+                >
+                    <i class="las la-sync-alt fs-2" :class="{ 'fa-spin': loading }"></i>
+                </button>
+            </div>
         </div>
 
         <!-- Skeleton Loading -->

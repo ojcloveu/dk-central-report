@@ -162,6 +162,15 @@ export const useBetStore = defineStore('bet', {
         },
 
         /**
+         * Action to clear all selected accounts and refresh range data.
+         */
+        clearAllSelectedAccounts() {
+            this.selectedAccounts = [];
+            this.rangesTables = initialRangeState;
+            this.fetchRangeData();
+        },
+
+        /**
          * Action fetches data for Range Table based on selected accounts and periods
          */
         async fetchRangeData(period = null, page = 1, per_page = null) {
