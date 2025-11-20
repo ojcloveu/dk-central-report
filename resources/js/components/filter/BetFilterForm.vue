@@ -2,6 +2,7 @@
 import { reactive, watch, onMounted, ref, nextTick, computed } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useFilterStore } from '@/stores/filterStore';
+import { useBetStore } from '@/stores/betStore';
 import SingleSelectFilter from './SingleSelectFilter.vue';
 import MultiSelectFilter from './MultiSelectFilter.vue';
 
@@ -23,7 +24,10 @@ const props = defineProps({
  */
 const localFilters = reactive({ ...props.initialFilters });
 const filterStore = useFilterStore();
+const betStore = useBetStore();
+
 const { pagination, loading } = storeToRefs(filterStore);
+const { hasSelectedAccounts } = storeToRefs(betStore);
 
 /*
  * Helpers: debounce for filter submission
@@ -61,6 +65,11 @@ const handleReset = () => {
 // Refetch bet and period data
 const handleRefetchBetAndPeriod = () => {
     props.onRefresh();
+};
+
+// Remove all selected accounts
+const handleRemoveSelectedAccounts = () => {
+    betStore.clearAllSelectedAccounts();
 };
 
 const hasFiltersToReset = computed(() => {
@@ -106,6 +115,18 @@ const handleLoadMoreChannels = (page, query) => {
             <h3 class="card-title">Filter Transactions</h3>
 
             <div class="btn-list">
+                <!-- Remove selected accounts Button -->
+                <button
+                    type="button"
+                    class="btn btn-primary px-2"
+                    @click="handleRemoveSelectedAccounts"
+                    title="Remove all selected accounts"
+                    :disabled="!hasSelectedAccounts"
+                >
+                    <i class="las la-user-circle fs-2 pe-1"></i>
+                    Reset selected
+                </button>
+
                 <!-- Reset Button -->
                 <button
                     type="button"
@@ -114,7 +135,7 @@ const handleLoadMoreChannels = (page, query) => {
                     title="Reset all filters to default"
                     :disabled="!hasFiltersToReset"
                 >
-                    <i class="las la-sliders-h fs-2"></i>
+                    <i class="las la-sliders-h fs-2 pe-1"></i>
                     Reset Filter
                 </button>
 
