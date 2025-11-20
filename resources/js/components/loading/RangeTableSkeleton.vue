@@ -11,7 +11,7 @@ const props = defineProps({
     // Number of skeleton rows to render in each table
     rowCount: {
         type: Number,
-        default: 3,
+        default: 10,
     },
 });
 
