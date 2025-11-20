@@ -3,13 +3,19 @@ import { storeToRefs } from 'pinia';
 import { useBetStore } from '../stores/betStore';
 import { amountColor, lpBgColor } from '../utils/getStatusClass';
 import RangeTableSkeleton from './loading/RangeTableSkeleton.vue';
-import { computed, ref, onMounted, watch } from 'vue';
+import { computed, ref, onMounted, watch, reactive, nextTick } from 'vue';
 
 const betStore = useBetStore();
 
 const { loading, rangeLoading } = storeToRefs(betStore);
 const { hasSelectedAccounts } = storeToRefs(betStore);
-const selectAllCheckbox = ref(null);
+const selectAllCheckboxes = ref({});
+
+const setSelectAllRef = (periodKey, el) => {
+    if (el) {
+        selectAllCheckboxes.value[periodKey] = el;
+    }
+};
 /*
  * Define the keys and labels
  */
@@ -67,6 +73,71 @@ const handleRemoveSelectedAccounts = () => {
 const handleRowCheckboxChange = (account, isChecked) => {
     betStore.toggleAccountSelection(account, isChecked);
 };
+
+/*
+ * Checkbox select/unselect all accounts in a period
+ */
+const getAllSelected = periodKey =>
+    computed(() => {
+        const data = getRangeData(periodKey)?.data || [];
+        if (data.length === 0) return false;
+
+        // Check if at least one account in period's data is selected
+        return data.every(row => betStore.selectedAccounts.includes(row.account));
+    });
+
+const getSomeSelected = periodKey =>
+    computed(() => {
+        const data = getRangeData(periodKey)?.data || [];
+        const allSelected = getAllSelected(periodKey).value;
+
+        // Check if at least one account in period's data is selected
+        return !allSelected && data.some(row => betStore.selectedAccounts.includes(row.account));
+    });
+
+// Handle select all checkbox change for a specific period
+const handleSelectAll = (periodKey, event) => {
+    const accounts = getRangeData(periodKey)?.data.map(row => row.account) || [];
+    const selectAll = event.target.checked;
+
+    if (selectAll) {
+        // Select all accounts on this page
+        const uniqueNewAccounts = accounts.filter(acc => !betStore.selectedAccounts.includes(acc));
+        betStore.selectedAccounts.push(...uniqueNewAccounts);
+    } else {
+        // Deselect only accounts on this page
+        betStore.selectedAccounts = betStore.selectedAccounts.filter(
+            acc => !accounts.includes(acc)
+        );
+    }
+    betStore.fetchRangeData();
+};
+
+// Watch and update indeterminate state for ALL checkboxes
+watch(
+    () => betStore.selectedAccounts,
+    async () => {
+        await nextTick();
+        rangePeriods.forEach(period => {
+            const checkboxEl = selectAllCheckboxes.value[period.key];
+            if (checkboxEl) {
+                checkboxEl.indeterminate = getSomeSelected(period.key).value;
+            }
+        });
+    },
+    { deep: true }
+);
+
+// Set initial indeterminate state on mount
+onMounted(async () => {
+    await nextTick();
+    rangePeriods.forEach(period => {
+        const checkboxEl = selectAllCheckboxes.value[period.key];
+        if (checkboxEl) {
+            checkboxEl.indeterminate = getSomeSelected(period.key).value;
+        }
+    });
+});
 </script>
 
 <template>
@@ -137,6 +208,13 @@ const handleRowCheckboxChange = (account, isChecked) => {
                                 <tr>
                                     <!-- Checkbox for select all Accounts -->
                                     <th class="w-1">
+                                        <input
+                                            :ref="el => setSelectAllRef(period.key, el)"
+                                            class="form-check-input m-0"
+                                            type="checkbox"
+                                            :checked="getAllSelected(period.key).value"
+                                            @change="handleSelectAll(period.key, $event)"
+                                        />
                                     </th>
                                     <th>Account</th>
                                     <th>Count</th>
