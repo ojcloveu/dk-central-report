@@ -43,7 +43,7 @@ const handleChangePerPage = (rangeKey, count) => {
 };
 
 const handleRefetchBetAndPeriod = () => {
-    betStore.fetchBetsWithReset();
+    betStore.refetchBetsAndPeriod();
 };
 </script>
 
