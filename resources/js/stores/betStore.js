@@ -141,6 +141,27 @@ export const useBetStore = defineStore('bet', {
         },
 
         /**
+         * Action to select/deselect all accounts currently displayed
+         */
+        toggleAllAccountsSelection(selectAll) {
+            const currentAccounts = this.data.map(bet => bet.account);
+
+            if (selectAll) {
+                // Merge current accounts with selected accounts
+                const uniqueNewAccounts = currentAccounts.filter(
+                    acc => !this.selectedAccounts.includes(acc)
+                );
+                this.selectedAccounts = [...this.selectedAccounts, ...uniqueNewAccounts];
+            } else {
+                // Only remove accounts visible on the current page
+                this.selectedAccounts = this.selectedAccounts.filter(
+                    acc => !currentAccounts.includes(acc)
+                );
+            }
+            this.fetchRangeData();
+        },
+
+        /**
          * Action fetches data for Range Table based on selected accounts and periods
          */
         async fetchRangeData(period = null, page = 1, per_page = null) {

@@ -1,4 +1,7 @@
 <script setup>
+import { useBetStore } from '@/stores/betStore';
+import { computed, ref, onMounted, watch } from 'vue';
+
 /*
  * Define the props this component accepts
  */
@@ -7,12 +10,69 @@ const props = defineProps({
     onSort: Function,
     sortableColumns: Array,
 });
+
+const betStore = useBetStore();
+const selectAllCheckbox = ref(null);
+
+/*
+ * Check if all current accounts are selected
+ */
+const allSelected = computed(() => {
+    if (betStore.data.length === 0) return false;
+    return betStore.data.every(bet => betStore.selectedAccounts.includes(bet.account));
+});
+
+/*
+ * Check if some accounts are selected
+ */
+const someSelected = computed(() => {
+    if (betStore.selectedAccounts.length === 0) return false;
+    return (
+        !allSelected.value &&
+        betStore.data.some(bet => betStore.selectedAccounts.includes(bet.account))
+    );
+});
+
+/*
+ * Handle select all checkbox change
+ */
+const handleSelectAll = event => {
+    betStore.toggleAllAccountsSelection(event.target.checked);
+}
+
+/*
+ * Watch for changes in someSelected to update state
+ */
+watch(someSelected, newValue => {
+    if (selectAllCheckbox.value) {
+        selectAllCheckbox.value.indeterminate = newValue;
+    }
+});
+
+/*
+ * Set initial indeterminate state on mount
+ */
+onMounted(() => {
+    if (selectAllCheckbox.value) {
+        selectAllCheckbox.value.indeterminate = someSelected.value;
+    }
+});
 </script>
 
 <template>
     <thead>
         <tr>
-            <th class="w-1"><input class="form-check-input m-0" type="checkbox" /></th>
+            <!-- Checkbox for select all Accounts -->
+            <th class="w-1">
+                <input
+                    ref="selectAllCheckbox"
+                    class="form-check-input m-0"
+                    type="checkbox"
+                    :checked="allSelected"
+                    @change="handleSelectAll"
+                />
+            </th>
+            <!-- Column headers -->
             <th
                 v-for="col in sortableColumns"
                 :key="col.key"
