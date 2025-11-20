@@ -90,7 +90,7 @@ const sortableColumns = [
         <BetFilterForm
             :initialFilters="localFilters"
             :onSubmit="submitFilters"
-            :onRefresh="betStore.fetchBetsWithReset"
+            :onRefresh="betStore.refetchBetsAndPeriod"
             :rangeLoading="loading || rangeLoading"
         />
 
