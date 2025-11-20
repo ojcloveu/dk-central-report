@@ -67,6 +67,9 @@ class BetReportController extends Controller
     {
         // Get Pagination parameter
         $perPage = $request->get('per_page', 10);
+        // Set default sorting to total_turnover DESC
+        $sortBy = $request->get('sort_by', 'total_turnover');
+        $sortDir = $request->get('sort_dir', 'desc');
 
         $startDate = null;
         $period = $request->get('period');
@@ -113,8 +116,10 @@ class BetReportController extends Controller
             ->selectRaw('SUM(turnover) as total_turnover')
             ->selectRaw('SUM(winlose) as total_winlose')
             ->selectRaw('SUM(lp) as total_lp')
-            ->groupBy('account')
-            ->orderBy('total_turnover', 'DESC');
+            ->groupBy('account');
+        
+        // Sorting based on request param
+        $query->orderBy($sortBy, $sortDir);
 
         $betPeriod = $query->paginate($perPage);
 
