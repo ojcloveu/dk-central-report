@@ -3,12 +3,13 @@ import { storeToRefs } from 'pinia';
 import { useBetStore } from '../stores/betStore';
 import { amountColor, lpBgColor } from '../utils/getStatusClass';
 import RangeTableSkeleton from './loading/RangeTableSkeleton.vue';
+import { computed, ref, onMounted, watch } from 'vue';
 
 const betStore = useBetStore();
 
 const { loading, rangeLoading } = storeToRefs(betStore);
 const { hasSelectedAccounts } = storeToRefs(betStore);
-
+const selectAllCheckbox = ref(null);
 /*
  * Define the keys and labels
  */
@@ -61,6 +62,10 @@ const handleRefetchBetAndPeriod = () => {
  */
 const handleRemoveSelectedAccounts = () => {
     betStore.clearAllSelectedAccounts();
+};
+
+const handleRowCheckboxChange = (account, isChecked) => {
+    betStore.toggleAccountSelection(account, isChecked);
 };
 </script>
 
@@ -130,6 +135,9 @@ const handleRemoveSelectedAccounts = () => {
                         <table class="table table-sm mb-0">
                             <thead>
                                 <tr>
+                                    <!-- Checkbox for select all Accounts -->
+                                    <th class="w-1">
+                                    </th>
                                     <th>Account</th>
                                     <th>Count</th>
                                     <th>Turnover</th>
@@ -141,7 +149,21 @@ const handleRemoveSelectedAccounts = () => {
                                 <tr
                                     v-for="row in getRangeData(period?.key).data"
                                     :key="row?.account"
+                                    :class="{ 'table-primary-light': true }"
                                 >
+                                    <td>
+                                        <input
+                                            class="form-check-input m-0"
+                                            type="checkbox"
+                                            :checked="true"
+                                            @change="
+                                                handleRowCheckboxChange(
+                                                    row.account,
+                                                    $event.target.checked
+                                                )
+                                            "
+                                        />
+                                    </td>
                                     <td>{{ row?.account }}</td>
                                     <td>{{ row?.total_count }}</td>
                                     <td :class="amountColor(row?.total_turnover)">
