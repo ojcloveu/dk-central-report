@@ -173,7 +173,13 @@ export const useBetStore = defineStore('bet', {
         /**
          * Action fetches data for Range Table based on selected accounts and periods
          */
-        async fetchRangeData(period = null, page = 1, per_page = null) {
+        async fetchRangeData(
+            period = null,
+            page = 1,
+            per_page = null,
+            sort_by = null,
+            sort_dir = null
+        ) {
             if (this.selectedAccounts.length === 0) {
                 this.rangesTables = initialRangeState;
                 return;
@@ -191,6 +197,14 @@ export const useBetStore = defineStore('bet', {
                     page: page,
                     per_page: currentPerPage,
                 };
+
+                // Add sort param if provided
+                if (sort_by) {
+                    params.sort_by = sort_by;
+                }
+                if (sort_dir) {
+                    params.sort_dir = sort_dir;
+                }
 
                 try {
                     const paginationData = await betServices.fetchRangePeriodData(params);
