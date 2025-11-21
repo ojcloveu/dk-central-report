@@ -52,8 +52,15 @@ class Bet extends Model
         return Attribute::make(
             get: function () {
                 $lp = $this->lp ?? $this->total_lp;
-                $lpJson = config('settings.lp_color') ?? [];
-                $lps = json_decode($lpJson, true);
+                $lpJson = config('settings.lp_color');
+
+                // Handle when setting is not seeded or is null
+                if (empty($lpJson)) {
+                    return 'gray';
+                }
+
+                // If already array use it, else decode the JSON
+                $lps = is_array($lpJson) ? $lpJson : json_decode($lpJson, true);
 
                 $defaultColor = 'gray';
 
