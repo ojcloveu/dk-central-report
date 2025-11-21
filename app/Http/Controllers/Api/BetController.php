@@ -24,7 +24,7 @@ class BetController extends Controller
             $start = now()->startOfDay();          // server timezone
             $end   = (clone $start)->addDay();     // start of next day
 
-            $rows = DB::table('bets as b')
+            $rows = DB::connection('dk')->table('bets as b')
                 ->join('v_user as u', 'u.id', '=', 'b.created_by')
                 ->join('channels as c', 'c.id', '=', 'b.channel_id')
                 ->where('c.channel_name', 'VN')
@@ -50,15 +50,50 @@ class BetController extends Controller
                 ->groupBy('b.created_by', 'u.fullusername', 'c.id', 'c.channel_name', DB::raw('DATE(b.created_at)'))
                 ->get();
 
+            // return response()->json([
+            //     'success' => true,
+            //     'message' => 'Bets synced successfully',
+            //     'data' => [
+            //         'date' => $start->format('Y-m-d'),
+            //         'channel' => 'VN',
+            //         'total_records' => $rows->count(),
+            //         'bets' => $rows
+            //     ]
+            // ], 200);
+            //loop $rows add to bets table
+            foreach ($rows as $row) {
+                DB::table('bets')->updateOrInsert(
+                    [
+                        'account' => $row->fullusername,
+                        'channel' => $row->channel_id,
+                        'trandate'   => $row->bet_date,
+                    ],
+                    [
+                        'account'    => $row->fullusername,
+                        'master'     => substr( $row->fullusername, 4),
+                        'channel'    => $row->channel_name,
+                        'trandate'   => $row->bet_date,
+                        'min'        => $row->min_bet,
+                        'max'        => $row->max_bet,
+                        'count'      => $row->total_bets,
+                        'turnover'   => $row->turnover,
+                        'winlose'    => $row->total_win_lose_amount,
+                        'lp'         => $row->total_win_lose_amount/$row->turnover, // Assuming lp is 0 for now, adjust as needed
+                        'updated_at' => now(),
+                    ]
+                );
+            }
             return response()->json([
                 'success' => true,
                 'message' => 'Bets synced successfully',
                 'data' => [
-                    'sync_date' => $start->format('Y-m-d'),
+                    'date' => $start->format('Y-m-d'),
+                    'channel' => 'VN',
                     'total_records' => $rows->count(),
                     'bets' => $rows
                 ]
             ], 200);
+            
 
         } catch (\Exception $e) {
             Log::error('Sync bets failed: ' . $e->getMessage(), [
