@@ -3,7 +3,7 @@ import { storeToRefs } from 'pinia';
 import { useBetStore } from '../stores/betStore';
 import { amountColor, lpBgColor } from '../utils/getStatusClass';
 import RangeTableSkeleton from './loading/RangeTableSkeleton.vue';
-import SortIcon from './SortIcon.vue';
+import SortIcon from './icons/SortIcon.vue';
 import { computed, ref, onMounted, watch, reactive, nextTick } from 'vue';
 
 const betStore = useBetStore();
