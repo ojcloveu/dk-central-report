@@ -4,6 +4,7 @@ import { useBetStore } from '../stores/betStore';
 import { amountColor, lpBgColor } from '../utils/getStatusClass';
 import RangeTableSkeleton from './loading/RangeTableSkeleton.vue';
 import SortIcon from './icons/SortIcon.vue';
+import ActionButton from './buttons/ActionButton.vue';
 import { computed, ref, onMounted, watch, reactive, nextTick } from 'vue';
 
 const betStore = useBetStore();
@@ -188,28 +189,25 @@ onMounted(async () => {
 
             <div class="d-flex gap-2">
                 <!-- Remove selected accounts Button -->
-                <button
-                    type="button"
-                    class="btn btn-primary px-2"
-                    @click="handleRemoveSelectedAccounts"
+                <ActionButton
+                    variant="primary"
+                    iconClass="las la-user-circle"
+                    label="Reset selected"
                     title="Remove all selected accounts"
                     :disabled="!hasSelectedAccounts"
-                >
-                    <i class="las la-user-circle fs-2 pe-1"></i>
-                    Reset selected
-                </button>
+                    @click="handleRemoveSelectedAccounts"
+                />
 
                 <!-- Refresh Button -->
-                <button
-                    type="button"
-                    class="btn btn-icon btn-outline-secondary"
-                    aria-label="Refresh"
-                    @click="handleRefetchBetAndPeriod"
+                <ActionButton
+                    variant="outline-secondary"
+                    iconClass="las la-sync-alt"
                     title="Refresh the data table and Reset filters"
                     :disabled="loading || rangeLoading"
-                >
-                    <i class="las la-sync-alt fs-2" :class="{ 'fa-spin': loading }"></i>
-                </button>
+                    :loading="loading"
+                    :iconOnly="true"
+                    @click="handleRefetchBetAndPeriod"
+                />
             </div>
         </div>
 
