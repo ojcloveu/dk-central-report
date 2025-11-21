@@ -24,7 +24,7 @@ const setSelectAllRef = (periodKey, el) => {
  */
 const rangePeriods = [
     { key: '7d', label: 'Last 7 days' },
-    { key: '1m', label: 'Last 1 month' },
+    { key: '1m', label: 'Previous month' },
     { key: '3m', label: 'Last 3 months' },
 ];
 
