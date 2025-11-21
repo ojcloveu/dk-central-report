@@ -345,7 +345,7 @@ onMounted(async () => {
                                     <td class="text-end" :class="amountColor(row?.total_winlose)">
                                         {{ row?.total_winlose }}
                                     </td>
-                                    <td :class="lpBgColor(row?.total_lp)">
+                                    <td class="text-end" :class="lpBgColor(row?.total_lp)">
                                         {{
                                             (
                                                 Number(
