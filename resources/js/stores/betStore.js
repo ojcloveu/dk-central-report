@@ -218,6 +218,7 @@ export const useBetStore = defineStore('bet', {
                             total: paginationData.meta.total,
                             links: paginationData.meta.links || [],
                         },
+                        date_range: paginationData.date_range || null,
                     };
                 } catch (error) {
                     console.error(`Error fetching range data for ${p}:`, error);

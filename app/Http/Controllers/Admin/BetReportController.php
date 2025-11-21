@@ -112,6 +112,12 @@ class BetReportController extends Controller
         $betPeriod = $query->paginate($perPage);
 
         return BetReportPeriodResource::collection($betPeriod)
+            ->additional([
+                'date_range' => [
+                    'start_date' => $startDate,
+                    'end_date' => $startEnd,
+                ],
+            ])
             ->response()
             ->setStatusCode(Response::HTTP_OK);
     }

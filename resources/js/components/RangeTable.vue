@@ -235,7 +235,17 @@ onMounted(async () => {
         <div v-else class="d-flex flex-column gap-3">
             <div v-for="period in rangePeriods" :key="period?.key" class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
-                    <strong>{{ period?.label }}</strong>
+                    <div>
+                        <strong>{{ period?.label }}</strong>
+                        <span
+                            v-if="getRangeData(period?.key)?.date_range"
+                            class="text-muted ms-2"
+                            style="font-size: 0.875rem"
+                        >
+                            ({{ getRangeData(period?.key)?.date_range?.start_date }} -
+                            {{ getRangeData(period?.key)?.date_range?.end_date }})
+                        </span>
+                    </div>
 
                     <!-- Show record options -->
                     <div v-if="getRangeData(period?.key)?.meta">
@@ -358,9 +368,9 @@ onMounted(async () => {
                                     </td>
 
                                     <!-- Dummy column deposit -->
-                                    <td class="text-success fw-bold">${{ getDummyDeposit() }}</td>
+                                    <td class="text-end text-success fw-bold">${{ getDummyDeposit() }}</td>
                                     <!-- Dummy column withdraw -->
-                                    <td class="text-danger fw-bold">${{ getDummyWithdraw() }}</td>
+                                    <td class="text-end text-danger fw-bold">${{ getDummyWithdraw() }}</td>
                                 </tr>
                             </tbody>
                         </table>
