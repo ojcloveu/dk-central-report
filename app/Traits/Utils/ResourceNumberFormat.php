@@ -58,7 +58,7 @@ trait ResourceNumberFormat
     public function formatAmount($amount)
     {
         return $amount < 0
-            ? '-$' . number_format(abs($this->rnfRemoveNumber($amount)), 2)
-            : '$' . number_format($this->rnfRemoveNumber($amount), 2);
+            ? '-$' . number_format(abs($this->rnfRemoveNumber($amount)), 0)
+            : '$' . number_format($this->rnfRemoveNumber($amount), 0);
     }
 }

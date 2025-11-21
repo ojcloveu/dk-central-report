@@ -235,7 +235,17 @@ onMounted(async () => {
         <div v-else class="d-flex flex-column gap-3">
             <div v-for="period in rangePeriods" :key="period?.key" class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
-                    <strong>{{ period?.label }}</strong>
+                    <div>
+                        <strong>{{ period?.label }}</strong>
+                        <span
+                            v-if="getRangeData(period?.key)?.date_range"
+                            class="text-muted ms-2"
+                            style="font-size: 0.875rem"
+                        >
+                            ({{ getRangeData(period?.key)?.date_range?.start_date }} -
+                            {{ getRangeData(period?.key)?.date_range?.end_date }})
+                        </span>
+                    </div>
 
                     <!-- Show record options -->
                     <div v-if="getRangeData(period?.key)?.meta">
@@ -277,7 +287,7 @@ onMounted(async () => {
                                         />
                                     </th>
 
-                                    <th @click="handleRangeSort('total_count')" class="sortable">
+                                    <th @click="handleRangeSort('total_count')" class="sortable text-end">
                                         Count
                                         <SortIcon
                                             :currentSortBy="rangeSort.sort_by"
@@ -286,7 +296,7 @@ onMounted(async () => {
                                         />
                                     </th>
 
-                                    <th @click="handleRangeSort('total_turnover')" class="sortable">
+                                    <th @click="handleRangeSort('total_turnover')" class="sortable text-end">
                                         Turnover
                                         <SortIcon
                                             :currentSortBy="rangeSort.sort_by"
@@ -295,7 +305,7 @@ onMounted(async () => {
                                         />
                                     </th>
 
-                                    <th @click="handleRangeSort('total_winlose')" class="sortable">
+                                    <th @click="handleRangeSort('total_winlose')" class="sortable text-end">
                                         Win/Lose
                                         <SortIcon
                                             :currentSortBy="rangeSort.sort_by"
@@ -304,7 +314,7 @@ onMounted(async () => {
                                         />
                                     </th>
 
-                                    <th @click="handleRangeSort('total_lp')" class="sortable">
+                                    <th @click="handleRangeSort('total_lp')" class="sortable text-end">
                                         LP
                                         <SortIcon
                                             :currentSortBy="rangeSort.sort_by"
@@ -314,8 +324,8 @@ onMounted(async () => {
                                     </th>
 
                                     <!-- Dummy column -->
-                                    <th>Total Deposit</th>
-                                    <th>Total Withdraw</th>
+                                    <th class="text-end">Total Deposit</th>
+                                    <th class="text-end">Total Withdraw</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -338,14 +348,14 @@ onMounted(async () => {
                                         />
                                     </td>
                                     <td>{{ row?.account }}</td>
-                                    <td>{{ row?.total_count }}</td>
-                                    <td :class="amountColor(row?.total_turnover)">
+                                    <td class="text-end">{{ row?.total_count }}</td>
+                                    <td class="text-end" :class="amountColor(row?.total_turnover)">
                                         {{ row?.total_turnover }}
                                     </td>
-                                    <td :class="amountColor(row?.total_winlose)">
+                                    <td class="text-end" :class="amountColor(row?.total_winlose)">
                                         {{ row?.total_winlose }}
                                     </td>
-                                    <td :class="lpBgColor(row?.total_lp)">
+                                    <td class="text-end" :class="lpBgColor(row?.total_lp)">
                                         {{
                                             (
                                                 Number(
@@ -358,9 +368,9 @@ onMounted(async () => {
                                     </td>
 
                                     <!-- Dummy column deposit -->
-                                    <td class="text-success fw-bold">${{ getDummyDeposit() }}</td>
+                                    <td class="text-end text-success fw-bold">${{ getDummyDeposit() }}</td>
                                     <!-- Dummy column withdraw -->
-                                    <td class="text-danger fw-bold">${{ getDummyWithdraw() }}</td>
+                                    <td class="text-end text-danger fw-bold">${{ getDummyWithdraw() }}</td>
                                 </tr>
                             </tbody>
                         </table>
