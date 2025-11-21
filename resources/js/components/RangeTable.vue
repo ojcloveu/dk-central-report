@@ -277,7 +277,7 @@ onMounted(async () => {
                                         />
                                     </th>
 
-                                    <th @click="handleRangeSort('total_count')" class="sortable">
+                                    <th @click="handleRangeSort('total_count')" class="sortable text-end">
                                         Count
                                         <SortIcon
                                             :currentSortBy="rangeSort.sort_by"
@@ -286,7 +286,7 @@ onMounted(async () => {
                                         />
                                     </th>
 
-                                    <th @click="handleRangeSort('total_turnover')" class="sortable">
+                                    <th @click="handleRangeSort('total_turnover')" class="sortable text-end">
                                         Turnover
                                         <SortIcon
                                             :currentSortBy="rangeSort.sort_by"
@@ -295,7 +295,7 @@ onMounted(async () => {
                                         />
                                     </th>
 
-                                    <th @click="handleRangeSort('total_winlose')" class="sortable">
+                                    <th @click="handleRangeSort('total_winlose')" class="sortable text-end">
                                         Win/Lose
                                         <SortIcon
                                             :currentSortBy="rangeSort.sort_by"
@@ -304,7 +304,7 @@ onMounted(async () => {
                                         />
                                     </th>
 
-                                    <th @click="handleRangeSort('total_lp')" class="sortable">
+                                    <th @click="handleRangeSort('total_lp')" class="sortable text-end">
                                         LP
                                         <SortIcon
                                             :currentSortBy="rangeSort.sort_by"
@@ -314,8 +314,8 @@ onMounted(async () => {
                                     </th>
 
                                     <!-- Dummy column -->
-                                    <th>Total Deposit</th>
-                                    <th>Total Withdraw</th>
+                                    <th class="text-end">Total Deposit</th>
+                                    <th class="text-end">Total Withdraw</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -338,11 +338,11 @@ onMounted(async () => {
                                         />
                                     </td>
                                     <td>{{ row?.account }}</td>
-                                    <td>{{ row?.total_count }}</td>
-                                    <td :class="amountColor(row?.total_turnover)">
+                                    <td class="text-end">{{ row?.total_count }}</td>
+                                    <td class="text-end" :class="amountColor(row?.total_turnover)">
                                         {{ row?.total_turnover }}
                                     </td>
-                                    <td :class="amountColor(row?.total_winlose)">
+                                    <td class="text-end" :class="amountColor(row?.total_winlose)">
                                         {{ row?.total_winlose }}
                                     </td>
                                     <td :class="lpBgColor(row?.total_lp)">

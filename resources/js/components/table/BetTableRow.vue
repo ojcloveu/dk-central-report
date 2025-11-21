@@ -42,7 +42,7 @@ const handleCheckboxChange = event => {
         <td>
             <span class="badge bg-azure-lt">{{ bet?.channel }}</span>
         </td>
-        <td class="text-nowrap">
+        <td class="text-end text-nowrap">
             {{
                 new Date(bet?.trandate).toLocaleDateString('en-US', {
                     month: 'short',
@@ -54,11 +54,11 @@ const handleCheckboxChange = event => {
         <td>
             <span class="badge" :class="getMasterBadgeClass(bet?.master)">{{ bet?.master }}</span>
         </td>
-        <td class="text-start">{{ bet?.min }}</td>
-        <td class="text-start">{{ bet?.max.toLocaleString() }}</td>
-        <td class="text-start">{{ bet?.count }}</td>
-        <td class="text-start fw-bold">{{ bet?.turnover }}</td>
-        <td class="text-start fw-bold" :class="amountColor(bet?.winlose)">
+        <td class="text-end">{{ bet?.min }}</td>
+        <td class="text-end">{{ bet?.max.toLocaleString() }}</td>
+        <td class="text-end">{{ bet?.count }}</td>
+        <td class="text-end fw-bold">{{ bet?.turnover }}</td>
+        <td class="text-end fw-bold" :class="amountColor(bet?.winlose)">
             {{ bet?.winlose }}
         </td>
         <td class="text-start fw-bold" :class="lpBgColor(bet?.lp)">

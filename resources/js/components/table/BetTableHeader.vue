@@ -79,7 +79,10 @@ onMounted(() => {
                 @click="onSort(col.key)"
                 class="cursor-pointer"
             >
-                <div class="d-flex align-items-center">
+                <div
+                    class="d-flex align-items-center"
+                    :class="{ 'justify-content-end': !['account', 'channel', 'master'].includes(col.key) }"
+                >
                     {{ col.label }}
                     <i
                         v-if="filters.sort_by === col.key"
