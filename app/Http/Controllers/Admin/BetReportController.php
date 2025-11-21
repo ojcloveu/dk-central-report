@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Resources\BetReportPeriodResource;
 use App\Http\Resources\BetReportResource;
 use App\Models\Bet;
+use App\Traits\MapDatetimeTrait;
 use Illuminate\Routing\Controller;
 use Inertia\Inertia;
 use Illuminate\Http\Request;
@@ -18,6 +19,8 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class BetReportController extends Controller
 {
+    use MapDatetimeTrait;
+
     public function index()
     {
         return Inertia::render('BetReport', []);
@@ -74,31 +77,16 @@ class BetReportController extends Controller
         $startDate = null;
         $period = $request->get('period');
 
-        switch ($period) {
-            case 'tm':
-                $startDate = Carbon::now()->startOfMonth();
-                break;
-            case '1m':
-                $startDate = Carbon::now()->subMonth();
-                break;
-            case '3m':
-                $startDate = Carbon::now()->subMonths(3);
-                break;
-            default:
-                // If no valid period is provided, return an empty
-                return response()->json([
-                    'data' => [],
-                    'current_page' => 1,
-                    'per_page' => $perPage,
-                    'total' => 0
-                ], 200);
-        }
+        $getStartDate = $this->getStartDate($period);
+        $startDate = $getStartDate->start_date;
+        $startEnd = $getStartDate->end_date;
 
         $query = Bet::query();
 
         // Apply date range filter
-        if ($startDate) {
-            $query->whereDate('trandate', '>=', $startDate->toDateString());
+        if ($startDate && $startEnd) {
+            $query->whereDate('trandate', '>=', $startDate);
+            $query->whereDate('trandate', '<=', $startEnd);
         }
 
         if ($request->filled('accounts')) {
@@ -117,7 +105,7 @@ class BetReportController extends Controller
             ->selectRaw('SUM(winlose) as total_winlose')
             ->selectRaw('(SUM(winlose) / SUM(turnover) * 100) as total_lp')
             ->groupBy('account');
-        
+
         // Sorting based on request param
         $query->orderBy($sortBy, $sortDir);
 
