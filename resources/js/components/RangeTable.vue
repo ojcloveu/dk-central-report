@@ -37,19 +37,27 @@ const getRangeData = key => betStore.rangesTables[key];
  * Handle pagination click
  */
 const handlePaginationClick = (rangeKey, linkLabel) => {
+    let targetPage = 1;
+
     if (typeof linkLabel === 'number') {
-        betStore.setRangePage(rangeKey, linkLabel);
-        return;
+        targetPage = linkLabel;
+    } else {
+        const meta = getRangeData(rangeKey)?.meta;
+        if (!meta) return;
+
+        if (linkLabel.includes('Previous')) {
+            targetPage = meta.current_page - 1;
+        } else if (linkLabel.includes('Next')) {
+            targetPage = meta.current_page + 1;
+        } else {
+            return;
+        }
     }
 
-    const meta = getRangeData(rangeKey)?.meta;
-    if (!meta) return;
-
-    if (linkLabel.includes('Previous')) {
-        betStore.setRangePage(rangeKey, meta.current_page - 1);
-    } else if (linkLabel.includes('Next')) {
-        betStore.setRangePage(rangeKey, meta.current_page + 1);
-    }
+    // Update all three range tables to the same page
+    rangePeriods.forEach(period => {
+        betStore.setRangePage(period.key, targetPage);
+    });
 };
 
 /*
@@ -252,27 +260,47 @@ onMounted(async () => {
                                     </th>
                                     <th @click="handleRangeSort('account')" class="sortable">
                                         Account
-                                        <SortIcon :currentSortBy="rangeSort.sort_by" columnName="account" :sortDirection="rangeSort.sort_dir" />
+                                        <SortIcon
+                                            :currentSortBy="rangeSort.sort_by"
+                                            columnName="account"
+                                            :sortDirection="rangeSort.sort_dir"
+                                        />
                                     </th>
 
                                     <th @click="handleRangeSort('total_count')" class="sortable">
                                         Count
-                                        <SortIcon :currentSortBy="rangeSort.sort_by" columnName="total_count" :sortDirection="rangeSort.sort_dir" />
+                                        <SortIcon
+                                            :currentSortBy="rangeSort.sort_by"
+                                            columnName="total_count"
+                                            :sortDirection="rangeSort.sort_dir"
+                                        />
                                     </th>
 
                                     <th @click="handleRangeSort('total_turnover')" class="sortable">
                                         Turnover
-                                        <SortIcon :currentSortBy="rangeSort.sort_by" columnName="total_turnover" :sortDirection="rangeSort.sort_dir" />
+                                        <SortIcon
+                                            :currentSortBy="rangeSort.sort_by"
+                                            columnName="total_turnover"
+                                            :sortDirection="rangeSort.sort_dir"
+                                        />
                                     </th>
 
                                     <th @click="handleRangeSort('total_winlose')" class="sortable">
                                         Win/Lose
-                                        <SortIcon :currentSortBy="rangeSort.sort_by" columnName="total_winlose" :sortDirection="rangeSort.sort_dir" />
+                                        <SortIcon
+                                            :currentSortBy="rangeSort.sort_by"
+                                            columnName="total_winlose"
+                                            :sortDirection="rangeSort.sort_dir"
+                                        />
                                     </th>
 
                                     <th @click="handleRangeSort('total_lp')" class="sortable">
                                         LP
-                                        <SortIcon :currentSortBy="rangeSort.sort_by" columnName="total_lp" :sortDirection="rangeSort.sort_dir" />
+                                        <SortIcon
+                                            :currentSortBy="rangeSort.sort_by"
+                                            columnName="total_lp"
+                                            :sortDirection="rangeSort.sort_dir"
+                                        />
                                     </th>
                                 </tr>
                             </thead>
