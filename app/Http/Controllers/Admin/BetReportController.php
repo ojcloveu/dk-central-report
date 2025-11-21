@@ -115,7 +115,7 @@ class BetReportController extends Controller
             ->selectRaw('SUM(count) as total_count')
             ->selectRaw('SUM(turnover) as total_turnover')
             ->selectRaw('SUM(winlose) as total_winlose')
-            ->selectRaw('SUM(lp) as total_lp')
+            ->selectRaw('(SUM(winlose) / SUM(turnover) * 100) as total_lp')
             ->groupBy('account');
         
         // Sorting based on request param

@@ -346,7 +346,7 @@ onMounted(async () => {
                                         {{ row?.total_winlose }}
                                     </td>
                                     <td :class="lpBgColor(row?.total_lp)">
-                                        {{ row?.total_lp.percentage }}
+                                        {{ row?.total_lp.percentage }}%
                                     </td>
 
                                     <!-- Dummy column deposit -->
