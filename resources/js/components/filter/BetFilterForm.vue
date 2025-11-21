@@ -5,6 +5,7 @@ import { useFilterStore } from '@/stores/filterStore';
 import { useBetStore } from '@/stores/betStore';
 import SingleSelectFilter from './SingleSelectFilter.vue';
 import MultiSelectFilter from './MultiSelectFilter.vue';
+import ActionButton from '../buttons/ActionButton.vue';
 
 /*
  * Props & emits
@@ -128,28 +129,25 @@ const handleLoadMoreChannels = (page, query) => {
                 </button>
 
                 <!-- Reset Button -->
-                <button
-                    type="button"
-                    class="btn btn-primary px-2"
-                    @click="handleReset"
+                <ActionButton
+                    variant="primary"
+                    iconClass="las la-sliders-h"
+                    label="Reset Filter"
                     title="Reset all filters to default"
                     :disabled="!hasFiltersToReset"
-                >
-                    <i class="las la-sliders-h fs-2 pe-1"></i>
-                    Reset Filter
-                </button>
+                    @click="handleReset"
+                />
 
                 <!-- Refresh Button -->
-                <button
-                    type="button"
-                    class="btn btn-icon btn-outline-secondary"
-                    aria-label="Refresh"
-                    @click="handleRefetchBetAndPeriod"
+                <ActionButton
+                    variant="outline-secondary"
+                    iconClass="las la-sync-alt"
                     title="Refresh the data table and Reset filters"
                     :disabled="rangeLoading"
-                >
-                    <i class="las la-sync-alt fs-2" :class="{ 'fa-spin': loading }"></i>
-                </button>
+                    :loading="loading"
+                    :iconOnly="true"
+                    @click="handleRefetchBetAndPeriod"
+                />
             </div>
         </div>
 
