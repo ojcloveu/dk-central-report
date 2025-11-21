@@ -192,8 +192,11 @@ class SyncBetsCommand extends Command
         $query = DB::connection('dk')->table('bets as b')
             ->join('v_user as u', 'u.id', '=', 'b.created_by')
             ->join('channels as c', 'c.id', '=', 'b.channel_id')
+            ->join('games as g', 'g.id', '=', 'b.game_id')
             ->where('b.created_at', '>=', $startDate)
+            ->where('g.status', '=', '2')
             ->where('b.created_at', '<=', $endDate);
+
             
         if ($channel) {
             $query->where('c.channel_name', $channel);
@@ -222,8 +225,10 @@ class SyncBetsCommand extends Command
         $query = DB::connection('dk')->table('bets as b')
             ->join('v_user as u', 'u.id', '=', 'b.created_by')
             ->join('channels as c', 'c.id', '=', 'b.channel_id')
+            ->join('games as g', 'g.id', '=', 'b.game_id')
             ->where('b.created_at', '>=', $startDate)
             ->where('b.created_at', '<=', $endDate)
+            ->where('g.status', '=', '2')
             ->selectRaw("
                 COUNT(b.id)                                 as total_bets,
                 MIN(b.bet_amount)                           as min_bet,
