@@ -16,6 +16,7 @@ const setSelectAllRef = (periodKey, el) => {
         selectAllCheckboxes.value[periodKey] = el;
     }
 };
+
 /*
  * Define the keys and labels
  */
@@ -50,11 +51,20 @@ const handlePaginationClick = (rangeKey, linkLabel) => {
 };
 
 /*
- * Handle change per page
+ * Handle change per page for record options selection 
  */
-const handleChangePerPage = (rangeKey, count) => {
-    betStore.setRangeItemsPerPage(rangeKey, +count);
+const handleChangePerPage = count => {
+    rangePeriods.forEach(period => {
+        betStore.setRangeItemsPerPage(period.key, +count);
+    });
 };
+
+/*
+ * Global value for record options selection 
+ */
+const globalPerPage = computed(() => {
+    return getRangeData('7d')?.meta?.per_page || 10;
+});
 
 /*
  * Handle refetch bet and period data
@@ -130,11 +140,13 @@ const handleSelectAll = (periodKey, event) => {
             acc => !accounts.includes(acc)
         );
     }
-    // Preserve current sort when refetch
+
     betStore.fetchRangeData(null, 1, null, rangeSort.sort_by, rangeSort.sort_dir);
 };
 
-// Watch and update indeterminate state for ALL checkboxes
+/*
+ * Watch and update indeterminate state for all checkboxes
+ */
 watch(
     () => betStore.selectedAccounts,
     async () => {
@@ -149,7 +161,9 @@ watch(
     { deep: true }
 );
 
-// Set initial indeterminate state on mount
+/*
+ * Set initial indeterminate state on mount
+ */
 onMounted(async () => {
     await nextTick();
     rangePeriods.forEach(period => {
@@ -210,8 +224,8 @@ onMounted(async () => {
                     <div v-if="getRangeData(period?.key)?.meta">
                         <select
                             class="form-select form-select-sm"
-                            :value="getRangeData(period.key).meta?.per_page"
-                            @change="handleChangePerPage(period?.key, $event.target?.value)"
+                            :value="globalPerPage"
+                            @change="handleChangePerPage($event.target?.value)"
                         >
                             <option value="10">10</option>
                             <option value="20">20</option>
