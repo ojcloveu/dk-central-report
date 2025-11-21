@@ -241,6 +241,9 @@ export const useBetStore = defineStore('bet', {
             this.fetchRangeData(period, page, count);
         },
 
+        /**
+         * Action to handle per-page change
+         */
         setPerPage(perPage) {
             this.filters.per_page = perPage;
             this.filters.page = 1;
