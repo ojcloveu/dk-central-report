@@ -172,6 +172,16 @@ watch(
 );
 
 /*
+ * Dummy data random
+ */
+const getDummyDeposit = () => {
+    return (Math.random() * 10000).toFixed(2);
+};
+const getDummyWithdraw = () => {
+    return (Math.random() * 8000).toFixed(2);
+};
+
+/*
  * Set initial indeterminate state on mount
  */
 onMounted(async () => {
@@ -302,6 +312,10 @@ onMounted(async () => {
                                             :sortDirection="rangeSort.sort_dir"
                                         />
                                     </th>
+
+                                    <!-- Dummy column -->
+                                    <th>Total Deposit</th>
+                                    <th>Total Withdraw</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -333,6 +347,15 @@ onMounted(async () => {
                                     </td>
                                     <td :class="lpBgColor(row?.total_lp)">
                                         {{ row?.total_lp.percentage }}
+                                    </td>
+
+                                    <!-- Dummy column deposit -->
+                                    <td class="text-success">
+                                        {{ getDummyDeposit() }}
+                                    </td>
+                                    <!-- Dummy column withdraw -->
+                                    <td class="text-danger">
+                                        {{ getDummyWithdraw() }}
                                     </td>
                                 </tr>
                             </tbody>
