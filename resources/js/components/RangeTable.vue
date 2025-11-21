@@ -245,7 +245,7 @@ onMounted(async () => {
                 <!-- Table body -->
                 <div class="card-body py-0">
                     <div v-if="getRangeData(period.key)?.data?.length" class="table-responsive">
-                        <table class="table table-sm mb-0">
+                        <table class="table table-sm table-hover mb-0">
                             <thead>
                                 <tr>
                                     <!-- Checkbox for select all Accounts -->
