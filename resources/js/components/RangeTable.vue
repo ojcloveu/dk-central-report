@@ -346,17 +346,21 @@ onMounted(async () => {
                                         {{ row?.total_winlose }}
                                     </td>
                                     <td :class="lpBgColor(row?.total_lp)">
-                                        {{ (row?.total_lp.percentage).toFixed(0) }}%
+                                        {{
+                                            (
+                                                Number(
+                                                    typeof row?.total_lp === 'number'
+                                                        ? row.total_lp
+                                                        : row?.total_lp?.percentage
+                                                ) || 0
+                                            ).toFixed(0)
+                                        }}%
                                     </td>
 
                                     <!-- Dummy column deposit -->
-                                    <td class="text-success fw-bold">
-                                        ${{ getDummyDeposit() }}
-                                    </td>
+                                    <td class="text-success fw-bold">${{ getDummyDeposit() }}</td>
                                     <!-- Dummy column withdraw -->
-                                    <td class="text-danger fw-bold">
-                                        ${{ getDummyWithdraw() }}
-                                    </td>
+                                    <td class="text-danger fw-bold">${{ getDummyWithdraw() }}</td>
                                 </tr>
                             </tbody>
                         </table>
