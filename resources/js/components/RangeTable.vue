@@ -23,7 +23,7 @@ const setSelectAllRef = (periodKey, el) => {
  * Define the keys and labels
  */
 const rangePeriods = [
-    { key: '7d', label: 'Last 7 days' },
+    { key: 'tm', label: 'This month' },
     { key: '1m', label: 'Previous month' },
     { key: '3m', label: 'Last 3 months' },
 ];
@@ -73,7 +73,7 @@ const handleChangePerPage = count => {
  * Global value for record options selection
  */
 const globalPerPage = computed(() => {
-    return getRangeData('7d')?.meta?.per_page || 10;
+    return getRangeData('tm')?.meta?.per_page || 10;
 });
 
 /*
@@ -110,7 +110,7 @@ const handleRangeSort = column => {
         rangeSort.sort_dir = 'asc';
     }
 
-    // Refetch all 7d, 1m, 3m tables with sort param
+    // Refetch all tm, 1m, 3m tables with sort param
     betStore.fetchRangeData(null, 1, null, rangeSort.sort_by, rangeSort.sort_dir);
 };
 

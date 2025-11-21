@@ -19,7 +19,7 @@ const getInitialFilters = () => ({
 
 // Initial state range data
 const initialRangeState = {
-    '7d': { data: [], meta: { current_page: 1, last_page: 1, per_page: 10 } },
+    tm: { data: [], meta: { current_page: 1, last_page: 1, per_page: 10 } },
     '1m': { data: [], meta: { current_page: 1, last_page: 1, per_page: 10 } },
     '3m': { data: [], meta: { current_page: 1, last_page: 1, per_page: 10 } },
 };
@@ -187,7 +187,7 @@ export const useBetStore = defineStore('bet', {
 
             this.rangeLoading = true;
 
-            const periods = period ? [period] : ['7d', '1m', '3m'];
+            const periods = period ? [period] : ['tm', '1m', '3m'];
 
             for (const p of periods) {
                 const currentPerPage = per_page || this.rangesTables[p].meta?.per_page;
