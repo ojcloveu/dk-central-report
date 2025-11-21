@@ -27,11 +27,13 @@ trait MapDatetimeTrait
         break;
       case '1m':
         $startDate = Carbon::now()->subMonth()->startOfMonth()->toDateString();
-        $endDate = Carbon::now()->subMonth()->endOfMonth()->toDateString();
+        // $endDate = Carbon::now()->subMonth()->endOfMonth()->toDateString();
+        $endDate = Carbon::today()->toDateString();
         break;
       case '3m':
         $startDate = Carbon::now()->subMonths(3)->startOfMonth()->toDateString();
-        $endDate = Carbon::today()->subMonth()->endOfMonth()->toDateString();
+        // $endDate = Carbon::today()->subMonth()->endOfMonth()->toDateString();
+        $endDate = Carbon::today()->toDateString();
         break;
       case '6m':
         $startDate = Carbon::now()->subMonths(6)->startOfMonth()->toDateString();
