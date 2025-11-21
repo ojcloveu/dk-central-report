@@ -27,8 +27,8 @@ const localFilters = reactive({ ...props.initialFilters });
 const filterStore = useFilterStore();
 const betStore = useBetStore();
 
-const { pagination, loading } = storeToRefs(filterStore);
-const { hasSelectedAccounts } = storeToRefs(betStore);
+const { pagination, loading: filterLoading } = storeToRefs(filterStore);
+const { hasSelectedAccounts, loading } = storeToRefs(betStore);
 
 /*
  * Helpers: debounce for filter submission
@@ -164,7 +164,7 @@ const handleLoadMoreChannels = (page, query) => {
                         v-model="localFilters.master"
                         :items="filterStore.masters"
                         :placeholder="'Select Master(s)'"
-                        :loading="loading.masters"
+                        :loading="filterLoading.masters"
                         :fetch-items="() => filterStore.fetchMasters({ page: 1 })"
                         :has-next-page="pagination.masters.hasNextPage"
                         :current-page="pagination.masters.currentPage"
@@ -179,7 +179,7 @@ const handleLoadMoreChannels = (page, query) => {
                         v-model="localFilters.account"
                         :items="filterStore.accounts"
                         :placeholder="'Select Account'"
-                        :loading="loading.accounts"
+                        :loading="filterLoading.accounts"
                         :fetch-items="() => filterStore.fetchAccounts({ page: 1 })"
                         :has-next-page="pagination.accounts.hasNextPage"
                         :current-page="pagination.accounts.currentPage"
@@ -194,7 +194,7 @@ const handleLoadMoreChannels = (page, query) => {
                         v-model="localFilters.channel"
                         :items="filterStore.channels"
                         :placeholder="'Select Channel'"
-                        :loading="loading.channels"
+                        :loading="filterLoading.channels"
                         :fetch-items="() => filterStore.fetchChannels({ page: 1 })"
                         :has-next-page="pagination.channels.hasNextPage"
                         :current-page="pagination.channels.currentPage"
