@@ -3,6 +3,7 @@ import { storeToRefs } from 'pinia';
 import { useBetStore } from '../stores/betStore';
 import { amountColor, lpBgColor } from '../utils/getStatusClass';
 import RangeTableSkeleton from './loading/RangeTableSkeleton.vue';
+import SortIcon from './SortIcon.vue';
 import { computed, ref, onMounted, watch, reactive, nextTick } from 'vue';
 
 const betStore = useBetStore();
@@ -51,7 +52,7 @@ const handlePaginationClick = (rangeKey, linkLabel) => {
 };
 
 /*
- * Handle change per page for record options selection 
+ * Handle change per page for record options selection
  */
 const handleChangePerPage = count => {
     rangePeriods.forEach(period => {
@@ -60,7 +61,7 @@ const handleChangePerPage = count => {
 };
 
 /*
- * Global value for record options selection 
+ * Global value for record options selection
  */
 const globalPerPage = computed(() => {
     return getRangeData('7d')?.meta?.per_page || 10;
@@ -253,37 +254,27 @@ onMounted(async () => {
                                     </th>
                                     <th @click="handleRangeSort('account')" class="sortable">
                                         Account
-                                        <span v-if="rangeSort.sort_by === 'account'">
-                                            {{ rangeSort.sort_dir === 'asc' ? '▲' : '▼' }}
-                                        </span>
+                                        <SortIcon :currentSortBy="rangeSort.sort_by" columnName="account" :sortDirection="rangeSort.sort_dir" />
                                     </th>
 
                                     <th @click="handleRangeSort('total_count')" class="sortable">
                                         Count
-                                        <span v-if="rangeSort.sort_by === 'total_count'">
-                                            {{ rangeSort.sort_dir === 'asc' ? '▲' : '▼' }}
-                                        </span>
+                                        <SortIcon :currentSortBy="rangeSort.sort_by" columnName="total_count" :sortDirection="rangeSort.sort_dir" />
                                     </th>
 
                                     <th @click="handleRangeSort('total_turnover')" class="sortable">
                                         Turnover
-                                        <span v-if="rangeSort.sort_by === 'total_turnover'">
-                                            {{ rangeSort.sort_dir === 'asc' ? '▲' : '▼' }}
-                                        </span>
+                                        <SortIcon :currentSortBy="rangeSort.sort_by" columnName="total_turnover" :sortDirection="rangeSort.sort_dir" />
                                     </th>
 
                                     <th @click="handleRangeSort('total_winlose')" class="sortable">
                                         Win/Lose
-                                        <span v-if="rangeSort.sort_by === 'total_winlose'">
-                                            {{ rangeSort.sort_dir === 'asc' ? '▲' : '▼' }}
-                                        </span>
+                                        <SortIcon :currentSortBy="rangeSort.sort_by" columnName="total_winlose" :sortDirection="rangeSort.sort_dir" />
                                     </th>
 
                                     <th @click="handleRangeSort('total_lp')" class="sortable">
                                         LP
-                                        <span v-if="rangeSort.sort_by === 'total_lp'">
-                                            {{ rangeSort.sort_dir === 'asc' ? '▲' : '▼' }}
-                                        </span>
+                                        <SortIcon :currentSortBy="rangeSort.sort_by" columnName="total_lp" :sortDirection="rangeSort.sort_dir" />
                                     </th>
                                 </tr>
                             </thead>
