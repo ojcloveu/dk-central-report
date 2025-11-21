@@ -61,7 +61,7 @@ const handleCheckboxChange = event => {
         <td class="text-end fw-bold" :class="amountColor(bet?.winlose)">
             {{ bet?.winlose }}
         </td>
-        <td class="text-start fw-bold" :class="lpBgColor(bet?.lp)">
+        <td class="text-end fw-bold" :class="lpBgColor(bet?.lp)">
             {{ (parseFloat(bet?.lp?.percentage) * 100).toFixed(0) }}%
         </td>
     </tr>
