@@ -29,7 +29,6 @@ export const formatDisplayDate = date => {
 
 /**
  * Checks if two dates are the same day
- * @param {Date|string} date1 - First date
  */
 export const isSameDay = (date1, date2) => {
     if (!date1 || !date2) return false;
