@@ -278,7 +278,7 @@ onMounted(async () => {
                                             @change="handleSelectAll(period.key, $event)"
                                         />
                                     </th>
-                                    <th @click="handleRangeSort('account')" class="sortable">
+                                    <th @click="handleRangeSort('account')" class="sortable cursor-pointer">
                                         Account
                                         <SortIcon
                                             :currentSortBy="rangeSort.sort_by"
@@ -287,7 +287,7 @@ onMounted(async () => {
                                         />
                                     </th>
 
-                                    <th @click="handleRangeSort('total_count')" class="sortable text-end">
+                                    <th @click="handleRangeSort('total_count')" class="sortable text-end cursor-pointer">
                                         Count
                                         <SortIcon
                                             :currentSortBy="rangeSort.sort_by"
@@ -296,7 +296,7 @@ onMounted(async () => {
                                         />
                                     </th>
 
-                                    <th @click="handleRangeSort('total_turnover')" class="sortable text-end">
+                                    <th @click="handleRangeSort('total_turnover')" class="sortable text-end cursor-pointer">
                                         Turnover
                                         <SortIcon
                                             :currentSortBy="rangeSort.sort_by"
@@ -305,7 +305,7 @@ onMounted(async () => {
                                         />
                                     </th>
 
-                                    <th @click="handleRangeSort('total_winlose')" class="sortable text-end">
+                                    <th @click="handleRangeSort('total_winlose')" class="sortable text-end cursor-pointer">
                                         Win/Lose
                                         <SortIcon
                                             :currentSortBy="rangeSort.sort_by"
@@ -314,7 +314,7 @@ onMounted(async () => {
                                         />
                                     </th>
 
-                                    <th @click="handleRangeSort('total_lp')" class="sortable text-end">
+                                    <th @click="handleRangeSort('total_lp')" class="sortable text-end cursor-pointer">
                                         LP
                                         <SortIcon
                                             :currentSortBy="rangeSort.sort_by"
@@ -326,6 +326,7 @@ onMounted(async () => {
                                     <!-- Dummy column -->
                                     <th class="text-end">Total Deposit</th>
                                     <th class="text-end">Total Withdraw</th>
+                                    <th class="text-end">Deposit - Withdraw</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -368,9 +369,14 @@ onMounted(async () => {
                                     </td>
 
                                     <!-- Dummy column deposit -->
-                                    <td class="text-end text-success fw-bold bg-green-lt">${{ getDummyDeposit() }}</td>
+                                    <td class="text-end text-success fw-bold bg-green-lt">${{ Number(getDummyDeposit()).toFixed(0) }}</td>
                                     <!-- Dummy column withdraw -->
-                                    <td class="text-end text-danger fw-bold bg-red-lt">${{ getDummyWithdraw() }}</td>
+                                    <td class="text-end text-danger fw-bold bg-red-lt">${{ Number(getDummyWithdraw()).toFixed(0) }}</td>
+                                    <!-- Dummy column deposit - withdraw -->
+                                    <td
+                                        class="text-end fw-bold"
+                                        :class="(Number(getDummyDeposit()) - Number(getDummyWithdraw())) < 0 ? 'bg-red-lt' : 'bg-green-lt'"
+                                    >${{ (Number(getDummyDeposit()) - Number(getDummyWithdraw())).toFixed(0) }}</td>
                                 </tr>
                             </tbody>
                         </table>
