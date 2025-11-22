@@ -369,9 +369,9 @@ onMounted(async () => {
                                     </td>
 
                                     <!-- Dummy column deposit -->
-                                    <td class="text-end text-success fw-bold bg-green-lt">${{ Number(getDummyDeposit()).toFixed(0) }}</td>
+                                    <td class="text-end text-success fw-bold bg-muted-lt">${{ Number(getDummyDeposit()).toFixed(0) }}</td>
                                     <!-- Dummy column withdraw -->
-                                    <td class="text-end text-danger fw-bold bg-red-lt">${{ Number(getDummyWithdraw()).toFixed(0) }}</td>
+                                    <td class="text-end text-danger fw-bold bg-muted-lt">${{ Number(getDummyWithdraw()).toFixed(0) }}</td>
                                     <!-- Dummy column deposit - withdraw -->
                                     <td
                                         class="text-end fw-bold"
