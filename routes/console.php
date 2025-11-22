@@ -14,15 +14,24 @@ Schedule::command('sync:bets --days-back=0')
     ->withoutOverlapping()
     ->runInBackground()
     ->appendOutputTo(storage_path('logs/bet-sync-scheduler.log'))
+    ->before(function () {
+        \Log::info('Scheduled bet sync started', [
+            'command' => 'sync:bets --days-back=0',
+            'start_time' => now()->toDateTimeString(),
+            'start_timestamp' => now()->timestamp
+        ]);
+    })
     ->onSuccess(function () {
         \Log::info('Scheduled bet sync completed successfully', [
             'command' => 'sync:bets --days-back=0',
-            'timestamp' => now()->toDateTimeString()
+            'end_time' => now()->toDateTimeString(),
+            'end_timestamp' => now()->timestamp
         ]);
     })
     ->onFailure(function () {
         \Log::error('Scheduled bet sync failed', [
             'command' => 'sync:bets --days-back=0',
-            'timestamp' => now()->toDateTimeString()
+            'end_time' => now()->toDateTimeString(),
+            'end_timestamp' => now()->timestamp
         ]);
     });
