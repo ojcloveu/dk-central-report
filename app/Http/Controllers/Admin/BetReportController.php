@@ -37,10 +37,16 @@ class BetReportController extends Controller
 
         $query = Bet::query();
 
-        // Filter by 'trandate'
-        if ($request->has('trandate')) {
-            $query->whereDate('trandate', $request->get('trandate'));
+        // Filter by date range (start_date and end_date)
+        if ($request->has('start_date') && $request->has('end_date')) {
+            $query->whereDate('trandate', '>=', $request->get('start_date'));
+            $query->whereDate('trandate', '<=', $request->get('end_date'));
+        } elseif ($request->has('start_date')) {
+            $query->whereDate('trandate', '>=', $request->get('start_date'));
+        } elseif ($request->has('end_date')) {
+            $query->whereDate('trandate', '<=', $request->get('end_date'));
         }
+
         // Filter by 'master'
         if ($request->filled('master')) {
             $query->where('master', 'LIKE', '%' . $request->get('master') . '%');
