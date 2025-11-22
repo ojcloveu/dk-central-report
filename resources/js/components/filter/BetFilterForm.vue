@@ -5,6 +5,7 @@ import { useFilterStore } from '@/stores/filterStore';
 import { useBetStore } from '@/stores/betStore';
 import SingleSelectFilter from './SingleSelectFilter.vue';
 import MultiSelectFilter from './MultiSelectFilter.vue';
+import DateRangeFilter from './DateRangeFilter.vue';
 import ActionButton from '../buttons/ActionButton.vue';
 
 /*
@@ -47,17 +48,20 @@ const triggerFilter = () => {
 let skipNextWatch = ref(false);
 
 // Watch for changes in filter form
-watch(localFilters, () => {
-    if (skipNextWatch.value) {
-        skipNextWatch.value = false;
-        return;
+watch(
+    () => [localFilters.trandate, localFilters.master, localFilters.account, localFilters.channel],
+    () => {
+        if (skipNextWatch.value) {
+            skipNextWatch.value = false;
+            return;
+        }
+        triggerFilter();
     }
-    triggerFilter();
-});
+);
 
 // Reset filters
 const handleReset = () => {
-    localFilters.trandate = '';
+    localFilters.trandate = { start_date: null, end_date: null };
     localFilters.master = [];
     localFilters.account = '';
     localFilters.channel = '';
@@ -75,7 +79,8 @@ const handleRemoveSelectedAccounts = () => {
 
 const hasFiltersToReset = computed(() => {
     return (
-        localFilters.trandate !== '' ||
+        localFilters.trandate?.start_date ||
+        localFilters.trandate?.end_date ||
         localFilters.master.length > 0 ||
         localFilters.account !== '' ||
         localFilters.channel !== ''
@@ -153,10 +158,13 @@ const handleLoadMoreChannels = (page, query) => {
 
         <div class="card-body">
             <form class="row g-3 align-items-end">
-                <!-- Date filter -->
+                <!-- Date Range filter -->
                 <div class="col-md-3 col-sm-6">
-                    <label class="form-label">Date</label>
-                    <input type="date" class="form-control" v-model="localFilters.trandate" />
+                    <label class="form-label">Date Range</label>
+                    <DateRangeFilter
+                        v-model="localFilters.trandate"
+                        :placeholder="'Select Date Range'"
+                    />
                 </div>
 
                 <!-- Master filter -->
