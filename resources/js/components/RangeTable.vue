@@ -368,9 +368,9 @@ onMounted(async () => {
                                     </td>
 
                                     <!-- Dummy column deposit -->
-                                    <td class="text-end text-success fw-bold">${{ getDummyDeposit() }}</td>
+                                    <td class="text-end text-success fw-bold bg-green-lt">${{ getDummyDeposit() }}</td>
                                     <!-- Dummy column withdraw -->
-                                    <td class="text-end text-danger fw-bold">${{ getDummyWithdraw() }}</td>
+                                    <td class="text-end text-danger fw-bold bg-red-lt">${{ getDummyWithdraw() }}</td>
                                 </tr>
                             </tbody>
                         </table>
