@@ -363,3 +363,10 @@ BET_SYNC_ENABLE_MONITORING=true
 - **Index Recommendations**: Automated index optimization suggestions
 
 This enhanced system provides a robust, scalable solution for processing millions of betting records while maintaining excellent performance and reliability.
+
+
+"/tmp/crontab.WCOEIF/crontab" 5L, 301B
+* * * * * docker exec dk-central-report-laravel.test-1 php /var/www/html/artisan schedule:run >> /dev/null 2>&1
+#* * * * * docker start dk-mlm-queue-1
+* * * * * cd /srv/dk-mlm && chown -R sail:sail storage/logs/
+*/5 * * * * /usr/local/bin/check-docker-containers.sh >> /var/log/check-docker-containers.log 2>&1

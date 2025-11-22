@@ -12,4 +12,17 @@ Artisan::command('inspire', function () {
 Schedule::command('sync:bets --days-back=0')
     ->everyFiveMinutes()
     ->withoutOverlapping()
-    ->runInBackground();
+    ->runInBackground()
+    ->appendOutputTo(storage_path('logs/bet-sync-scheduler.log'))
+    ->onSuccess(function () {
+        \Log::info('Scheduled bet sync completed successfully', [
+            'command' => 'sync:bets --days-back=0',
+            'timestamp' => now()->toDateTimeString()
+        ]);
+    })
+    ->onFailure(function () {
+        \Log::error('Scheduled bet sync failed', [
+            'command' => 'sync:bets --days-back=0',
+            'timestamp' => now()->toDateTimeString()
+        ]);
+    });
