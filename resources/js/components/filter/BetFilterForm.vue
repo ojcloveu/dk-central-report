@@ -153,11 +153,13 @@ const handleLoadMoreChannels = (page, query) => {
 
         <div class="card-body">
             <form class="row g-3 align-items-end">
+                <!-- Date filter -->
                 <div class="col-md-3 col-sm-6">
                     <label class="form-label">Date</label>
                     <input type="date" class="form-control" v-model="localFilters.trandate" />
                 </div>
 
+                <!-- Master filter -->
                 <div class="col-md-3 col-sm-6">
                     <label class="form-label">Master</label>
                     <MultiSelectFilter
@@ -173,6 +175,7 @@ const handleLoadMoreChannels = (page, query) => {
                     />
                 </div>
 
+                <!-- Account filter -->
                 <div class="col-md-3 col-sm-6">
                     <label class="form-label">Account</label>
                     <SingleSelectFilter
@@ -188,6 +191,7 @@ const handleLoadMoreChannels = (page, query) => {
                     />
                 </div>
 
+                <!-- Channel filter -->
                 <div class="col-md-3 col-sm-6">
                     <label class="form-label">Channel</label>
                     <SingleSelectFilter
