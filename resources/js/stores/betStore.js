@@ -12,7 +12,7 @@ const getInitialFilters = () => ({
     sort_by: 'trandate',
     sort_dir: 'desc',
     account: '',
-    trandate: '',
+    trandate: { start_date: null, end_date: null },
     master: [],
     channel: '',
 });
@@ -40,7 +40,7 @@ export const useBetStore = defineStore('bet', {
 
             filters: {
                 ...getInitialFilters(),
-                trandate: getTodayDate(),
+                trandate: { start_date: getTodayDate(), end_date: getTodayDate() },
             },
         };
     },
@@ -56,7 +56,11 @@ export const useBetStore = defineStore('bet', {
             Object.entries(state.filters).forEach(([key, value]) => {
                 if (value === '' || value === null) return;
 
-                if (Array.isArray(value)) {
+                // Handle date range object
+                if (key === 'trandate' && typeof value === 'object') {
+                    if (value.start_date) params.append('start_date', value.start_date);
+                    if (value.end_date) params.append('end_date', value.end_date);
+                } else if (Array.isArray(value)) {
                     value.forEach(v => params.append(key, v));
                 } else {
                     params.append(key, value);
