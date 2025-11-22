@@ -1,5 +1,14 @@
 <script setup>
-import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
+import { ref, computed, onMounted, onUnmounted } from 'vue';
+import {
+    formatDate,
+    formatDisplayDate,
+    isSameDay,
+    isInRange,
+    getPresetDates,
+    generateCalendar,
+    getMonthYearLabel,
+} from '@/utils/dateUtils';
 
 /*
  * Props & Emits
@@ -30,46 +39,6 @@ const currentMonth2 = ref(new Date());
 const dateRangeRef = ref(null);
 
 /*
- * Date Utilities
- */
-const formatDate = date => {
-    if (!date) return null;
-    const d = new Date(date);
-    const year = d.getFullYear();
-    const month = String(d.getMonth() + 1).padStart(2, '0');
-    const day = String(d.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
-};
-
-const formatDisplayDate = date => {
-    if (!date) return '';
-    const d = new Date(date);
-    const day = String(d.getDate()).padStart(2, '0');
-    const month = d.toLocaleString('en-US', { month: 'short' });
-    const year = String(d.getFullYear()).slice(-2);
-    return `${day} ${month} ${year}`;
-};
-
-const isSameDay = (date1, date2) => {
-    if (!date1 || !date2) return false;
-    const d1 = new Date(date1);
-    const d2 = new Date(date2);
-    return (
-        d1.getFullYear() === d2.getFullYear() &&
-        d1.getMonth() === d2.getMonth() &&
-        d1.getDate() === d2.getDate()
-    );
-};
-
-const isInRange = (date, start, end) => {
-    if (!start || !end) return false;
-    const d = new Date(date);
-    const s = new Date(start);
-    const e = new Date(end);
-    return d >= s && d <= e;
-};
-
-/*
  * Preset Date Ranges
  */
 const presets = [
@@ -82,92 +51,14 @@ const presets = [
     { label: 'Custom Range', value: 'custom' },
 ];
 
-const getPresetDates = preset => {
-    const today = new Date();
-    const start = new Date();
-    const end = new Date();
-
-    switch (preset) {
-        case 'today':
-            return { start_date: formatDate(today), end_date: formatDate(today) };
-        case 'yesterday':
-            start.setDate(today.getDate() - 1);
-            end.setDate(today.getDate() - 1);
-            return { start_date: formatDate(start), end_date: formatDate(end) };
-        case 'last7days':
-            start.setDate(today.getDate() - 6);
-            return { start_date: formatDate(start), end_date: formatDate(today) };
-        case 'last30days':
-            start.setDate(today.getDate() - 29);
-            return { start_date: formatDate(start), end_date: formatDate(today) };
-        case 'thismonth':
-            start.setDate(1);
-            return { start_date: formatDate(start), end_date: formatDate(today) };
-        case 'lastmonth':
-            start.setMonth(today.getMonth() - 1);
-            start.setDate(1);
-            end.setMonth(today.getMonth());
-            end.setDate(0);
-            return { start_date: formatDate(start), end_date: formatDate(end) };
-        default:
-            return { start_date: null, end_date: null };
-    }
-};
-
 /*
- * Calendar Generation
+ * Calendar Computed Properties
  */
-const generateCalendar = monthDate => {
-    const year = monthDate.getFullYear();
-    const month = monthDate.getMonth();
-    const firstDay = new Date(year, month, 1);
-    const lastDay = new Date(year, month + 1, 0);
-    const daysInMonth = lastDay.getDate();
-    const startingDayOfWeek = firstDay.getDay();
-
-    const calendar = [];
-    let week = [];
-
-    // Fill in previous month's days
-    for (let i = 0; i < startingDayOfWeek; i++) {
-        const prevMonthDay = new Date(year, month, -startingDayOfWeek + i + 1);
-        week.push({ date: prevMonthDay, isCurrentMonth: false });
-    }
-
-    // Fill in current month's days
-    for (let day = 1; day <= daysInMonth; day++) {
-        const date = new Date(year, month, day);
-        week.push({ date, isCurrentMonth: true });
-
-        if (week.length === 7) {
-            calendar.push(week);
-            week = [];
-        }
-    }
-
-    // Fill in next month's days
-    if (week.length > 0) {
-        const remainingDays = 7 - week.length;
-        for (let i = 1; i <= remainingDays; i++) {
-            const nextMonthDay = new Date(year, month + 1, i);
-            week.push({ date: nextMonthDay, isCurrentMonth: false });
-        }
-        calendar.push(week);
-    }
-
-    return calendar;
-};
-
 const calendar1 = computed(() => generateCalendar(currentMonth1.value));
 const calendar2 = computed(() => generateCalendar(currentMonth2.value));
 
-const monthYearLabel1 = computed(() => {
-    return currentMonth1.value.toLocaleString('en-US', { month: 'short', year: 'numeric' });
-});
-
-const monthYearLabel2 = computed(() => {
-    return currentMonth2.value.toLocaleString('en-US', { month: 'short', year: 'numeric' });
-});
+const monthYearLabel1 = computed(() => getMonthYearLabel(currentMonth1.value));
+const monthYearLabel2 = computed(() => getMonthYearLabel(currentMonth2.value));
 
 /*
  * Calendar Navigation
