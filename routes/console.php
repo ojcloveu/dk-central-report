@@ -21,17 +21,21 @@ Schedule::command('sync:bets --days-back=0')
             'start_timestamp' => now()->timestamp
         ]);
     })
-    ->onSuccess(function () {
+    ->onSuccess(function ($output) {
         \Log::info('Scheduled bet sync completed successfully', [
             'command' => 'sync:bets --days-back=0',
             'end_time' => now()->toDateTimeString(),
-            'end_timestamp' => now()->timestamp
+            'end_timestamp' => now()->timestamp,
+            'output' => $output,
+            'exit_code' => 0
         ]);
     })
-    ->onFailure(function () {
+    ->onFailure(function ($output) {
         \Log::error('Scheduled bet sync failed', [
             'command' => 'sync:bets --days-back=0',
             'end_time' => now()->toDateTimeString(),
-            'end_timestamp' => now()->timestamp
+            'end_timestamp' => now()->timestamp,
+            'output' => $output,
+            'exit_code' => 'non-zero'
         ]);
     });
