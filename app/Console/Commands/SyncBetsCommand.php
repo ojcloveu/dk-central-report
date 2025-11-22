@@ -20,7 +20,8 @@ class SyncBetsCommand extends Command
                             {--channel= : Channel name filter}
                             {--background : Run as background job}
                             {--chunk-size=1000 : Chunk size for processing}
-                            {--days-back=1 : Number of days back from today if no dates provided}';
+                            {--days-back=1 : Number of days back from today if no dates provided}
+                            {--hours-back= : Number of hours back from now (takes precedence over days-back)}';
 
     /**
      * The console command description.
@@ -43,7 +44,7 @@ class SyncBetsCommand extends Command
             $channel = $this->option('channel');
             $background = $this->option('background');
             
-            $this->info("Date range: {$startDate->format('Y-m-d')} to {$endDate->format('Y-m-d')}");
+            $this->info("Date range: {$startDate->format('Y-m-d H:i:s')} to {$endDate->format('Y-m-d H:i:s')}");
             if ($channel) {
                 $this->info("Channel filter: {$channel}");
             }
@@ -83,6 +84,12 @@ class SyncBetsCommand extends Command
             return Carbon::parse($this->option('start-date'))->startOfDay();
         }
         
+        // Hours-back takes precedence over days-back
+        if ($this->option('hours-back')) {
+            $hoursBack = (int) $this->option('hours-back');
+            return now()->subHours($hoursBack);
+        }
+        
         $daysBack = (int) $this->option('days-back');
         return now()->subDays($daysBack)->startOfDay();
     }
@@ -94,6 +101,11 @@ class SyncBetsCommand extends Command
     {
         if ($this->option('end-date')) {
             return Carbon::parse($this->option('end-date'))->endOfDay();
+        }
+        
+        // If using hours-back, end date should be current time
+        if ($this->option('hours-back')) {
+            return now();
         }
         
         return $this->getStartDate()->addDay()->subSecond();

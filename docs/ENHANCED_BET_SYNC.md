@@ -137,31 +137,45 @@ GET /api/sync-bets/status/{jobId}
 ### Basic Sync Command
 
 ```bash
-# Sync today's data
-php artisan sync:bets
+# Sync today's data (Docker)
+docker exec -it app_cr php artisan sync:bets
+
+# Sync from the last 3 hours (using new --hours-back option)
+docker exec -it app_cr php artisan sync:bets --hours-back=3
+
+# Sync from the last 6 hours
+docker exec -it app_cr php artisan sync:bets --hours-back=6
 
 # Sync specific date range
-php artisan sync:bets --start-date=2025-11-01 --end-date=2025-11-20
+docker exec -it app_cr php artisan sync:bets --start-date=2025-11-01 --end-date=2025-11-20
 
 # Sync with channel filter
-php artisan sync:bets --channel=VN --days-back=7
+docker exec -it app_cr php artisan sync:bets --channel=VN --days-back=7
+
+# Sync with channel filter using hours
+docker exec -it app_cr php artisan sync:bets --channel=VN --hours-back=12
 
 # Run as background job
-php artisan sync:bets --start-date=2025-10-01 --end-date=2025-11-20 --background
+docker exec -it app_cr php artisan sync:bets --start-date=2025-10-01 --end-date=2025-11-20 --background
 
 # Custom chunk size
-php artisan sync:bets --chunk-size=2000
+docker exec -it app_cr php artisan sync:bets --chunk-size=2000
+
+# Non-Docker alternative (if running locally)
+php artisan sync:bets --hours-back=3
 ```
 
 ### Monitor Job Status
 
 ```bash
-# Check job status
-php artisan sync:bets-status sync_bets_673f8a1b2c4d5
+# Check job status (Docker)
+docker exec -it app_cr php artisan sync:bets-status sync_bets_673f8a1b2c4d5
 
-# Monitor with real-time progress
+# Monitor with real-time progress (Docker)
+docker exec -it app_cr php artisan sync:bets-status sync_bets_673f8a1b2c4d5
+
+# Non-Docker alternative
 php artisan sync:bets-status sync_bets_673f8a1b2c4d5
-# (Will offer to monitor progress in real-time)
 ```
 
 ## Configuration
