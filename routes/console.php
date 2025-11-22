@@ -21,21 +21,35 @@ Schedule::command('sync:bets --days-back=0')
             'start_timestamp' => now()->timestamp
         ]);
     })
-    ->onSuccess(function ($output) {
+    ->onSuccess(function () {
+        $logContent = '';
+        $logFile = storage_path('logs/bet-sync-scheduler.log');
+        if (file_exists($logFile)) {
+            $lines = file($logFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+            $logContent = implode("\n", array_slice($lines, -20)); // Get last 20 lines
+        }
+        
         \Log::info('Scheduled bet sync completed successfully', [
             'command' => 'sync:bets --days-back=0',
             'end_time' => now()->toDateTimeString(),
             'end_timestamp' => now()->timestamp,
-            'output' => $output,
+            'recent_output' => $logContent,
             'exit_code' => 0
         ]);
     })
-    ->onFailure(function ($output) {
+    ->onFailure(function () {
+        $logContent = '';
+        $logFile = storage_path('logs/bet-sync-scheduler.log');
+        if (file_exists($logFile)) {
+            $lines = file($logFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+            $logContent = implode("\n", array_slice($lines, -20)); // Get last 20 lines
+        }
+        
         \Log::error('Scheduled bet sync failed', [
             'command' => 'sync:bets --days-back=0',
             'end_time' => now()->toDateTimeString(),
             'end_timestamp' => now()->timestamp,
-            'output' => $output,
+            'recent_output' => $logContent,
             'exit_code' => 'non-zero'
         ]);
     });
