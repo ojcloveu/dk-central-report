@@ -9,7 +9,7 @@ Artisan::command('inspire', function () {
 })->purpose('Display an inspiring quote');
 
 // Schedule bet sync command to run every 5 minutes without overlapping
-Schedule::command('sync:bets --hours-back=1')
+Schedule::command('sync:bets --days-back=0')
     ->everyFiveMinutes()
     ->withoutOverlapping()
     ->runInBackground()
