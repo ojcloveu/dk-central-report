@@ -61,10 +61,10 @@ class BetCrudController extends CrudController
             ->default(date('Y-m-d') . ' - ' . date('Y-m-d'))
             ->whenActive(function ($value) {
                 $dates = explode(' - ', $value);
-                if (count($dates) == 2) {
+                // if (count($dates) == 2) {
                     CRUD::addClause('whereDate', 'trandate', '>=', $dates[0]);
                     CRUD::addClause('whereDate', 'trandate', '<=', $dates[1]);
-                }
+                // }
             });
 
         /**
