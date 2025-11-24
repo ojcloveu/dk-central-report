@@ -34,49 +34,6 @@ const rangePeriods = [
 const getRangeData = key => betStore.rangesTables[key];
 
 /*
- * Handle pagination click
- */
-const handlePaginationClick = (rangeKey, linkLabel) => {
-    let targetPage = 1;
-
-    if (typeof linkLabel === 'number') {
-        targetPage = linkLabel;
-    } else {
-        const meta = getRangeData(rangeKey)?.meta;
-        if (!meta) return;
-
-        if (linkLabel.includes('Previous')) {
-            targetPage = meta.current_page - 1;
-        } else if (linkLabel.includes('Next')) {
-            targetPage = meta.current_page + 1;
-        } else {
-            return;
-        }
-    }
-
-    // Update all three range tables to the same page
-    rangePeriods.forEach(period => {
-        betStore.setRangePage(period.key, targetPage);
-    });
-};
-
-/*
- * Handle change per page for record options selection
- */
-const handleChangePerPage = count => {
-    rangePeriods.forEach(period => {
-        betStore.setRangeItemsPerPage(period.key, +count);
-    });
-};
-
-/*
- * Global value for record options selection
- */
-const globalPerPage = computed(() => {
-    return getRangeData('tm')?.meta?.per_page || 10;
-});
-
-/*
  * Handle refetch bet and period data
  */
 const handleRefetchBetAndPeriod = () => {
@@ -151,7 +108,7 @@ const handleSelectAll = (periodKey, event) => {
         );
     }
 
-    betStore.fetchRangeData(null, 1, null, rangeSort.sort_by, rangeSort.sort_dir);
+    betStore.fetchRangeData(null, null, null, rangeSort.sort_by, rangeSort.sort_dir);
 };
 
 /*
@@ -247,13 +204,9 @@ onMounted(async () => {
                         </span>
                     </div>
 
-                    <!-- Show record options -->
+                    <!-- Show record options (This just hide the data in frontend) -->
                     <div v-if="getRangeData(period?.key)?.meta">
-                        <select
-                            class="form-select form-select-sm"
-                            :value="globalPerPage"
-                            @change="handleChangePerPage($event.target?.value)"
-                        >
+                        <select class="form-select form-select-sm" :value="globalPerPage">
                             <option value="10">10</option>
                             <option value="20">20</option>
                             <option value="50">50</option>
@@ -278,7 +231,10 @@ onMounted(async () => {
                                             @change="handleSelectAll(period.key, $event)"
                                         />
                                     </th>
-                                    <th @click="handleRangeSort('account')" class="sortable cursor-pointer">
+                                    <th
+                                        @click="handleRangeSort('account')"
+                                        class="sortable cursor-pointer"
+                                    >
                                         Account
                                         <SortIcon
                                             :currentSortBy="rangeSort.sort_by"
@@ -287,7 +243,10 @@ onMounted(async () => {
                                         />
                                     </th>
 
-                                    <th @click="handleRangeSort('total_count')" class="sortable text-end cursor-pointer">
+                                    <th
+                                        @click="handleRangeSort('total_count')"
+                                        class="sortable text-end cursor-pointer"
+                                    >
                                         Count
                                         <SortIcon
                                             :currentSortBy="rangeSort.sort_by"
@@ -296,7 +255,10 @@ onMounted(async () => {
                                         />
                                     </th>
 
-                                    <th @click="handleRangeSort('total_turnover')" class="sortable text-end cursor-pointer">
+                                    <th
+                                        @click="handleRangeSort('total_turnover')"
+                                        class="sortable text-end cursor-pointer"
+                                    >
                                         Turnover
                                         <SortIcon
                                             :currentSortBy="rangeSort.sort_by"
@@ -305,7 +267,10 @@ onMounted(async () => {
                                         />
                                     </th>
 
-                                    <th @click="handleRangeSort('total_winlose')" class="sortable text-end cursor-pointer">
+                                    <th
+                                        @click="handleRangeSort('total_winlose')"
+                                        class="sortable text-end cursor-pointer"
+                                    >
                                         Win/Lose
                                         <SortIcon
                                             :currentSortBy="rangeSort.sort_by"
@@ -314,7 +279,10 @@ onMounted(async () => {
                                         />
                                     </th>
 
-                                    <th @click="handleRangeSort('total_lp')" class="sortable text-end cursor-pointer">
+                                    <th
+                                        @click="handleRangeSort('total_lp')"
+                                        class="sortable text-end cursor-pointer"
+                                    >
                                         LP
                                         <SortIcon
                                             :currentSortBy="rangeSort.sort_by"
@@ -369,45 +337,35 @@ onMounted(async () => {
                                     </td>
 
                                     <!-- Dummy column deposit -->
-                                    <td class="text-end text-success fw-bold bg-muted-lt">${{ Number(getDummyDeposit()).toFixed(0) }}</td>
+                                    <td class="text-end text-success fw-bold bg-muted-lt">
+                                        ${{ Number(getDummyDeposit()).toFixed(0) }}
+                                    </td>
                                     <!-- Dummy column withdraw -->
-                                    <td class="text-end text-danger fw-bold bg-muted-lt">${{ Number(getDummyWithdraw()).toFixed(0) }}</td>
+                                    <td class="text-end text-danger fw-bold bg-muted-lt">
+                                        ${{ Number(getDummyWithdraw()).toFixed(0) }}
+                                    </td>
                                     <!-- Dummy column deposit - withdraw -->
                                     <td
                                         class="text-end fw-bold"
-                                        :class="(Number(getDummyDeposit()) - Number(getDummyWithdraw())) < 0 ? 'bg-red-lt' : 'bg-green-lt'"
-                                    >${{ (Number(getDummyDeposit()) - Number(getDummyWithdraw())).toFixed(0) }}</td>
+                                        :class="
+                                            Number(getDummyDeposit()) - Number(getDummyWithdraw()) <
+                                            0
+                                                ? 'bg-red-lt'
+                                                : 'bg-green-lt'
+                                        "
+                                    >
+                                        ${{
+                                            (
+                                                Number(getDummyDeposit()) -
+                                                Number(getDummyWithdraw())
+                                            ).toFixed(0)
+                                        }}
+                                    </td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
                     <div v-else class="p-3 text-muted">No data for this period.</div>
-                </div>
-
-                <!-- Pagination -->
-                <div
-                    v-if="getRangeData(period.key)?.meta"
-                    class="card-footer d-flex flex-column flex-sm-row align-items-center"
-                >
-                    <ul
-                        class="pagination m-0 mt-2 mt-sm-0 w-auto w-sm-auto justify-content-center justify-content-md-end flex-grow-1"
-                    >
-                        <li
-                            v-for="link in getRangeData(period?.key).meta?.links"
-                            :key="link?.label"
-                            class="page-item"
-                            :class="{ active: link?.active, disabled: !link.url }"
-                        >
-                            <a
-                                href="#"
-                                class="page-link mx-1"
-                                @click.prevent="
-                                    handlePaginationClick(period?.key, link?.page || link?.label)
-                                "
-                                v-html="link?.label"
-                            ></a>
-                        </li>
-                    </ul>
                 </div>
             </div>
         </div>

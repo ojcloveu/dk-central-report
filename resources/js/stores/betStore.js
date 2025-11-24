@@ -19,9 +19,9 @@ const getInitialFilters = () => ({
 
 // Initial state range data
 const initialRangeState = {
-    tm: { data: [], meta: { current_page: 1, last_page: 1, per_page: 10 } },
-    '1m': { data: [], meta: { current_page: 1, last_page: 1, per_page: 10 } },
-    '3m': { data: [], meta: { current_page: 1, last_page: 1, per_page: 10 } },
+    tm: { data: [] },
+    '1m': { data: [] },
+    '3m': { data: [] },
 };
 
 export const useBetStore = defineStore('bet', {
@@ -179,7 +179,7 @@ export const useBetStore = defineStore('bet', {
          */
         async fetchRangeData(
             period = null,
-            page = 1,
+            page = null,
             per_page = null,
             sort_by = null,
             sort_dir = null
@@ -194,12 +194,9 @@ export const useBetStore = defineStore('bet', {
             const periods = period ? [period] : ['tm', '1m', '3m'];
 
             for (const p of periods) {
-                const currentPerPage = per_page || this.rangesTables[p].meta?.per_page;
                 const params = {
                     accounts: this.selectedAccounts.join(','),
                     period: p,
-                    page: page,
-                    per_page: currentPerPage,
                 };
 
                 // Add sort param if provided
@@ -211,18 +208,11 @@ export const useBetStore = defineStore('bet', {
                 }
 
                 try {
-                    const paginationData = await betServices.fetchRangePeriodData(params);
+                    const response = await betServices.fetchRangePeriodData(params);
 
                     this.rangesTables[p] = {
-                        data: paginationData.data,
-                        meta: {
-                            current_page: paginationData.meta.current_page,
-                            last_page: paginationData.meta.last_page,
-                            per_page: paginationData.meta.per_page,
-                            total: paginationData.meta.total,
-                            links: paginationData.meta.links || [],
-                        },
-                        date_range: paginationData.date_range || null,
+                        data: response.data,
+                        date_range: response.date_range || null,
                     };
                 } catch (error) {
                     console.error(`Error fetching range data for ${p}:`, error);
@@ -230,20 +220,6 @@ export const useBetStore = defineStore('bet', {
             }
 
             this.rangeLoading = false;
-        },
-
-        /**
-         * Action to handle pagination
-         */
-        setRangePage(period, page) {
-            this.fetchRangeData(period, page, this.rangesTables[period].meta.per_page);
-        },
-
-        /**
-         * Action to handle per-page change
-         */
-        setRangeItemsPerPage(period, count, page = 1) {
-            this.fetchRangeData(period, page, count);
         },
 
         /**
