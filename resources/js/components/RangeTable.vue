@@ -38,13 +38,65 @@ const getRangeData = key => betStore.rangesTables[key];
  */
 const perPage = ref(10);
 
+// Sorting state for RangeTable (client-side)
+const rangeSort = reactive({
+    sort_by: 'account',
+    sort_dir: 'asc',
+});
+
 /*
- * Client filtering
+ * Client filtering and sorting
  */
+// Helper extract LP percentage value
+const getLpPercentageValue = lpValue => {
+    if (typeof lpValue === 'object' && lpValue?.percentage !== undefined) {
+        return parseFloat(lpValue.percentage || 0);
+    }
+    return parseFloat(lpValue || 0);
+};
+
+// Sort data based on current sort state
+const getSortedData = periodKey => {
+    const data = getRangeData(periodKey)?.data || [];
+    if (data.length === 0) return [];
+
+    // Create a copy
+    const sortedData = [...data];
+
+    sortedData.sort((a, b) => {
+        let aVal = a[rangeSort.sort_by];
+        let bVal = b[rangeSort.sort_by];
+
+        // Handling for total_lp which is an object
+        if (rangeSort.sort_by === 'total_lp') {
+            aVal = getLpPercentageValue(aVal);
+            bVal = getLpPercentageValue(bVal);
+            return rangeSort.sort_dir === 'asc' ? aVal - bVal : bVal - aVal;
+        }
+
+        // Handle numeric values
+        if (typeof aVal === 'number' && typeof bVal === 'number') {
+            return rangeSort.sort_dir === 'asc' ? aVal - bVal : bVal - aVal;
+        }
+
+        // Handle string values
+        const aStr = String(aVal || '').toLowerCase();
+        const bStr = String(bVal || '').toLowerCase();
+
+        if (rangeSort.sort_dir === 'asc') {
+            return aStr.localeCompare(bStr);
+        } else {
+            return bStr.localeCompare(aStr);
+        }
+    });
+
+    return sortedData;
+};
+
 // Get filtered data based on perPage limit
 const getFilteredData = periodKey => {
-    const data = getRangeData(periodKey)?.data || [];
-    return data.slice(0, perPage.value);
+    const sortedData = getSortedData(periodKey);
+    return sortedData.slice(0, perPage.value);
 };
 
 // Handle change per page for client filtering
@@ -70,13 +122,7 @@ const handleRowCheckboxChange = (account, isChecked) => {
     betStore.toggleAccountSelection(account, isChecked);
 };
 
-// Sorting state for RangeTable
-const rangeSort = reactive({
-    sort_by: 'account',
-    sort_dir: 'asc',
-});
-
-// Handle sorting when click table column
+// Handle sorting in client-side
 const handleRangeSort = column => {
     if (rangeSort.sort_by === column) {
         // toggle direction
@@ -85,9 +131,6 @@ const handleRangeSort = column => {
         rangeSort.sort_by = column;
         rangeSort.sort_dir = 'asc';
     }
-
-    // Refetch all tm, 1m, 3m tables with sort param
-    betStore.fetchRangeData(null, 1, null, rangeSort.sort_by, rangeSort.sort_dir);
 };
 
 /*
@@ -127,7 +170,7 @@ const handleSelectAll = (periodKey, event) => {
         );
     }
 
-    betStore.fetchRangeData(null, null, null, rangeSort.sort_by, rangeSort.sort_dir);
+    betStore.fetchRangeData();
 };
 
 /*
