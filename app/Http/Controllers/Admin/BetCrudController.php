@@ -58,13 +58,18 @@ class BetCrudController extends CrudController
         CRUD::filter('trandate')
             ->type('date_range')
             ->label('Transaction Date')
-            ->default(date('Y-m-d') . ' - ' . date('Y-m-d'))
+            ->default([
+                'from' => date('Y-m-d') . ' 00:00:00',
+                'to' => date('Y-m-d') . ' 23:59:59'
+            ])
             ->whenActive(function ($value) {
-                $dates = explode(' - ', $value);
-                // if (count($dates) == 2) {
-                    CRUD::addClause('whereDate', 'trandate', '>=', $dates[0]);
-                    CRUD::addClause('whereDate', 'trandate', '<=', $dates[1]);
-                // }
+                if (is_string($value)) {
+                    $value = json_decode($value, true);
+                }
+                if (isset($value['from']) && isset($value['to'])) {
+                    CRUD::addClause('where', 'trandate', '>=', $value['from']);
+                    CRUD::addClause('where', 'trandate', '<=', $value['to']);
+                }
             });
 
         /**
