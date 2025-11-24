@@ -34,6 +34,25 @@ const rangePeriods = [
 const getRangeData = key => betStore.rangesTables[key];
 
 /*
+ * Client-only pagination state
+ */
+const perPage = ref(10);
+
+/*
+ * Client filtering
+ */
+// Get filtered data based on perPage limit
+const getFilteredData = periodKey => {
+    const data = getRangeData(periodKey)?.data || [];
+    return data.slice(0, perPage.value);
+};
+
+// Handle change per page for client filtering
+const handleChangePerPage = count => {
+    perPage.value = +count;
+};
+
+/*
  * Handle refetch bet and period data
  */
 const handleRefetchBetAndPeriod = () => {
@@ -76,7 +95,7 @@ const handleRangeSort = column => {
  */
 const getAllSelected = periodKey =>
     computed(() => {
-        const data = getRangeData(periodKey)?.data || [];
+        const data = getFilteredData(periodKey);
         if (data.length === 0) return false;
 
         // Check if at least one account in period's data is selected
@@ -85,7 +104,7 @@ const getAllSelected = periodKey =>
 
 const getSomeSelected = periodKey =>
     computed(() => {
-        const data = getRangeData(periodKey)?.data || [];
+        const data = getFilteredData(periodKey);
         const allSelected = getAllSelected(periodKey).value;
 
         // Check if at least one account in period's data is selected
@@ -94,7 +113,7 @@ const getSomeSelected = periodKey =>
 
 // Handle select all checkbox change for a specific period
 const handleSelectAll = (periodKey, event) => {
-    const accounts = getRangeData(periodKey)?.data.map(row => row.account) || [];
+    const accounts = getFilteredData(periodKey).map(row => row.account) || [];
     const selectAll = event.target.checked;
 
     if (selectAll) {
@@ -204,13 +223,18 @@ onMounted(async () => {
                         </span>
                     </div>
 
-                    <!-- Show record options (This just hide the data in frontend) -->
-                    <div v-if="getRangeData(period?.key)?.meta">
-                        <select class="form-select form-select-sm" :value="globalPerPage">
+                    <!-- Show record options (Frontend filters display) -->
+                    <div v-if="getRangeData(period?.key)?.data?.length">
+                        <select
+                            class="form-select form-select-sm"
+                            :value="perPage"
+                            @change="handleChangePerPage($event.target?.value)"
+                        >
                             <option value="10">10</option>
                             <option value="20">20</option>
                             <option value="50">50</option>
                             <option value="100">100</option>
+                            <option value="9999">All</option>
                         </select>
                     </div>
                 </div>
@@ -299,7 +323,7 @@ onMounted(async () => {
                             </thead>
                             <tbody>
                                 <tr
-                                    v-for="row in getRangeData(period?.key).data"
+                                    v-for="row in getFilteredData(period?.key)"
                                     :key="row?.account"
                                     :class="{ 'table-primary-light': true }"
                                 >
