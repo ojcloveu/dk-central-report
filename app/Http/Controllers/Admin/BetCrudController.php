@@ -54,6 +54,19 @@ class BetCrudController extends CrudController
         CRUD::column('winlose')->type('number')->prefix('$');
         CRUD::column('lp')->type('number')->suffix('%');
 
+        // Add date range filter for trandate with today as default
+        CRUD::filter('trandate')
+            ->type('date_range')
+            ->label('Transaction Date')
+            ->default(date('Y-m-d') . ' - ' . date('Y-m-d'))
+            ->whenActive(function ($value) {
+                $dates = explode(' - ', $value);
+                if (count($dates) == 2) {
+                    CRUD::addClause('whereDate', 'trandate', '>=', $dates[0]);
+                    CRUD::addClause('whereDate', 'trandate', '<=', $dates[1]);
+                }
+            });
+
         /**
          * Columns can be defined using the fluent syntax:
          * - CRUD::column('price')->type('number');
