@@ -373,7 +373,7 @@ onUnmounted(() => {
                         </button>
                         <button
                             type="button"
-                            class="btn btn-danger"
+                            class="btn btn-primary"
                             @click="applyDateRange"
                             :disabled="!tempStartDate || !tempEndDate"
                         >
@@ -603,7 +603,7 @@ onUnmounted(() => {
 /* Selected Range Display */
 .selected-range {
     text-align: center;
-    padding: 1rem;
+    padding: 4px;
     margin-top: 1rem;
     border-top: 1px solid var(--tblr-border-color);
     font-size: 0.875rem;
