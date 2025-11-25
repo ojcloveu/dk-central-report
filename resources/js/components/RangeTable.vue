@@ -2,10 +2,11 @@
 import { storeToRefs } from 'pinia';
 import { useBetStore } from '../stores/betStore';
 import { amountColor, lpBgColor } from '../utils/getStatusClass';
+import { computed, ref, onMounted, watch, reactive, nextTick } from 'vue';
+import { useRangeTableSorting } from '../composables/useRangeTableSorting';
 import RangeTableSkeleton from './loading/RangeTableSkeleton.vue';
 import SortIcon from './icons/SortIcon.vue';
 import ActionButton from './buttons/ActionButton.vue';
-import { computed, ref, onMounted, watch, reactive, nextTick } from 'vue';
 
 const betStore = useBetStore();
 
@@ -34,76 +35,14 @@ const rangePeriods = [
 const getRangeData = key => betStore.rangesTables[key];
 
 /*
+ * Use sorting composables
+ */
+const { rangeSort, handleRangeSort, getSortedData } = useRangeTableSorting(getRangeData);
+
+/*
  * Client-only pagination state
  */
 const perPage = ref(10);
-
-// Sorting state for RangeTable (client-side)
-const rangeSort = reactive({
-    sort_by: 'account',
-    sort_dir: 'asc',
-});
-
-/*
- * Client filtering and sorting
- */
-// Remove '$' and ',' then parse
-const parseCurrency = (value) => {
-    if (typeof value === 'number') return value;
-    if (!value) return 0;
-    
-    return parseFloat(String(value).replace(/[$,]/g, ''));
-};
-// Helper extract LP percentage value
-const getLpPercentageValue = lpValue => {
-    if (typeof lpValue === 'object' && lpValue?.percentage !== undefined) {
-        return parseFloat(lpValue.percentage || 0);
-    }
-    return parseFloat(lpValue || 0);
-};
-
-// Sort data based on current sort state
-const getSortedData = periodKey => {
-    const data = getRangeData(periodKey)?.data || [];
-    if (data.length === 0) return [];
-
-    // Create a copy
-    const sortedData = [...data];
-
-    sortedData.sort((a, b) => {
-        let aVal = a[rangeSort.sort_by];
-        let bVal = b[rangeSort.sort_by];
-
-        // Handling for 'winlose','turnover
-        if (['total_winlose', 'total_turnover'].includes(rangeSort.sort_by)) {
-            aVal = parseCurrency(aVal);
-            bVal = parseCurrency(bVal);
-            return rangeSort.sort_dir === 'asc' ? aVal - bVal : bVal - aVal;
-        }
-        // Handling for total_lp which is an object
-        if (rangeSort.sort_by === 'total_lp') {
-            aVal = getLpPercentageValue(aVal);
-            bVal = getLpPercentageValue(bVal);
-            return rangeSort.sort_dir === 'asc' ? aVal - bVal : bVal - aVal;
-        }
-        // Handling numeric values
-        if (typeof aVal === 'number' && typeof bVal === 'number') {
-            return rangeSort.sort_dir === 'asc' ? aVal - bVal : bVal - aVal;
-        }
-
-        // Handle string values
-        const aStr = String(aVal || '').toLowerCase();
-        const bStr = String(bVal || '').toLowerCase();
-
-        if (rangeSort.sort_dir === 'asc') {
-            return aStr.localeCompare(bStr);
-        } else {
-            return bStr.localeCompare(aStr);
-        }
-    });
-
-    return sortedData;
-};
 
 // Get filtered data based on perPage limit
 const getFilteredData = periodKey => {
@@ -132,17 +71,6 @@ const handleRemoveSelectedAccounts = () => {
 
 const handleRowCheckboxChange = (account, isChecked) => {
     betStore.toggleAccountSelection(account, isChecked);
-};
-
-// Handle sorting in client-side
-const handleRangeSort = column => {
-    if (rangeSort.sort_by === column) {
-        // toggle direction
-        rangeSort.sort_dir = rangeSort.sort_dir === 'asc' ? 'desc' : 'asc';
-    } else {
-        rangeSort.sort_by = column;
-        rangeSort.sort_dir = 'asc';
-    }
 };
 
 /*
