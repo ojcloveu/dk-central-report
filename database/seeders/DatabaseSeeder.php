@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\User;
+use Database\Seeders\Production\IgnoreAccountSettingSeeder;
 use Database\Seeders\Production\LpColorSettingSeeder;
 use Illuminate\Database\Seeder;
 use Database\Seeders\Production\DefaultUserSeeder;
@@ -30,6 +31,7 @@ class DatabaseSeeder extends Seeder
 
             // Setting
             LpColorSettingSeeder::class,
+            IgnoreAccountSettingSeeder::class,
         ]);
     }
 }
