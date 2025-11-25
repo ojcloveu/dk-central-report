@@ -24,6 +24,13 @@ const initialRangeState = {
     '3m': { data: [] },
 };
 
+// Initial cache state for account data per period
+const initialCacheState = {
+    tm: {},
+    '1m': {},
+    '3m': {},
+};
+
 export const useBetStore = defineStore('bet', {
     state: () => {
         return {
@@ -37,6 +44,9 @@ export const useBetStore = defineStore('bet', {
             selectedAccounts: [],
             rangesTables: initialRangeState,
             rangeLoading: false,
+
+            // Cache for account data per period
+            accountDataCache: initialCacheState,
 
             filters: {
                 ...getInitialFilters(),
@@ -132,94 +142,202 @@ export const useBetStore = defineStore('bet', {
         /**
          * Adds or removes an account from the selected list
          */
-        toggleAccountSelection(account, isChecked) {
+        async toggleAccountSelection(account, isChecked) {
             if (isChecked) {
                 if (!this.selectedAccounts.includes(account)) {
                     this.selectedAccounts.push(account);
+                    // Fetch data only for the new account if not cached
+                    await this.fetchAccountData(account);
                 }
             } else {
+                // Remove from selected accounts
                 this.selectedAccounts = this.selectedAccounts.filter(a => a !== account);
             }
-            // Trigger the range data fetch immediately after selection changes
-            this.fetchRangeData();
+            // Rebuild display from cache
+            this.rebuildRangeTablesFromCache();
         },
 
         /**
          * Action to select/deselect all accounts currently displayed
          */
-        toggleAllAccountsSelection(selectAll) {
+        async toggleAllAccountsSelection(selectAll) {
             const currentAccounts = this.data.map(bet => bet.account);
 
             if (selectAll) {
-                // Merge current accounts with selected accounts
+                // Find accounts that need to be added
                 const uniqueNewAccounts = currentAccounts.filter(
                     acc => !this.selectedAccounts.includes(acc)
                 );
                 this.selectedAccounts = [...this.selectedAccounts, ...uniqueNewAccounts];
+
+                // Fetch data only for uncached accounts
+                await this.fetchMultipleAccountsData(uniqueNewAccounts);
             } else {
                 // Only remove accounts visible on the current page
                 this.selectedAccounts = this.selectedAccounts.filter(
                     acc => !currentAccounts.includes(acc)
                 );
             }
-            this.fetchRangeData();
+
+            // Rebuild display from cache
+            this.rebuildRangeTablesFromCache();
         },
 
         /**
-         * Action to clear all selected accounts and refresh range data.
+         * Action to clear all selected accounts and cache
          */
         clearAllSelectedAccounts() {
             this.selectedAccounts = [];
             this.rangesTables = initialRangeState;
-            this.fetchRangeData();
+            this.accountDataCache = initialCacheState;
         },
 
         /**
-         * Action fetches data for Range Table based on selected accounts and periods
+         * Fetch data for a single account across all periods and add to cache
          */
-        async fetchRangeData(
-            period = null,
-            page = null,
-            per_page = null,
-            sort_by = null,
-            sort_dir = null
-        ) {
+        async fetchAccountData(account) {
+            this.rangeLoading = true;
+            const periods = ['tm', '1m', '3m'];
+
+            for (const period of periods) {
+                // Skip if already cached
+                if (this.accountDataCache[period][account]) {
+                    continue;
+                }
+
+                try {
+                    const params = {
+                        accounts: account,
+                        period: period,
+                    };
+
+                    const response = await betServices.fetchRangePeriodData(params);
+
+                    // Cache the account data
+                    if (response.data && response.data.length > 0) {
+                        this.accountDataCache[period][account] = response.data[0];
+                    }
+
+                    // Store date_range if not already stored
+                    if (!this.rangesTables[period].date_range && response.date_range) {
+                        this.rangesTables[period].date_range = response.date_range;
+                    }
+                } catch (error) {
+                    console.error(
+                        `Error fetching data for account ${account}, period ${period}:`,
+                        error
+                    );
+                }
+            }
+
+            this.rangeLoading = false;
+        },
+
+        /**
+         * Fetch data for multiple accounts and add to cache
+         */
+        async fetchMultipleAccountsData(accounts) {
+            if (!accounts || accounts.length === 0) return;
+
+            this.rangeLoading = true;
+            const periods = ['tm', '1m', '3m'];
+
+            for (const period of periods) {
+                // Filter out already cached accounts
+                const uncachedAccounts = accounts.filter(
+                    acc => !this.accountDataCache[period][acc]
+                );
+
+                if (uncachedAccounts.length === 0) continue;
+
+                try {
+                    const params = {
+                        accounts: uncachedAccounts.join(','),
+                        period: period,
+                    };
+
+                    const response = await betServices.fetchRangePeriodData(params);
+
+                    // Cache each account's data
+                    if (response.data) {
+                        response.data.forEach(accountData => {
+                            this.accountDataCache[period][accountData.account] = accountData;
+                        });
+                    }
+
+                    // Store date_range if not already stored
+                    if (!this.rangesTables[period].date_range && response.date_range) {
+                        this.rangesTables[period].date_range = response.date_range;
+                    }
+                } catch (error) {
+                    console.error(`Error fetching data for period ${period}:`, error);
+                }
+            }
+
+            this.rangeLoading = false;
+        },
+
+        /**
+         * Rebuild range tables from cache based on selected accounts
+         */
+        rebuildRangeTablesFromCache() {
+            const periods = ['tm', '1m', '3m'];
+
+            periods.forEach(period => {
+                const data = this.selectedAccounts
+                    .map(account => this.accountDataCache[period][account])
+                    .filter(Boolean);
+
+                this.rangesTables[period] = {
+                    data: data,
+                    date_range: this.rangesTables[period].date_range || null,
+                };
+            });
+        },
+
+        /**
+         * Fetch data for account(s) - fetches all selected accounts
+         */
+        async fetchAccountsData(accounts) {
+            // Normalize input to array
+            const accountsArray = Array.isArray(accounts) ? accounts : [accounts];
+
+            if (!accountsArray || accountsArray.length === 0) return;
+
+            this.rangeLoading = true;
+            const periods = ['tm', '1m', '3m'];
+
+            for (const period of periods) {
+                try {
+                    const params = {
+                        accounts: accountsArray.join(','),
+                        period: period,
+                    };
+
+                    const response = await betServices.fetchRangePeriodData(params);
+
+                    this.rangesTables[period] = {
+                        data: response.data || [],
+                        date_range: response.date_range || null,
+                    };
+                } catch (error) {
+                    console.error(`Error fetching data for period ${period}:`, error);
+                }
+            }
+
+            this.rangeLoading = false;
+        },
+
+        /**
+         * Fetch range data for selected accounts
+         */
+        async fetchRangeData() {
             if (this.selectedAccounts.length === 0) {
                 this.rangesTables = initialRangeState;
                 return;
             }
 
-            this.rangeLoading = true;
-
-            const periods = period ? [period] : ['tm', '1m', '3m'];
-
-            for (const p of periods) {
-                const params = {
-                    accounts: this.selectedAccounts.join(','),
-                    period: p,
-                };
-
-                // Add sort param if provided
-                if (sort_by) {
-                    params.sort_by = sort_by;
-                }
-                if (sort_dir) {
-                    params.sort_dir = sort_dir;
-                }
-
-                try {
-                    const response = await betServices.fetchRangePeriodData(params);
-
-                    this.rangesTables[p] = {
-                        data: response.data,
-                        date_range: response.date_range || null,
-                    };
-                } catch (error) {
-                    console.error(`Error fetching range data for ${p}:`, error);
-                }
-            }
-
-            this.rangeLoading = false;
+            await this.fetchAccountsData(this.selectedAccounts);
         },
 
         /**
@@ -238,6 +356,7 @@ export const useBetStore = defineStore('bet', {
             this.filters = getInitialFilters();
             this.selectedAccounts = [];
             this.rangesTables = initialRangeState;
+            this.accountDataCache = initialCacheState;
             this.fetchBets();
         },
 
