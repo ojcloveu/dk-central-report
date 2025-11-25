@@ -81,7 +81,7 @@ const getAllSelected = periodKey =>
         const data = getFilteredData(periodKey);
         if (data.length === 0) return false;
 
-        // Check if at least one account in period's data is selected
+        // Check at least one account in period data is selected
         return data.every(row => betStore.selectedAccounts.includes(row.account));
     });
 
@@ -90,7 +90,7 @@ const getSomeSelected = periodKey =>
         const data = getFilteredData(periodKey);
         const allSelected = getAllSelected(periodKey).value;
 
-        // Check if at least one account in period's data is selected
+        // Check at least one account in period data is selected
         return !allSelected && data.some(row => betStore.selectedAccounts.includes(row.account));
     });
 
