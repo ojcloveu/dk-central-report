@@ -2,7 +2,7 @@
 import { storeToRefs } from 'pinia';
 import { useBetStore } from '../stores/betStore';
 import { amountColor, lpBgColor } from '../utils/getStatusClass';
-import { computed, ref, onMounted, watch, reactive, nextTick } from 'vue';
+import { computed, ref, onMounted, watch, nextTick } from 'vue';
 import { useRangeTableSorting } from '../composables/useRangeTableSorting';
 import RangeTableSkeleton from './loading/RangeTableSkeleton.vue';
 import SortIcon from './icons/SortIcon.vue';
