@@ -11,6 +11,7 @@ use Inertia\Inertia;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Symfony\Component\HttpFoundation\Response;
+use Backpack\Settings\app\Models\Setting;
 
 /**
  * Class ReportController
@@ -58,6 +59,13 @@ class BetReportController extends Controller
         // Filter by 'channel'
         if ($request->filled('channel')) {
             $query->where('channel', $request->get('channel'));
+        }
+
+        // Filter out ignored accounts
+        $ignoreAccount = config('settings.ignore_account');
+        if (!empty($ignoreAccount)) {
+            $ignoredAccounts = array_map('trim', explode(',', $ignoreAccount));
+            $query->whereNotIn('account', $ignoredAccounts);
         }
 
         $query->orderBy($sortBy, $sortDir);
