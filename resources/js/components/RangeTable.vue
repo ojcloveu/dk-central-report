@@ -47,6 +47,13 @@ const rangeSort = reactive({
 /*
  * Client filtering and sorting
  */
+// Remove '$' and ',' then parse
+const parseCurrency = (value) => {
+    if (typeof value === 'number') return value;
+    if (!value) return 0;
+    
+    return parseFloat(String(value).replace(/[$,]/g, ''));
+};
 // Helper extract LP percentage value
 const getLpPercentageValue = lpValue => {
     if (typeof lpValue === 'object' && lpValue?.percentage !== undefined) {
@@ -67,14 +74,19 @@ const getSortedData = periodKey => {
         let aVal = a[rangeSort.sort_by];
         let bVal = b[rangeSort.sort_by];
 
+        // Handling for 'winlose','turnover
+        if (['total_winlose', 'total_turnover'].includes(rangeSort.sort_by)) {
+            aVal = parseCurrency(aVal);
+            bVal = parseCurrency(bVal);
+            return rangeSort.sort_dir === 'asc' ? aVal - bVal : bVal - aVal;
+        }
         // Handling for total_lp which is an object
         if (rangeSort.sort_by === 'total_lp') {
             aVal = getLpPercentageValue(aVal);
             bVal = getLpPercentageValue(bVal);
             return rangeSort.sort_dir === 'asc' ? aVal - bVal : bVal - aVal;
         }
-
-        // Handle numeric values
+        // Handling numeric values
         if (typeof aVal === 'number' && typeof bVal === 'number') {
             return rangeSort.sort_dir === 'asc' ? aVal - bVal : bVal - aVal;
         }
