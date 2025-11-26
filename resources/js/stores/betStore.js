@@ -315,9 +315,10 @@ export const useBetStore = defineStore('bet', {
          */
         rebuildRangeTablesFromCache() {
             const periods = ['tm', '1m', '3m'];
+            const uniqueAccounts = [...new Set(this.selectedAccounts)];
 
             periods.forEach(period => {
-                const data = this.selectedAccounts
+                const data = uniqueAccounts
                     .map(account => this.accountDataCache[period][account])
                     .filter(Boolean);
 
@@ -423,7 +424,8 @@ export const useBetStore = defineStore('bet', {
 
             // If all accounts are cached, rebuild from cache
             if (uncachedAccounts.length === 0) {
-                const data = this.selectedAccounts
+                const uniqueAccounts = [...new Set(this.selectedAccounts)];
+                const data = uniqueAccounts
                     .map(account => this.accountDataCache[period][account])
                     .filter(Boolean);
 
@@ -456,7 +458,8 @@ export const useBetStore = defineStore('bet', {
                 }
 
                 // Rebuild display from cache for all selected accounts
-                const data = this.selectedAccounts
+                const uniqueAccounts = [...new Set(this.selectedAccounts)];
+                const data = uniqueAccounts
                     .map(account => this.accountDataCache[period][account])
                     .filter(Boolean);
 
