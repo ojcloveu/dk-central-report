@@ -42,17 +42,15 @@ const { rangeSort, handleRangeSort, getSortedData } = useRangeTableSorting(getRa
 /*
  * Client-only pagination state
  */
-const perPage = ref(10);
-
 // Get filtered data based on perPage limit
 const getFilteredData = periodKey => {
     const sortedData = getSortedData(periodKey);
-    return sortedData.slice(0, perPage.value);
+    return sortedData.slice(0, betStore.rangePerPage);
 };
 
 // Handle change per page for client filtering
 const handleChangePerPage = count => {
-    perPage.value = +count;
+    betStore.setRangePerPage(+count);
 };
 
 /*
@@ -210,7 +208,7 @@ onMounted(async () => {
                     <div v-if="getRangeData(period?.key)?.data?.length">
                         <select
                             class="form-select form-select-sm"
-                            :value="perPage"
+                            :value="betStore.rangePerPage"
                             @change="handleChangePerPage($event.target?.value)"
                         >
                             <option value="10">10</option>
