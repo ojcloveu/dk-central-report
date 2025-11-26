@@ -22,6 +22,7 @@ const initialRangeState = {
     tm: { data: [] },
     '1m': { data: [] },
     '3m': { data: [] },
+    all_time: { data: [] },
 };
 
 // Initial cache state for account data per period
@@ -29,6 +30,7 @@ const initialCacheState = {
     tm: {},
     '1m': {},
     '3m': {},
+    all_time: {},
 };
 
 export const useBetStore = defineStore('bet', {
@@ -44,6 +46,8 @@ export const useBetStore = defineStore('bet', {
             selectedAccounts: [],
             rangesTables: initialRangeState,
             rangeLoading: false,
+            showAllTimeReport: false,
+            rangePerPage: 10,
 
             // Cache for account data per period
             accountDataCache: initialCacheState,
@@ -130,6 +134,22 @@ export const useBetStore = defineStore('bet', {
             this.fetchBets();
         },
 
+         /**
+         * Action to handle per-page change
+         */
+        setPerPage(perPage) {
+            this.filters.per_page = perPage;
+            this.filters.page = 1;
+            this.fetchBets();
+        },
+
+        /**
+         * Action to set range per page
+         */
+        setRangePerPage(perPage) {
+            this.rangePerPage = perPage;
+        },
+
         /**
          * Action to apply filters
          */
@@ -190,6 +210,7 @@ export const useBetStore = defineStore('bet', {
             this.selectedAccounts = [];
             this.rangesTables = initialRangeState;
             this.accountDataCache = initialCacheState;
+            this.showAllTimeReport = false;
         },
 
         /**
@@ -341,15 +362,6 @@ export const useBetStore = defineStore('bet', {
         },
 
         /**
-         * Action to handle per-page change
-         */
-        setPerPage(perPage) {
-            this.filters.per_page = perPage;
-            this.filters.page = 1;
-            this.fetchBets();
-        },
-
-        /**
          * Action clear selections and refresh the main table data
          */
         fetchBetsWithReset() {
@@ -367,5 +379,7 @@ export const useBetStore = defineStore('bet', {
             this.fetchBets();
             this.fetchRangeData();
         },
+
+        
     },
 });
