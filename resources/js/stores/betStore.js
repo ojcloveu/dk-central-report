@@ -48,6 +48,10 @@ export const useBetStore = defineStore('bet', {
             rangeLoading: false,
             showAllTimeReport: false,
             rangePerPage: 10,
+            rangeSort: {
+                sort_by: 'account',
+                sort_dir: 'asc',
+            },
 
             // Cache for account data per period
             accountDataCache: initialCacheState,
@@ -134,7 +138,7 @@ export const useBetStore = defineStore('bet', {
             this.fetchBets();
         },
 
-         /**
+        /**
          * Action to handle per-page change
          */
         setPerPage(perPage) {
@@ -148,6 +152,14 @@ export const useBetStore = defineStore('bet', {
          */
         setRangePerPage(perPage) {
             this.rangePerPage = perPage;
+        },
+
+        /**
+         * Action to set range sort
+         */
+        setRangeSort(sortBy, sortDir) {
+            this.rangeSort.sort_by = sortBy;
+            this.rangeSort.sort_dir = sortDir;
         },
 
         /**

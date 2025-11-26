@@ -35,9 +35,22 @@ const rangePeriods = [
 const getRangeData = key => betStore.rangesTables[key];
 
 /*
- * Use sorting composables
+ * Use sorting composables with shared state from store
  */
-const { rangeSort, handleRangeSort, getSortedData } = useRangeTableSorting(getRangeData);
+const handleRangeSortClick = column => {
+    if (betStore.rangeSort.sort_by === column) {
+        // Toggle direction
+        betStore.setRangeSort(column, betStore.rangeSort.sort_dir === 'asc' ? 'desc' : 'asc');
+    } else {
+        betStore.setRangeSort(column, 'asc');
+    }
+};
+
+const { rangeSort, handleRangeSort, getSortedData } = useRangeTableSorting(
+    getRangeData,
+    betStore.rangeSort,
+    handleRangeSortClick
+);
 
 /*
  * Client-only pagination state
@@ -297,8 +310,8 @@ onMounted(async () => {
                                     </th>
 
                                     <!-- Dummy column -->
-                                    <th class="text-end">Total Deposit</th>
-                                    <th class="text-end">Total Withdraw</th>
+                                    <th class="text-end th-bg-muted">Total Deposit</th>
+                                    <th class="text-end th-bg-muted">Total Withdraw</th>
                                     <th class="text-end">Deposit - Withdraw</th>
                                 </tr>
                             </thead>
@@ -376,3 +389,9 @@ onMounted(async () => {
         </div>
     </div>
 </template>
+
+<style scoped>
+.th-bg-muted {
+    background-color: var(--tblr-muted-lt) !important;
+}
+</style>

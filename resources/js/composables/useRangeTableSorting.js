@@ -26,15 +26,8 @@ const getLpPercentageValue = lpValue => {
 
 /**
  * Composable for handling client-side sorting for the Range Table data
- * @returns {{ rangeSort: object, handleRangeSort: function, getSortedData: function }}
  */
-export function useRangeTableSorting(getRangeData) {
-    // Sorting state (reactive)
-    const rangeSort = reactive({
-        sort_by: 'account',
-        sort_dir: 'asc',
-    });
-
+export function useRangeTableSorting(getRangeData, rangeSort, handleRangeSortFn) {
     // Main Sorting Function
     const getSortedData = periodKey => {
         // Use helper function to get the raw data
@@ -81,16 +74,8 @@ export function useRangeTableSorting(getRangeData) {
         return sortedData;
     };
 
-    // Sorting Handler
-    const handleRangeSort = column => {
-        if (rangeSort.sort_by === column) {
-            // toggle direction
-            rangeSort.sort_dir = rangeSort.sort_dir === 'asc' ? 'desc' : 'asc';
-        } else {
-            rangeSort.sort_by = column;
-            rangeSort.sort_dir = 'asc';
-        }
-    };
+    // Sorting Handler - use the passed function from store
+    const handleRangeSort = handleRangeSortFn;
 
     return {
         rangeSort,

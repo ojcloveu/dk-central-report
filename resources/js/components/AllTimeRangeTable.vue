@@ -20,9 +20,22 @@ const selectAllCheckbox = ref(null);
 const getRangeData = () => betStore.rangesTables.all_time;
 
 /*
- * Use sorting composables
+ * Use sorting composables with shared state from store
  */
-const { rangeSort, handleRangeSort, getSortedData } = useRangeTableSorting(() => getRangeData());
+const handleRangeSortClick = column => {
+    if (betStore.rangeSort.sort_by === column) {
+        // Toggle direction
+        betStore.setRangeSort(column, betStore.rangeSort.sort_dir === 'asc' ? 'desc' : 'asc');
+    } else {
+        betStore.setRangeSort(column, 'asc');
+    }
+};
+
+const { rangeSort, handleRangeSort, getSortedData } = useRangeTableSorting(
+    () => getRangeData(),
+    betStore.rangeSort,
+    handleRangeSortClick
+);
 
 /*
  * Client-only pagination state (now from store)
