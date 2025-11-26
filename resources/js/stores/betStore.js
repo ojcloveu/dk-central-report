@@ -380,6 +380,83 @@ export const useBetStore = defineStore('bet', {
             this.fetchRangeData();
         },
 
-        
+        /**
+         * Toggle All Time Report visibility
+         */
+        toggleAllTimeReport() {
+            this.showAllTimeReport = !this.showAllTimeReport;
+
+            // Fetch all-time data when showing first time
+            if (this.showAllTimeReport && this.selectedAccounts.length > 0) {
+                this.fetchAllTimeData();
+            }
+        },
+
+        /**
+         * Fetch all-time data for selected accounts
+         */
+        async fetchAllTimeData() {
+            if (this.selectedAccounts.length === 0) {
+                this.rangesTables.all_time = { data: [] };
+                return;
+            }
+
+            this.rangeLoading = true;
+            const period = 'all_time';
+
+            // Filter out, cached accounts
+            const uncachedAccounts = this.selectedAccounts.filter(
+                acc => !this.accountDataCache[period][acc]
+            );
+
+            // If all accounts are cached, rebuild from cache
+            if (uncachedAccounts.length === 0) {
+                const data = this.selectedAccounts
+                    .map(account => this.accountDataCache[period][account])
+                    .filter(Boolean);
+
+                this.rangesTables[period] = {
+                    data: data,
+                    date_range: this.rangesTables[period].date_range || null,
+                };
+                this.rangeLoading = false;
+                return;
+            }
+
+            try {
+                const params = {
+                    accounts: uncachedAccounts.join(','),
+                    period: period,
+                };
+
+                const response = await betServices.fetchRangePeriodData(params);
+
+                // Cache each account data
+                if (response.data) {
+                    response.data.forEach(accountData => {
+                        this.accountDataCache[period][accountData.account] = accountData;
+                    });
+                }
+
+                // Store date_range
+                if (response.date_range) {
+                    this.rangesTables[period].date_range = response.date_range;
+                }
+
+                // Rebuild display from cache for all selected accounts
+                const data = this.selectedAccounts
+                    .map(account => this.accountDataCache[period][account])
+                    .filter(Boolean);
+
+                this.rangesTables[period] = {
+                    data: data,
+                    date_range: response.date_range || null,
+                };
+            } catch (error) {
+                console.error(`Error fetching all-time data:`, error);
+            } finally {
+                this.rangeLoading = false;
+            }
+        },
     },
 });
