@@ -1,7 +1,7 @@
 <!-- BetDataTable.vue -->
 <script setup>
 import { onMounted, reactive } from 'vue';
-import { useBetStore } from '../stores/betStore';
+import { useBetStore } from '@/stores/betStore';
 import BetPageHeader from './BetPageHeader.vue';
 import BetFilterForm from './filter/BetFilterForm.vue';
 import BetTableHeader from './table/BetTableHeader.vue';

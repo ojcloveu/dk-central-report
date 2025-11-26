@@ -1,6 +1,6 @@
 <script setup>
 import { storeToRefs } from 'pinia';
-import { useBetStore } from '../stores/betStore';
+import { useBetStore } from '@/stores/betStore';
 import { amountColor, lpBgColor } from '../utils/getStatusClass';
 import { computed, ref, onMounted, watch, nextTick } from 'vue';
 import { useRangeTableSorting } from '../composables/useRangeTableSorting';
