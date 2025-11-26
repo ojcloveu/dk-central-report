@@ -4,7 +4,7 @@ defineProps({
         type: String,
         default: 'primary',
         validator: value =>
-            ['primary', 'secondary', 'outline-secondary', 'danger', 'success'].includes(value),
+            ['primary', 'secondary', 'outline-secondary', 'outline-danger', 'danger', 'success'].includes(value),
     },
     iconClass: {
         type: String,
