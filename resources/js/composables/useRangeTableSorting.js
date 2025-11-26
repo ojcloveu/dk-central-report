@@ -55,7 +55,14 @@ export function useRangeTableSorting(getRangeData, rangeSort, handleRangeSortFn)
                 return rangeSort.sort_dir === 'asc' ? aVal - bVal : bVal - aVal;
             }
 
-            // Handling numeric values (total_count)
+            // Handling total_count (convert to number if string)
+            if (rangeSort.sort_by === 'total_count') {
+                aVal = Number(aVal) || 0;
+                bVal = Number(bVal) || 0;
+                return rangeSort.sort_dir === 'asc' ? aVal - bVal : bVal - aVal;
+            }
+
+            // Handling numeric values
             if (typeof aVal === 'number' && typeof bVal === 'number') {
                 return rangeSort.sort_dir === 'asc' ? aVal - bVal : bVal - aVal;
             }
