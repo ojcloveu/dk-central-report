@@ -9,8 +9,10 @@ import BetTableRow from './table/BetTableRow.vue';
 import Pagination from './table/Pagination.vue';
 import EmptyState from './EmptyState.vue';
 import RangeTable from './RangeTable.vue';
+import AllTimeRangeTable from './AllTimeRangeTable.vue';
 import BetTableSkeleton from './loading/BetTableSkeleton.vue';
 import { storeToRefs } from 'pinia';
+import ActionButton from './buttons/ActionButton.vue';
 
 /*
  * State Management & Initialization
@@ -146,5 +148,21 @@ const sortableColumns = [
 
         <!-- Range Table (Visible when accounts are selected) -->
         <RangeTable v-if="betStore.hasSelectedAccounts" class="mt-4" />
+
+        <!-- All Time Report Button -->
+        <div v-if="betStore.hasSelectedAccounts" class="mt-3 d-flex justify-content-end">
+            <ActionButton
+                variant="primary"
+                iconClass="las la-chart-bar"
+                :label="betStore.showAllTimeReport ? 'Hide All Time Report' : 'All Time Report'"
+                title="All Time Report"
+                :disabled="betStore.rangeLoading && betStore.showAllTimeReport"
+                :loading="betStore.rangeLoading && betStore.showAllTimeReport"
+                @click="betStore.toggleAllTimeReport"
+            />
+        </div>
+
+        <!-- All Time Range Table -->
+        <AllTimeRangeTable v-if="betStore.showAllTimeReport" />
     </div>
 </template>
