@@ -163,12 +163,7 @@ class BetReportController extends Controller
             // Fetch summary data from external DK API
             $summaryData = $dkApiService->getSummary($uniqueAccounts);
 
-            return response()->json([
-                'success' => true,
-                'data' => $summaryData,
-                'accounts_count' => count($uniqueAccounts)
-            ], Response::HTTP_OK);
-
+            return response()->json($summaryData, Response::HTTP_OK);
         } catch (\InvalidArgumentException $e) {
             return response()->json([
                 'success' => false,
