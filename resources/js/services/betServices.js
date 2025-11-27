@@ -23,9 +23,27 @@ const betServices = {
         if (!params || !params.accounts || !params.period) {
             throw new Error('Accounts and period are required for fetchRangePeriodData.');
         }
-        
+
         const response = await axios.get('/admin/api/bet-period', {
             params: params,
+        });
+
+        return response.data;
+    },
+
+    /**
+     * Fetches external summary data (deposit/withdraw) from DK API
+     */
+    async fetchExternalSummary(accounts) {
+        if (!accounts || accounts.length === 0) {
+            throw new Error('Accounts array is required for fetchExternalSummary.');
+        }
+
+        // Join unique accounts as comma-separated string
+        const accountsString = accounts.join(',');
+
+        const response = await axios.get('/admin/api/external-summary', {
+            params: { accounts: accountsString },
         });
 
         return response.data;
