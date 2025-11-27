@@ -93,6 +93,32 @@ export const useBetStore = defineStore('bet', {
         },
 
         hasSelectedAccounts: state => state.selectedAccounts.length > 0,
+
+        /**
+         * Getter to map external summary data by account
+         * Returns object with account as key and {deposits, withdraws, profit} as value
+         */
+        externalSummaryByAccount: state => {
+            if (!state.externalSummaryData) {
+                return {};
+            }
+
+            const summaryMap = {};
+            const rawData = state.externalSummaryData;
+            const dataArray = Array.isArray(rawData) ? rawData : rawData.data || [];
+
+            dataArray.forEach(item => {
+                if (item.username) {
+                    summaryMap[item.username] = {
+                        deposits: item.deposits,
+                        withdraws: item.withdraws,
+                        profit: item.profit,
+                    };
+                }
+            });
+
+            return summaryMap;
+        },
     },
 
     actions: {
@@ -493,14 +519,10 @@ export const useBetStore = defineStore('bet', {
             try {
                 // Get unique accounts from selectedAccounts
                 const uniqueAccounts = [...new Set(this.selectedAccounts)];
-
-                console.log('Fetching external summary for unique accounts:', uniqueAccounts);
-
                 const response = await betServices.fetchExternalSummary(uniqueAccounts);
 
-                if (response.success) {
+                if (response.status) {
                     this.externalSummaryData = response.data;
-                    console.log('External summary data fetched successfully:', response);
                 } else {
                     console.error('Failed to fetch external summary:', response.message);
                     this.externalSummaryData = null;
