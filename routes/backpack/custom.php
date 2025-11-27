@@ -22,7 +22,13 @@ Route::group([
 
     // Initial route
     Route::get('report', 'BetReportController@index')->name('page.report.index');
-    // API route
-    Route::get('api/bets', 'BetReportController@betReports')->name('api.bets.index');
-    Route::get('api/bet-period', 'BetReportController@betReportPeriod')->name('api.bets.period');
+    
+    // API routes
+    Route::group(['prefix' => 'api'], function () {
+        Route::get('bets', 'BetReportController@betReports')->name('api.bets.index');
+        Route::get('bet-period', 'BetReportController@betReportPeriod')->name('api.bets.period');
+
+        // DK API route
+        Route::get('external-summary', 'BetReportController@getExternalSummary')->name('api.external.summary');
+    });
 });

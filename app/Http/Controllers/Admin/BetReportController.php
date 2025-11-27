@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Resources\BetReportPeriodResource;
 use App\Http\Resources\BetReportResource;
 use App\Models\Bet;
+use App\Services\DkApiService;
 use App\Traits\MapDatetimeTrait;
 use Illuminate\Routing\Controller;
 use Inertia\Inertia;
@@ -132,5 +133,58 @@ class BetReportController extends Controller
             ])
             ->response()
             ->setStatusCode(Response::HTTP_OK);
+    }
+
+    /**
+     * Fetches external summary data (deposit/withdraw) from DK API
+     */
+    public function getExternalSummary(Request $request, DkApiService $dkApiService)
+    {
+        try {
+            // Get accounts param
+            $accountsString = $request->get('accounts', '');
+            if (empty($accountsString)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Accounts parameter is required'
+                ], 400);
+            }
+
+            // Parse and deduplicate accounts to ensure unique
+            $accountsArray = array_map('trim', explode(',', $accountsString));
+            $uniqueAccounts = array_unique(array_filter($accountsArray));
+            if (empty($uniqueAccounts)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No valid accounts provided'
+                ], 400);
+            }
+
+            // Fetch summary data from external DK API
+            $summaryData = $dkApiService->getSummary($uniqueAccounts);
+
+            return response()->json([
+                'success' => true,
+                'data' => $summaryData,
+                'accounts_count' => count($uniqueAccounts)
+            ], Response::HTTP_OK);
+
+        } catch (\InvalidArgumentException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 400);
+        } catch (\Exception $e) {
+            \Log::error('Error fetching external summary: ' . $e->getMessage(), [
+                'exception' => $e,
+                'request' => $request->all()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to fetch external summary data',
+                'error' => config('app.debug') ? $e->getMessage() : 'Internal server error'
+            ], 500);
+        }
     }
 }
