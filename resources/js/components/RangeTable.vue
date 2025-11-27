@@ -10,7 +10,7 @@ import ActionButton from './buttons/ActionButton.vue';
 
 const betStore = useBetStore();
 
-const { loading, rangeLoading, externalSummaryLoading, externalSummaryByAccount } =
+const { loading, rangeLoading, externalSummaryLoading, externalSummaryCache } =
     storeToRefs(betStore);
 const { hasSelectedAccounts } = storeToRefs(betStore);
 const selectAllCheckboxes = ref({});
@@ -146,15 +146,15 @@ watch(
  * Get deposit/withdraw/profit data from dk API
  */
 const getDeposit = account => {
-    return externalSummaryByAccount.value[account]?.deposits || '$0';
+    return externalSummaryCache.value[account]?.deposits || '$0';
 };
 
 const getWithdraw = account => {
-    return externalSummaryByAccount.value[account]?.withdraws || '$0';
+    return externalSummaryCache.value[account]?.withdraws || '$0';
 };
 
 const getProfit = account => {
-    return externalSummaryByAccount.value[account]?.profit || '$0';
+    return externalSummaryCache.value[account]?.profit || '$0';
 };
 
 /*

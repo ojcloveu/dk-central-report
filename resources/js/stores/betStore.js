@@ -56,8 +56,8 @@ export const useBetStore = defineStore('bet', {
             // Cache for account data per period
             accountDataCache: initialCacheState,
 
-            // External summary data (deposit/withdraw)
-            externalSummaryData: null,
+            // External summary data (deposit/withdraw/profit) cache by account
+            externalSummaryCache: {},
             externalSummaryLoading: false,
 
             filters: {
@@ -93,32 +93,6 @@ export const useBetStore = defineStore('bet', {
         },
 
         hasSelectedAccounts: state => state.selectedAccounts.length > 0,
-
-        /**
-         * Getter to map external summary data by account
-         * Returns object with account as key and {deposits, withdraws, profit} as value
-         */
-        externalSummaryByAccount: state => {
-            if (!state.externalSummaryData) {
-                return {};
-            }
-
-            const summaryMap = {};
-            const rawData = state.externalSummaryData;
-            const dataArray = Array.isArray(rawData) ? rawData : rawData.data || [];
-
-            dataArray.forEach(item => {
-                if (item.username) {
-                    summaryMap[item.username] = {
-                        deposits: item.deposits,
-                        withdraws: item.withdraws,
-                        profit: item.profit,
-                    };
-                }
-            });
-
-            return summaryMap;
-        },
     },
 
     actions: {
@@ -252,6 +226,7 @@ export const useBetStore = defineStore('bet', {
             this.selectedAccounts = [];
             this.rangesTables = initialRangeState;
             this.accountDataCache = initialCacheState;
+            this.externalSummaryCache = {};
             this.showAllTimeReport = false;
         },
 
@@ -505,31 +480,48 @@ export const useBetStore = defineStore('bet', {
         },
 
         /**
-         * Fetch external summary data (deposit/withdraw) from DK API
+         * Fetch external summary data (deposit/withdraw/profit) from DK API
          */
         async fetchExternalSummary() {
             if (this.selectedAccounts.length === 0) {
                 console.warn('No accounts selected for external summary');
-                this.externalSummaryData = null;
+                return;
+            }
+
+            // Filter out accounts that already cached
+            const uniqueAccounts = [...new Set(this.selectedAccounts)];
+            const uncachedAccounts = uniqueAccounts.filter(
+                account => !this.externalSummaryCache[account]
+            );
+
+            // If all accounts cached, no need to fetch
+            if (uncachedAccounts.length === 0) {
+                console.log('All accounts already cached, skipping API request');
                 return;
             }
 
             this.externalSummaryLoading = true;
 
             try {
-                // Get unique accounts from selectedAccounts
-                const uniqueAccounts = [...new Set(this.selectedAccounts)];
-                const response = await betServices.fetchExternalSummary(uniqueAccounts);
-
+                const response = await betServices.fetchExternalSummary(uncachedAccounts);
                 if (response.status) {
-                    this.externalSummaryData = response.data;
+                    // Cache the fetched data by account
+                    const dataArray = Array.isArray(response.data) ? response.data : [];
+
+                    dataArray.forEach(item => {
+                        if (item.username) {
+                            this.externalSummaryCache[item.username] = {
+                                deposits: item.deposits,
+                                withdraws: item.withdraws,
+                                profit: item.profit,
+                            };
+                        }
+                    });
                 } else {
                     console.error('Failed to fetch external summary:', response.message);
-                    this.externalSummaryData = null;
                 }
             } catch (error) {
                 console.error('Error fetching external summary:', error);
-                this.externalSummaryData = null;
             } finally {
                 this.externalSummaryLoading = false;
             }
