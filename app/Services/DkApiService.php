@@ -8,13 +8,9 @@ use Illuminate\Support\Facades\Log;
 class DkApiService
 {
   /**
-   * Base URL for DK API
+   * Base URL and Authorization token for DK API
    */
   private string $baseUrl;
-
-  /**
-   * Authorization token for DK API
-   */
   private string $token;
 
   /**
@@ -52,8 +48,8 @@ class DkApiService
       foreach ($usernames as $username) {
         $queryParams[] = 'username[]=' . urlencode($username);
       }
-      $queryString = implode('&', $queryParams);
 
+      $queryString = implode('&', $queryParams);
       $url = rtrim($this->baseUrl, '/') . '/api/report/summary?' . $queryString;
 
       // Make HTTP request with authorization header
@@ -73,7 +69,6 @@ class DkApiService
       $data = $response->json();
 
       return $data;
-
     } catch (\Exception $e) {
       Log::error('Error fetching DK API summary: ' . $e->getMessage(), [
         'usernames' => $usernames,
