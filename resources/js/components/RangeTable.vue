@@ -10,7 +10,8 @@ import ActionButton from './buttons/ActionButton.vue';
 
 const betStore = useBetStore();
 
-const { loading, rangeLoading } = storeToRefs(betStore);
+const { loading, rangeLoading, externalSummaryLoading, externalSummaryByAccount } =
+    storeToRefs(betStore);
 const { hasSelectedAccounts } = storeToRefs(betStore);
 const selectAllCheckboxes = ref({});
 
@@ -142,14 +143,32 @@ watch(
 );
 
 /*
- * Dummy data random
+ * Get deposit/withdraw/profit data from dk API
  */
-const getDummyDeposit = () => {
-    return (Math.random() * 10000).toFixed(2);
+const getDeposit = account => {
+    return externalSummaryByAccount.value[account]?.deposits || '$0';
 };
-const getDummyWithdraw = () => {
-    return (Math.random() * 8000).toFixed(2);
+
+const getWithdraw = account => {
+    return externalSummaryByAccount.value[account]?.withdraws || '$0';
 };
+
+const getProfit = account => {
+    return externalSummaryByAccount.value[account]?.profit || '$0';
+};
+
+/*
+ * Watch for selected accounts changes and fetch external summary
+ */
+watch(
+    () => betStore.selectedAccounts,
+    async newAccounts => {
+        if (newAccounts.length > 0) {
+            await betStore.fetchExternalSummary();
+        }
+    },
+    { immediate: true, deep: true }
+);
 
 /*
  * Set initial indeterminate state on mount
@@ -354,30 +373,27 @@ onMounted(async () => {
                                         }}%
                                     </td>
 
-                                    <!-- Dummy column deposit -->
+                                    <!-- Total Deposit -->
                                     <td class="text-end text-success fw-bold bg-muted-lt">
-                                        ${{ Number(getDummyDeposit()).toFixed(0) }}
+                                        <span v-if="externalSummaryLoading">Loading...</span>
+                                        <span v-else>{{ getDeposit(row.account) }}</span>
                                     </td>
-                                    <!-- Dummy column withdraw -->
+                                    <!-- Total Withdraw -->
                                     <td class="text-end text-danger fw-bold bg-muted-lt">
-                                        ${{ Number(getDummyWithdraw()).toFixed(0) }}
+                                        <span v-if="externalSummaryLoading">Loading...</span>
+                                        <span v-else>{{ getWithdraw(row.account) }}</span>
                                     </td>
-                                    <!-- Dummy column deposit - withdraw -->
+                                    <!-- Deposit - Withdraw -->
                                     <td
                                         class="text-end fw-bold"
                                         :class="
-                                            Number(getDummyDeposit()) - Number(getDummyWithdraw()) <
-                                            0
+                                            Number(getProfit(row.account)) < 0
                                                 ? 'bg-red-lt'
                                                 : 'bg-green-lt'
                                         "
                                     >
-                                        ${{
-                                            (
-                                                Number(getDummyDeposit()) -
-                                                Number(getDummyWithdraw())
-                                            ).toFixed(0)
-                                        }}
+                                        <span v-if="externalSummaryLoading">Loading...</span>
+                                        <span v-else>{{ getProfit(row.account) }}</span>
                                     </td>
                                 </tr>
                             </tbody>
