@@ -35,4 +35,9 @@ return [
         ],
     ],
 
+    'dk' => [
+        'dk_url' => env('DK_API_URL'),
+        'dk_token' => env('DK_API_TOKEN'),
+    ],
+
 ];
