@@ -56,6 +56,10 @@ export const useBetStore = defineStore('bet', {
             // Cache for account data per period
             accountDataCache: initialCacheState,
 
+            // External summary data (deposit/withdraw)
+            externalSummaryData: null,
+            externalSummaryLoading: false,
+
             filters: {
                 ...getInitialFilters(),
                 trandate: { start_date: getTodayDate(), end_date: getTodayDate() },
@@ -471,6 +475,41 @@ export const useBetStore = defineStore('bet', {
                 console.error(`Error fetching all-time data:`, error);
             } finally {
                 this.rangeLoading = false;
+            }
+        },
+
+        /**
+         * Fetch external summary data (deposit/withdraw) from DK API
+         */
+        async fetchExternalSummary() {
+            if (this.selectedAccounts.length === 0) {
+                console.warn('No accounts selected for external summary');
+                this.externalSummaryData = null;
+                return;
+            }
+
+            this.externalSummaryLoading = true;
+
+            try {
+                // Get unique accounts from selectedAccounts
+                const uniqueAccounts = [...new Set(this.selectedAccounts)];
+
+                console.log('Fetching external summary for unique accounts:', uniqueAccounts);
+
+                const response = await betServices.fetchExternalSummary(uniqueAccounts);
+
+                if (response.success) {
+                    this.externalSummaryData = response.data;
+                    console.log('External summary data fetched successfully:', response);
+                } else {
+                    console.error('Failed to fetch external summary:', response.message);
+                    this.externalSummaryData = null;
+                }
+            } catch (error) {
+                console.error('Error fetching external summary:', error);
+                this.externalSummaryData = null;
+            } finally {
+                this.externalSummaryLoading = false;
             }
         },
     },
