@@ -371,7 +371,30 @@ onMounted(async () => {
                                             "
                                         />
                                     </td>
-                                    <td>{{ row?.account }}</td>
+                                    <td
+                                        :style="{
+                                            backgroundColor:
+                                                betStore.highlightedAccounts[row.account] || '',
+                                            color: betStore.highlightedAccounts[row.account]
+                                                ? '#1d273b'
+                                                : '',
+                                        }"
+                                    >
+                                        <div class="d-flex align-items-center gap-2" >
+                                            {{ row?.account }}
+                                            <i
+                                                class="las la-highlighter cursor-pointer text-muted"
+                                                :class="{
+                                                    'text-primary':
+                                                        betStore.highlightedAccounts[row.account],
+                                                }"
+                                                @click="
+                                                    betStore.toggleAccountHighlight(row.account)
+                                                "
+                                                title="Highlight Account"
+                                            ></i>
+                                        </div>
+                                    </td>
                                     <td class="text-end">{{ row?.total_count }}</td>
                                     <td class="text-end" :class="amountColor(row?.total_turnover)">
                                         {{ row?.total_turnover }}

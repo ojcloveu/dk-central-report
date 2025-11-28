@@ -60,6 +60,9 @@ export const useBetStore = defineStore('bet', {
             externalSummaryCache: {},
             externalSummaryLoading: false,
 
+            // Highlighted accounts
+            highlightedAccounts: {},
+
             filters: {
                 ...getInitialFilters(),
                 trandate: { start_date: getTodayDate(), end_date: getTodayDate() },
@@ -523,7 +526,6 @@ export const useBetStore = defineStore('bet', {
                             };
                         }
                     });
-
                 } else {
                     console.error('Failed to fetch external summary:', response.message);
                 }
@@ -531,6 +533,19 @@ export const useBetStore = defineStore('bet', {
                 console.error('Error fetching external summary:', error);
             } finally {
                 this.externalSummaryLoading = false;
+            }
+        },
+
+        /**
+         * Toggle highlight for an account with a random color
+         */
+        toggleAccountHighlight(account) {
+            if (this.highlightedAccounts[account]) {
+                delete this.highlightedAccounts[account];
+            } else {
+                // Generate a random pastel color
+                const hue = Math.floor(Math.random() * 360);
+                this.highlightedAccounts[account] = `hsl(${hue}, 70%, 85%)`;
             }
         },
     },
