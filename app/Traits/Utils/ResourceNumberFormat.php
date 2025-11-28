@@ -61,4 +61,17 @@ trait ResourceNumberFormat
             ? '-$' . number_format(abs($this->rnfRemoveNumber($amount)), 0)
             : '$' . number_format($this->rnfRemoveNumber($amount), 0);
     }
+
+    /**
+     * Formats an integer value with thousands separators and no decimals
+     * e.g., 1000 -> 1,000
+     */
+    public function formatCount(int|float|string|null $count): string
+    {
+        $number = $this->rnfRemoveNumber($count, 0);
+        $formattedCount = number_format($number, 0);
+        return $number < 0
+            ? '-' . $formattedCount
+            : $formattedCount;
+    }
 }

@@ -16,7 +16,7 @@ class BetReportPeriodResource extends JsonResource
     {
         return [
             'account' => $this->account,
-            'total_count' => $this->total_count,
+            'total_count' => $this->formatCount($this->total_count),
             'total_turnover' => $this->formatAmount($this->total_turnover),
             'total_winlose' => $this->formatAmount($this->total_winlose),
             'total_lp' => [

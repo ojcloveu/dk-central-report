@@ -22,7 +22,7 @@ class BetReportResource extends JsonResource
             'master' => $this->master,
             'min' => $this->min,
             'max' => $this->max,
-            'count' => $this->count,
+            'count' => $this->formatCount($this->count),
             'turnover' => $this->formatAmount($this->turnover),
             'winlose' => $this->formatAmount($this->winlose),
             'lp' => [
