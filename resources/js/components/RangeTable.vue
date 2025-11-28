@@ -158,19 +158,6 @@ const getProfit = account => {
 };
 
 /*
- * Watch for selected accounts changes and fetch external summary
- */
-watch(
-    () => betStore.selectedAccounts,
-    async newAccounts => {
-        if (newAccounts.length > 0) {
-            await betStore.fetchExternalSummary();
-        }
-    },
-    { immediate: true, deep: true }
-);
-
-/*
  * Set initial indeterminate state on mount
  */
 onMounted(async () => {

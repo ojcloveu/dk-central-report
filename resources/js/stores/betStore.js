@@ -184,6 +184,10 @@ export const useBetStore = defineStore('bet', {
                     this.selectedAccounts.push(account);
                     // Fetch data only for the new account if not cached
                     await this.fetchAccountData(account);
+                    // Fetch external summary only if account is not cached
+                    if (!this.externalSummaryCache[account]) {
+                        await this.fetchExternalSummary();
+                    }
                 }
             } else {
                 // Remove from selected accounts
@@ -208,6 +212,8 @@ export const useBetStore = defineStore('bet', {
 
                 // Fetch data only for uncached accounts
                 await this.fetchMultipleAccountsData(uniqueNewAccounts);
+                // Fetch external summary for new accounts
+                await this.fetchExternalSummary();
             } else {
                 // Only remove accounts visible on the current page
                 this.selectedAccounts = this.selectedAccounts.filter(
@@ -494,9 +500,8 @@ export const useBetStore = defineStore('bet', {
                 account => !this.externalSummaryCache[account]
             );
 
-            // If all accounts cached, no need to fetch
+            // If all accounts cached, no fetch
             if (uncachedAccounts.length === 0) {
-                console.log('All accounts already cached, skipping API request');
                 return;
             }
 
@@ -504,8 +509,9 @@ export const useBetStore = defineStore('bet', {
 
             try {
                 const response = await betServices.fetchExternalSummary(uncachedAccounts);
+
                 if (response.status) {
-                    // Cache the fetched data by account
+                    // Cache only accounts found in the API response
                     const dataArray = Array.isArray(response.data) ? response.data : [];
 
                     dataArray.forEach(item => {
@@ -517,6 +523,7 @@ export const useBetStore = defineStore('bet', {
                             };
                         }
                     });
+
                 } else {
                     console.error('Failed to fetch external summary:', response.message);
                 }
