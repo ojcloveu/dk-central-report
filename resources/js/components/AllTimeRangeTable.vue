@@ -320,7 +320,7 @@ onMounted(async () => {
                                 </th>
                                 <th
                                     @click="handleRangeSort('profit')"
-                                    class="sortable text-end cursor-pointer"
+                                    class="sortable text-end th-bg-muted cursor-pointer"
                                 >
                                     Deposit - Withdraw
                                     <SortIcon
@@ -371,24 +371,17 @@ onMounted(async () => {
                                 </td>
 
                                 <!-- Total Deposit -->
-                                <td class="text-end text-success fw-bold bg-muted-lt">
+                                <td class="text-end text-success fw-bold bg-yellow-lt">
                                     <span v-if="externalSummaryLoading">Loading...</span>
                                     <span v-else>{{ getDeposit(row.account) }}</span>
                                 </td>
                                 <!-- Total Withdraw -->
-                                <td class="text-end text-danger fw-bold bg-muted-lt">
+                                <td class="text-end text-danger fw-bold bg-yellow-lt">
                                     <span v-if="externalSummaryLoading">Loading...</span>
                                     <span v-else>{{ getWithdraw(row.account) }}</span>
                                 </td>
                                 <!-- Deposit - Withdraw -->
-                                <td
-                                    class="text-end fw-bold"
-                                    :class="
-                                        Number(getProfit(row.account)) < 0
-                                            ? 'bg-red-lt'
-                                            : 'bg-green-lt'
-                                    "
-                                >
+                                <td class="text-end fw-bold">
                                     <span v-if="externalSummaryLoading">Loading...</span>
                                     <span v-else>{{ getProfit(row.account) }}</span>
                                 </td>
@@ -404,6 +397,6 @@ onMounted(async () => {
 
 <style scoped>
 .th-bg-muted {
-    background-color: var(--tblr-muted-lt) !important;
+    background-color: var(--tblr-yellow-lt) !important;
 }
 </style>
