@@ -10,7 +10,8 @@ import ActionButton from './buttons/ActionButton.vue';
 
 const betStore = useBetStore();
 
-const { loading, rangeLoading } = storeToRefs(betStore);
+const { loading, rangeLoading, externalSummaryCache, externalSummaryLoading } =
+    storeToRefs(betStore);
 const { hasSelectedAccounts } = storeToRefs(betStore);
 const selectAllCheckbox = ref(null);
 
@@ -34,7 +35,8 @@ const handleRangeSortClick = column => {
 const { rangeSort, handleRangeSort, getSortedData } = useRangeTableSorting(
     () => getRangeData(),
     betStore.rangeSort,
-    handleRangeSortClick
+    handleRangeSortClick,
+    externalSummaryCache
 );
 
 /*
@@ -121,6 +123,21 @@ watch(
     },
     { deep: true }
 );
+
+/*
+ * Helper functions to get external summary data
+ */
+const getDeposit = account => {
+    return externalSummaryCache.value[account]?.deposits || '$0';
+};
+
+const getWithdraw = account => {
+    return externalSummaryCache.value[account]?.withdraws || '$0';
+};
+
+const getProfit = account => {
+    return externalSummaryCache.value[account]?.profit || '$0';
+};
 
 /*
  * Set initial indeterminate state on mount
@@ -277,6 +294,41 @@ onMounted(async () => {
                                         :sortDirection="rangeSort.sort_dir"
                                     />
                                 </th>
+
+                                <!-- External Summary Columns -->
+                                <th
+                                    @click="handleRangeSort('deposits')"
+                                    class="sortable text-end th-bg-muted cursor-pointer"
+                                >
+                                    Total Deposit
+                                    <SortIcon
+                                        :currentSortBy="rangeSort.sort_by"
+                                        columnName="deposits"
+                                        :sortDirection="rangeSort.sort_dir"
+                                    />
+                                </th>
+                                <th
+                                    @click="handleRangeSort('withdraws')"
+                                    class="sortable text-end th-bg-muted cursor-pointer"
+                                >
+                                    Total Withdraw
+                                    <SortIcon
+                                        :currentSortBy="rangeSort.sort_by"
+                                        columnName="withdraws"
+                                        :sortDirection="rangeSort.sort_dir"
+                                    />
+                                </th>
+                                <th
+                                    @click="handleRangeSort('profit')"
+                                    class="sortable text-end cursor-pointer"
+                                >
+                                    Deposit - Withdraw
+                                    <SortIcon
+                                        :currentSortBy="rangeSort.sort_by"
+                                        columnName="profit"
+                                        :sortDirection="rangeSort.sort_dir"
+                                    />
+                                </th>
                             </tr>
                         </thead>
                         <tbody>
@@ -316,6 +368,29 @@ onMounted(async () => {
                                             ) || 0
                                         ).toFixed(0)
                                     }}%
+                                </td>
+
+                                <!-- Total Deposit -->
+                                <td class="text-end text-success fw-bold bg-muted-lt">
+                                    <span v-if="externalSummaryLoading">Loading...</span>
+                                    <span v-else>{{ getDeposit(row.account) }}</span>
+                                </td>
+                                <!-- Total Withdraw -->
+                                <td class="text-end text-danger fw-bold bg-muted-lt">
+                                    <span v-if="externalSummaryLoading">Loading...</span>
+                                    <span v-else>{{ getWithdraw(row.account) }}</span>
+                                </td>
+                                <!-- Deposit - Withdraw -->
+                                <td
+                                    class="text-end fw-bold"
+                                    :class="
+                                        Number(getProfit(row.account)) < 0
+                                            ? 'bg-red-lt'
+                                            : 'bg-green-lt'
+                                    "
+                                >
+                                    <span v-if="externalSummaryLoading">Loading...</span>
+                                    <span v-else>{{ getProfit(row.account) }}</span>
                                 </td>
                             </tr>
                         </tbody>
