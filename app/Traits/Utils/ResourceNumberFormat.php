@@ -74,4 +74,22 @@ trait ResourceNumberFormat
             ? '-' . $formattedCount
             : $formattedCount;
     }
+
+    /**
+     * Formats a percentage value (assumed to be already multiplied by 100)
+     * to zero decimal places with a '%' sign, using truncation (floor)
+     * e.g., 79.2786 -> 79%
+     */
+    public function formatPercentageZeroDecimal(int|float|string|null $percentageAmount): string
+    {
+        $number = (float) $percentageAmount;
+        $truncatedNumber = floor(abs($number));
+        $formattedNumber = number_format($truncatedNumber, 0);
+
+        $result = $number < 0
+            ? '-' . $formattedNumber
+            : $formattedNumber;
+
+        return $result;
+    }
 }

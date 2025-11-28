@@ -20,7 +20,7 @@ class BetReportPeriodResource extends JsonResource
             'total_turnover' => $this->formatAmount($this->total_turnover),
             'total_winlose' => $this->formatAmount($this->total_winlose),
             'total_lp' => [
-                'percentage' => $this->total_lp,
+                'percentage' => $this->formatPercentageZeroDecimal($this->total_lp),
                 'color' => $this->lpColor,
             ],
         ];

@@ -26,7 +26,7 @@ class BetReportResource extends JsonResource
             'turnover' => $this->formatAmount($this->turnover),
             'winlose' => $this->formatAmount($this->winlose),
             'lp' => [
-                'percentage' => $this->lp,
+                'percentage' => $this->formatPercentageZeroDecimal($this->lp),
                 'color' => $this->lpColor,
             ],
         ];
