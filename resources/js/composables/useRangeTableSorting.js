@@ -72,8 +72,8 @@ export function useRangeTableSorting(
 
             // Handling total_count (convert to number if string)
             if (rangeSort.sort_by === 'total_count') {
-                aVal = Number(aVal) || 0;
-                bVal = Number(bVal) || 0;
+                aVal = parseFloat(String(aVal).replace(/,/g, '')) || 0;
+                bVal = parseFloat(String(bVal).replace(/,/g, '')) || 0;
                 return rangeSort.sort_dir === 'asc' ? aVal - bVal : bVal - aVal;
             }
 
