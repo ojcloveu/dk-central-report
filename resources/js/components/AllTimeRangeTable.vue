@@ -123,16 +123,6 @@ watch(
 );
 
 /*
- * Dummy data random
- */
-const getDummyDeposit = () => {
-    return (Math.random() * 10000).toFixed(2);
-};
-const getDummyWithdraw = () => {
-    return (Math.random() * 8000).toFixed(2);
-};
-
-/*
  * Set initial indeterminate state on mount
  */
 onMounted(async () => {
@@ -287,11 +277,6 @@ onMounted(async () => {
                                         :sortDirection="rangeSort.sort_dir"
                                     />
                                 </th>
-
-                                <!-- Dummy column -->
-                                <th class="text-end th-bg-muted">Total Deposit</th>
-                                <th class="text-end th-bg-muted">Total Withdraw</th>
-                                <th class="text-end">Deposit - Withdraw</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -331,30 +316,6 @@ onMounted(async () => {
                                             ) || 0
                                         ).toFixed(0)
                                     }}%
-                                </td>
-
-                                <!-- Dummy column deposit -->
-                                <td class="text-end text-success fw-bold bg-muted-lt">
-                                    ${{ Number(getDummyDeposit()).toFixed(0) }}
-                                </td>
-                                <!-- Dummy column withdraw -->
-                                <td class="text-end text-danger fw-bold bg-muted-lt">
-                                    ${{ Number(getDummyWithdraw()).toFixed(0) }}
-                                </td>
-                                <!-- Dummy column deposit - withdraw -->
-                                <td
-                                    class="text-end fw-bold"
-                                    :class="
-                                        Number(getDummyDeposit()) - Number(getDummyWithdraw()) < 0
-                                            ? 'bg-red-lt'
-                                            : 'bg-green-lt'
-                                    "
-                                >
-                                    ${{
-                                        (
-                                            Number(getDummyDeposit()) - Number(getDummyWithdraw())
-                                        ).toFixed(0)
-                                    }}
                                 </td>
                             </tr>
                         </tbody>
