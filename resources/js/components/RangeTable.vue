@@ -417,7 +417,9 @@ onMounted(async () => {
                             </tbody>
                         </table>
                     </div>
-                    <div v-else class="p-3 text-muted">No data for this period.</div>
+                    <div v-else-if="!rangeLoading" class="p-3 text-muted">
+                        No data for this period.
+                    </div>
                 </div>
             </div>
         </div>
