@@ -27,7 +27,12 @@ const getLpPercentageValue = lpValue => {
 /**
  * Composable for handling client-side sorting for the Range Table data
  */
-export function useRangeTableSorting(getRangeData, rangeSort, handleRangeSortFn) {
+export function useRangeTableSorting(
+    getRangeData,
+    rangeSort,
+    handleRangeSortFn,
+    externalSummaryCache
+) {
     // Main Sorting Function
     const getSortedData = periodKey => {
         // Use helper function to get the raw data
@@ -40,6 +45,16 @@ export function useRangeTableSorting(getRangeData, rangeSort, handleRangeSortFn)
         sortedData.sort((a, b) => {
             let aVal = a[rangeSort.sort_by];
             let bVal = b[rangeSort.sort_by];
+
+            // Handling for external summary fields (deposits, withdraws, profit)
+            if (['deposits', 'withdraws', 'profit'].includes(rangeSort.sort_by)) {
+                const aSummary = externalSummaryCache?.value?.[a.account];
+                const bSummary = externalSummaryCache?.value?.[b.account];
+
+                aVal = parseCurrency(aSummary?.[rangeSort.sort_by] || '$0');
+                bVal = parseCurrency(bSummary?.[rangeSort.sort_by] || '$0');
+                return rangeSort.sort_dir === 'asc' ? aVal - bVal : bVal - aVal;
+            }
 
             // Handling for currency values ('winlose', 'turnover')
             if (['total_winlose', 'total_turnover'].includes(rangeSort.sort_by)) {

@@ -50,7 +50,8 @@ const handleRangeSortClick = column => {
 const { rangeSort, handleRangeSort, getSortedData } = useRangeTableSorting(
     getRangeData,
     betStore.rangeSort,
-    handleRangeSortClick
+    handleRangeSortClick,
+    externalSummaryCache
 );
 
 /*
@@ -315,10 +316,40 @@ onMounted(async () => {
                                         />
                                     </th>
 
-                                    <!-- Dummy column -->
-                                    <th class="text-end th-bg-muted">Total Deposit</th>
-                                    <th class="text-end th-bg-muted">Total Withdraw</th>
-                                    <th class="text-end">Deposit - Withdraw</th>
+                                    <!-- External Summary Columns -->
+                                    <th
+                                        @click="handleRangeSort('deposits')"
+                                        class="sortable text-end th-bg-muted cursor-pointer"
+                                    >
+                                        Total Deposit
+                                        <SortIcon
+                                            :currentSortBy="rangeSort.sort_by"
+                                            columnName="deposits"
+                                            :sortDirection="rangeSort.sort_dir"
+                                        />
+                                    </th>
+                                    <th
+                                        @click="handleRangeSort('withdraws')"
+                                        class="sortable text-end th-bg-muted cursor-pointer"
+                                    >
+                                        Total Withdraw
+                                        <SortIcon
+                                            :currentSortBy="rangeSort.sort_by"
+                                            columnName="withdraws"
+                                            :sortDirection="rangeSort.sort_dir"
+                                        />
+                                    </th>
+                                    <th
+                                        @click="handleRangeSort('profit')"
+                                        class="sortable text-end cursor-pointer"
+                                    >
+                                        Deposit - Withdraw
+                                        <SortIcon
+                                            :currentSortBy="rangeSort.sort_by"
+                                            columnName="profit"
+                                            :sortDirection="rangeSort.sort_dir"
+                                        />
+                                    </th>
                                 </tr>
                             </thead>
                             <tbody>
