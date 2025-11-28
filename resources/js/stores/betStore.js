@@ -184,6 +184,7 @@ export const useBetStore = defineStore('bet', {
         async toggleAccountSelection(account, isChecked) {
             if (isChecked) {
                 if (!this.selectedAccounts.includes(account)) {
+                    this.rangeLoading = true;
                     this.selectedAccounts.push(account);
                     // Fetch data only for the new account if not cached
                     await this.fetchAccountData(account);
@@ -198,6 +199,7 @@ export const useBetStore = defineStore('bet', {
             }
             // Rebuild display from cache
             this.rebuildRangeTablesFromCache();
+            this.rangeLoading = false;
         },
 
         /**
@@ -207,6 +209,7 @@ export const useBetStore = defineStore('bet', {
             const currentAccounts = this.data.map(bet => bet.account);
 
             if (selectAll) {
+                this.rangeLoading = true;
                 // Find accounts that need to be added
                 const uniqueNewAccounts = currentAccounts.filter(
                     acc => !this.selectedAccounts.includes(acc)
@@ -226,6 +229,7 @@ export const useBetStore = defineStore('bet', {
 
             // Rebuild display from cache
             this.rebuildRangeTablesFromCache();
+            this.rangeLoading = false;
         },
 
         /**
@@ -237,13 +241,13 @@ export const useBetStore = defineStore('bet', {
             this.accountDataCache = initialCacheState;
             this.externalSummaryCache = {};
             this.showAllTimeReport = false;
+            this.highlightedAccounts = {};
         },
 
         /**
          * Fetch data for a single account across all periods and add to cache
          */
         async fetchAccountData(account) {
-            this.rangeLoading = true;
             const periods = ['tm', '1m', '3m'];
 
             for (const period of periods) {
@@ -276,8 +280,6 @@ export const useBetStore = defineStore('bet', {
                     );
                 }
             }
-
-            this.rangeLoading = false;
         },
 
         /**
@@ -286,7 +288,6 @@ export const useBetStore = defineStore('bet', {
         async fetchMultipleAccountsData(accounts) {
             if (!accounts || accounts.length === 0) return;
 
-            this.rangeLoading = true;
             const periods = ['tm', '1m', '3m'];
 
             for (const period of periods) {
@@ -320,8 +321,6 @@ export const useBetStore = defineStore('bet', {
                     console.error(`Error fetching data for period ${period}:`, error);
                 }
             }
-
-            this.rangeLoading = false;
         },
 
         /**
