@@ -372,6 +372,8 @@ onMounted(async () => {
                                         />
                                     </td>
                                     <td
+                                        @click="betStore.toggleAccountHighlight(row.account)"
+                                        class="cursor-pointer"
                                         :style="{
                                             backgroundColor:
                                                 betStore.highlightedAccounts[row.account] || '',
@@ -380,17 +382,14 @@ onMounted(async () => {
                                                 : '',
                                         }"
                                     >
-                                        <div class="d-flex align-items-center gap-2" >
+                                        <div class="d-flex align-items-center gap-2">
                                             {{ row?.account }}
                                             <i
-                                                class="las la-highlighter cursor-pointer text-muted"
+                                                class="las la-highlighter text-muted"
                                                 :class="{
                                                     'text-primary':
                                                         betStore.highlightedAccounts[row.account],
                                                 }"
-                                                @click="
-                                                    betStore.toggleAccountHighlight(row.account)
-                                                "
                                                 title="Highlight Account"
                                             ></i>
                                         </div>
