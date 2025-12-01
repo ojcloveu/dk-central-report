@@ -4,6 +4,7 @@ namespace App\Services;
 
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Cache;
 
 class MlmService
 {
@@ -15,6 +16,16 @@ class MlmService
         if (isset($this->accessToken) &&
             Carbon::now()->lessThan($this->tokenExpiry)) {
             return $this->accessToken;
+        }
+
+        $cachedToken = Cache::get('mlm:access_token');
+        if ($cachedToken) {
+            $this->accessToken = $cachedToken['token'];
+            $this->tokenExpiry = Carbon::parse($cachedToken['expires_at']);
+
+            if (Carbon::now()->lessThan($this->tokenExpiry)) {
+                return $this->accessToken;
+            }
         }
 
         $response = Http::asForm()->post(config('services.mlm.api_url') . '/oauth/token', [
@@ -35,6 +46,11 @@ class MlmService
         $this->accessToken = $data['access_token'];
         $this->tokenExpiry = Carbon::now()->addSeconds($data['expires_in'] - 60);
 
+        Cache::put('mlm:access_token', [
+            'token' => $this->accessToken,
+            'expires_at' => $this->tokenExpiry,
+        ], $data['expires_in'] - 60);
+
         return $this->accessToken;
     }
 
@@ -54,5 +70,30 @@ class MlmService
             ->post(config('services.mlm.api_url') . $endpoint, $payload)
             ->throw()
             ->json();
+    }
+
+    /**
+     * Clear token cache (useful for testing/debugging)
+     */
+    public function clearTokenCache(): void
+    {
+        Cache::forget('mlm:access_token');
+        $this->accessToken = '';
+        $this->tokenExpiry = Carbon::now()->subDay();
+    }
+
+    /**
+     * Get token expiry info (for debugging)
+     */
+    public function getTokenInfo(): array
+    {
+        return [
+            'token_exists' => isset($this->accessToken),
+            'expires_at' => $this->tokenExpiry ?? null,
+            'seconds_left' => $this->tokenExpiry ?
+                $this->tokenExpiry->diffInSeconds(Carbon::now()) : 0,
+            'is_valid' => isset($this->accessToken) &&
+                         Carbon::now()->lessThan($this->tokenExpiry),
+        ];
     }
 }
