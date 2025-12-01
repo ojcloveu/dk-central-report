@@ -20,8 +20,9 @@ Route::group([
     Route::crud('channel', 'ChannelCrudController');
     Route::crud('masters', 'MasterCrudController');
 
-    // Initial route
+    // Inertia route
     Route::get('report', 'BetReportController@index')->name('page.report.index');
+    Route::get('master', 'MasterReportController@index')->name('page.master.index');
     
     // API routes
     Route::group(['prefix' => 'api'], function () {

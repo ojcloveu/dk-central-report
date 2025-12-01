@@ -15,6 +15,7 @@
 
 {{-- Bet Report --}}
 <x-backpack::menu-item title="Bet Report" icon="las la-clipboard" :link="backpack_url('report')" />
+<x-backpack::menu-item title="Master Report" icon="las la-clipboard" :link="backpack_url('master')" />
 
 {{-- User Management --}}
 <x-backpack::menu-dropdown title="User Management" icon="la la-user">
