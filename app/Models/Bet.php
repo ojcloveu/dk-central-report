@@ -51,18 +51,23 @@ class Bet extends Model
     {
         return Attribute::make(
             get: function () {
-                $lp = $this->lp ?? $this->total_lp;
-                $lpJson = config('settings.lp_color');
+                $lp = $this->lpPercentTimeHundred ?? $this->total_lp;
 
-                // Handle when setting is not seeded or is null
-                if (empty($lpJson)) {
-                    return 'gray';
+                // Ensure $lp is a float, handling potential string formats like "-1,234"
+                if (is_string($lp)) {
+                    $lp = (float) str_replace(',', '', $lp);
+                } else {
+                    $lp = (float) $lp;
                 }
 
-                // If already array use it, else decode the JSON
-                $lps = is_array($lpJson) ? $lpJson : json_decode($lpJson, true);
-
+                $lpJson = config('settings.lp_color');
                 $defaultColor = 'gray';
+
+                if (empty($lpJson)) {
+                    return $defaultColor;
+                }
+
+                $lps = is_array($lpJson) ? $lpJson : json_decode($lpJson, true);
 
                 if (empty($lps) || !is_array($lps)) {
                     return $defaultColor;
@@ -87,6 +92,15 @@ class Bet extends Model
         return Attribute::make(
             get: function () {
                 return $this->formatPercentageZeroDecimal($this->lp ?? $this->total_lp);
+            }
+        );
+    }
+
+    protected function lpPercentTimeHundred(): Attribute
+    {
+        return Attribute::make(
+            get: function () {
+                return $this->formatPercentageZeroDecimal(($this->lp ?? $this->total_lp) * 100);
             }
         );
     }
