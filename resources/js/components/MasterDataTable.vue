@@ -64,7 +64,7 @@ const turnoverItem = ref({
         <div class="card-header">
             <h3 class="card-title">Master Report</h3>
         </div>
-        <div class="card-body py-0">
+        <div class="card-body py-0 px-2">
             <div class="table-responsive">
                 <table class="table table-sm table-hover mb-0 align-middle">
                     <thead>
@@ -75,10 +75,18 @@ const turnoverItem = ref({
                         </tr>
                         <tr>
                             <th class="fw-bold text-start border-end">Channel</th>
-                            <th class="fw-bold text-end border-end">Last Month</th>
-                            <th class="fw-bold text-end border-end">This Month</th>
-                            <th class="fw-bold text-end border-end">Last Month</th>
-                            <th class="fw-bold text-end">This Month</th>
+                            <th class="fw-bold text-end border-end">
+                                Last Month <span class="text-primary">(01/Dec/25 - 31/Dec/25)</span>
+                            </th>
+                            <th class="fw-bold text-end border-end">
+                                This Month <span class="text-primary">(01/Dec/25 - 31/Dec/25)</span>
+                            </th>
+                            <th class="fw-bold text-end border-end">
+                                Last Month <span class="text-primary">(01/Dec/25 - 31/Dec/25)</span>
+                            </th>
+                            <th class="fw-bold text-end">
+                                This Month <span class="text-primary">(01/Dec/25 - 31/Dec/25)</span>
+                            </th>
                         </tr>
                     </thead>
                     <tbody>
