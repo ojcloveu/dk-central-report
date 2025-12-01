@@ -43,14 +43,9 @@ class DkApiService
     }
 
     try {
-      // Build query param
-      $queryParams = [];
-      foreach ($usernames as $username) {
-        $queryParams[] = 'username[]=' . urlencode($username);
-      }
-
-      $queryString = implode('&', $queryParams);
-      $url = rtrim($this->baseUrl, '/') . '/api/report/summary?' . $queryString;
+      // Build query param - DK API expects comma-separated string
+      $usernameString = implode(',', array_map('urlencode', $usernames));
+      $url = rtrim($this->baseUrl, '/') . '/api/report/summary?username=' . $usernameString;
 
       // Make HTTP request with authorization header
       $response = Http::withHeaders([
