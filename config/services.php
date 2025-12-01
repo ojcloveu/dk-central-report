@@ -40,4 +40,19 @@ return [
         'dk_token' => env('DK_API_TOKEN'),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | MLM Report API Configuration
+    |--------------------------------------------------------------------------
+    |
+    | Configuration for MLM Report API integration.
+    | Includes client credentials, API endpoint, and request timeout settings.
+    |
+    */
+    'mlm' => [
+        'client_id' => env('MLM_CLIENT_ID'),
+        'client_secret' => env('MLM_CLIENT_SECRET'),
+        'api_url' => env('MLM_API_URL'),
+        'api_timeout' => env('MLM_API_TIMEOUT', 3000),
+    ],
 ];
