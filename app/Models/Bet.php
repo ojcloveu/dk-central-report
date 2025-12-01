@@ -82,4 +82,12 @@ class Bet extends Model
             }
         );
     }
+
+    protected function lpNumber(): Attribute {
+        return Attribute::make(
+            get: function () {
+                return $this->formatPercentageZeroDecimal($this->lp ?? $this->total_lp);
+            }
+        );
+    }
 }
