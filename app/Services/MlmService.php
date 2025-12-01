@@ -54,20 +54,35 @@ class MlmService
         return $this->accessToken;
     }
 
+    /**
+     * Normalize endpoint - ensures leading slash
+     * For example:
+     * 'api/report/summary' → '/api/report/summary'
+     * '/api/report/summary' → '/api/report/summary'
+     */
+    protected function normalizeEndpoint(string $endpoint): string
+    {
+        return '/' . ltrim($endpoint, '/');
+    }
+
     public function get(string $endpoint, array $params = [])
     {
+        $normalizedEndpoint = $this->normalizeEndpoint($endpoint);
+
         return Http::timeout(config('services.mlm.api_timeout'))
             ->withToken($this->getAccessToken())
-            ->get(config('services.mlm.api_url') . $endpoint, $params)
+            ->get(config('services.mlm.api_url') . $normalizedEndpoint, $params)
             ->throw()
             ->json();
     }
 
     public function post(string $endpoint, array $payload = [])
     {
+        $normalizedEndpoint = $this->normalizeEndpoint($endpoint);
+
         return Http::timeout(config('services.mlm.api_timeout'))
             ->withToken($this->getAccessToken())
-            ->post(config('services.mlm.api_url') . $endpoint, $payload)
+            ->post(config('services.mlm.api_url') . $normalizedEndpoint, $payload)
             ->throw()
             ->json();
     }
