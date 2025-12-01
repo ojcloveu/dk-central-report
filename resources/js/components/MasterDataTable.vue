@@ -50,7 +50,7 @@ const turnoverItem = ref({
 
 <template>
     <!-- Title -->
-    <div class="mb-3 d-flex justify-content-between align-items-end">
+    <div class="d-flex justify-content-between align-items-end">
         <div>
             <h2 class="page-title">Master Report</h2>
             <div class="text-muted mt-1">
