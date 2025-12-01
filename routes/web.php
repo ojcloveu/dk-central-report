@@ -13,3 +13,13 @@ Route::get('/health', function () {
 });
 
 Route::get('/sync-bets', [BetController::class, 'syncBets']);
+
+// Route::get('/test-dk-api', function () {
+//     $mlmService = new \App\Services\MlmService();
+
+//     $data = $mlmService->get('/api/report/summary', [
+//         'username' => 'DKANAABA001',
+//     ]);
+
+//     dd($data);
+// });
