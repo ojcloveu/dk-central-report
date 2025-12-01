@@ -357,8 +357,14 @@ onMounted(async () => {
                                     v-for="row in getFilteredData(period?.key)"
                                     :key="row?.account"
                                     :class="{ 'table-primary-light': true }"
+                                    @click="betStore.toggleAccountHighlight(row.account)"
+                                    class="cursor-pointer"
+                                    :style="{
+                                        backgroundColor:
+                                            betStore.highlightedAccounts[row.account] || '',
+                                    }"
                                 >
-                                    <td>
+                                    <td @click.stop>
                                         <input
                                             class="form-check-input m-0"
                                             type="checkbox"
@@ -372,11 +378,7 @@ onMounted(async () => {
                                         />
                                     </td>
                                     <td
-                                        @click="betStore.toggleAccountHighlight(row.account)"
-                                        class="cursor-pointer"
                                         :style="{
-                                            backgroundColor:
-                                                betStore.highlightedAccounts[row.account] || '',
                                             color: betStore.highlightedAccounts[row.account]
                                                 ? '#1d273b'
                                                 : '',
@@ -384,24 +386,61 @@ onMounted(async () => {
                                     >
                                         <div class="d-flex align-items-center gap-2">
                                             {{ row?.account }}
-                                            <i
-                                                class="las la-highlighter text-muted"
-                                                :class="{
-                                                    'text-primary':
-                                                        betStore.highlightedAccounts[row.account],
-                                                }"
-                                                title="Highlight Account"
-                                            ></i>
                                         </div>
                                     </td>
-                                    <td class="text-end">{{ row?.total_count }}</td>
-                                    <td class="text-end" :class="amountColor(row?.total_turnover)">
+                                    <td
+                                        class="text-end"
+                                        :style="{
+                                            color: betStore.highlightedAccounts[row.account]
+                                                ? '#1d273b'
+                                                : '',
+                                        }"
+                                    >
+                                        {{ row?.total_count }}
+                                    </td>
+                                    <td
+                                        class="text-end"
+                                        :class="
+                                            betStore.highlightedAccounts[row.account]
+                                                ? ''
+                                                : amountColor(row?.total_turnover)
+                                        "
+                                        :style="{
+                                            color: betStore.highlightedAccounts[row.account]
+                                                ? '#1d273b'
+                                                : '',
+                                        }"
+                                    >
                                         {{ row?.total_turnover }}
                                     </td>
-                                    <td class="text-end" :class="amountColor(row?.total_winlose)">
+                                    <td
+                                        class="text-end"
+                                        :class="
+                                            betStore.highlightedAccounts[row.account]
+                                                ? ''
+                                                : amountColor(row?.total_winlose)
+                                        "
+                                        :style="{
+                                            color: betStore.highlightedAccounts[row.account]
+                                                ? '#1d273b'
+                                                : '',
+                                        }"
+                                    >
                                         {{ row?.total_winlose }}
                                     </td>
-                                    <td class="text-end" :class="lpBgColor(row?.total_lp)">
+                                    <td
+                                        class="text-end"
+                                        :class="
+                                            betStore.highlightedAccounts[row.account]
+                                                ? ''
+                                                : lpBgColor(row?.total_lp)
+                                        "
+                                        :style="{
+                                            color: betStore.highlightedAccounts[row.account]
+                                                ? '#1d273b'
+                                                : '',
+                                        }"
+                                    >
                                         {{
                                             (
                                                 Number(
@@ -414,17 +453,48 @@ onMounted(async () => {
                                     </td>
 
                                     <!-- Total Deposit -->
-                                    <td class="text-end text-success fw-bold bg-yellow-lt">
+                                    <td
+                                        class="text-end fw-bold"
+                                        :class="
+                                            betStore.highlightedAccounts[row.account]
+                                                ? ''
+                                                : 'text-success bg-yellow-lt'
+                                        "
+                                        :style="{
+                                            color: betStore.highlightedAccounts[row.account]
+                                                ? '#1d273b'
+                                                : '',
+                                        }"
+                                    >
                                         <span v-if="externalSummaryLoading">Loading...</span>
                                         <span v-else>{{ getDeposit(row.account) }}</span>
                                     </td>
                                     <!-- Total Withdraw -->
-                                    <td class="text-end text-danger fw-bold bg-yellow-lt">
+                                    <td
+                                        class="text-end fw-bold"
+                                        :class="
+                                            betStore.highlightedAccounts[row.account]
+                                                ? ''
+                                                : 'text-danger bg-yellow-lt'
+                                        "
+                                        :style="{
+                                            color: betStore.highlightedAccounts[row.account]
+                                                ? '#1d273b'
+                                                : '',
+                                        }"
+                                    >
                                         <span v-if="externalSummaryLoading">Loading...</span>
                                         <span v-else>{{ getWithdraw(row.account) }}</span>
                                     </td>
                                     <!-- Deposit - Withdraw -->
-                                    <td class="text-end fw-bold">
+                                    <td
+                                        class="text-end fw-bold"
+                                        :style="{
+                                            color: betStore.highlightedAccounts[row.account]
+                                                ? '#1d273b'
+                                                : '',
+                                        }"
+                                    >
                                         <span v-if="externalSummaryLoading">Loading...</span>
                                         <span v-else>{{ getProfit(row.account) }}</span>
                                     </td>
