@@ -1,6 +1,6 @@
 <script setup>
 import MasterDataTable from '@/components/MasterDataTable.vue';
-import MasterChart from '@/components/MasterChart.vue';
+import MasterChart from '@/components/charts/MasterChart.vue';
 </script>
 
 <template>
