@@ -92,7 +92,7 @@ const getSomeSelected = computed(() => {
 });
 
 // Handle select all checkbox change
-const handleSelectAll = async event => {
+const handleSelectAll = event => {
     const accounts = getFilteredData().map(row => row.account) || [];
     const selectAll = event.target.checked;
 
@@ -107,11 +107,7 @@ const handleSelectAll = async event => {
         );
     }
 
-    // Wait for Vue to flush the reactive update
-    await nextTick();
-
-    // Rebuild the range tables from cache
-    betStore.rebuildRangeTablesFromCache();
+    betStore.fetchAllTimeData();
 };
 
 /*
@@ -126,16 +122,6 @@ watch(
         }
     },
     { deep: true }
-);
-
-watch(
-    () => betStore.selectedAccounts,
-    async () => {
-        if (betStore.showAllTimeReport) {
-            await nextTick();
-            await betStore.fetchAllTimeData();
-        }
-    }
 );
 
 /*

@@ -108,7 +108,7 @@ const getSomeSelected = periodKey =>
     });
 
 // Handle select all checkbox change for a specific period
-const handleSelectAll = async (periodKey, event) => {
+const handleSelectAll = (periodKey, event) => {
     const accounts = getFilteredData(periodKey).map(row => row.account) || [];
     const selectAll = event.target.checked;
 
@@ -123,11 +123,7 @@ const handleSelectAll = async (periodKey, event) => {
         );
     }
 
-    // Wait for Vue to flush the update to DOM
-    await nextTick();
-
-    // Rebuild the range tables from cache
-    betStore.rebuildRangeTablesFromCache();
+    betStore.fetchRangeData();
 };
 
 /*
