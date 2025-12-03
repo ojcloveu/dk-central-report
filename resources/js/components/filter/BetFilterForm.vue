@@ -184,6 +184,7 @@ const countRangeRef = ref({
             <form class="row g-3 align-items-end">
                 <!-- Date Range filter -->
                 <div class="col-md-3 col-sm-6">
+                    <label for="trandate">Date Range</label>
                     <DateRangeFilter
                         v-model="localFilters.trandate"
                         :placeholder="'Select Date Range'"
@@ -192,6 +193,7 @@ const countRangeRef = ref({
 
                 <!-- Master filter -->
                 <div class="col-md-3 col-sm-6">
+                    <label for="master">Master</label>
                     <MultiSelectFilter
                         v-model="localFilters.master"
                         :items="filterStore.masters"
@@ -207,6 +209,7 @@ const countRangeRef = ref({
 
                 <!-- Account filter -->
                 <div class="col-md-3 col-sm-6">
+                    <label for="account">Account</label>
                     <SingleSelectFilter
                         v-model="localFilters.account"
                         :items="filterStore.accounts"
@@ -222,6 +225,7 @@ const countRangeRef = ref({
 
                 <!-- Channel filter -->
                 <div class="col-md-3 col-sm-6">
+                    <label for="channel">Channel</label>
                     <SingleSelectFilter
                         v-model="localFilters.channel"
                         :items="filterStore.channels"
@@ -235,8 +239,29 @@ const countRangeRef = ref({
                     />
                 </div>
 
+                <!-- Count Range filter -->
+                <div class="col-md-3 col-sm-6">
+                    <label for="countRange">Count Range</label>
+                    <RangeFilterModal
+                        v-model="countRangeRef"
+                        label="Count Range"
+                        :placeholder="{ min: 'Min', max: 'Max' }"
+                    />
+                </div>
+
+                <!-- Turnover Range filter -->
+                <div class="col-md-3 col-sm-6">
+                    <label for="turnoverRange">Turnover Range</label>
+                    <RangeFilterModal
+                        v-model="turnoverRangeRef"
+                        label="Turnover Range"
+                        :placeholder="{ min: 'Min', max: 'Max' }"
+                    />
+                </div>
+
                 <!-- Win/Lose Range filter -->
                 <div class="col-md-3 col-sm-6">
+                    <label for="winLoseRange">Win/Lose Range</label>
                     <RangeFilterModal
                         v-model="winLoseRangeRef"
                         label="Win/Lose Range"
@@ -245,29 +270,12 @@ const countRangeRef = ref({
                     />
                 </div>
 
-                <!-- Turnover Range filter -->
-                <div class="col-md-3 col-sm-6">
-                    <RangeFilterModal
-                        v-model="turnoverRangeRef"
-                        label="Turnover Range"
-                        :placeholder="{ min: 'Min', max: 'Max' }"
-                    />
-                </div>
-
                 <!-- LP Range filter -->
                 <div class="col-md-3 col-sm-6">
+                    <label for="lPRange">LP Range</label>
                     <RangeFilterModal
                         v-model="lPRangeRef"
                         label="LP Range"
-                        :placeholder="{ min: 'Min', max: 'Max' }"
-                    />
-                </div>
-
-                <!-- Count Range filter -->
-                <div class="col-md-3 col-sm-6">
-                    <RangeFilterModal
-                        v-model="countRangeRef"
-                        label="Count Range"
                         :placeholder="{ min: 'Min', max: 'Max' }"
                     />
                 </div>
