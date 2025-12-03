@@ -28,7 +28,9 @@ Route::group([
     Route::group(['prefix' => 'api'], function () {
         Route::get('bets', 'BetReportController@betReports')->name('api.bets.index');
         Route::get('bet-period', 'BetReportController@betReportPeriod')->name('api.bets.period');
+
         Route::get('master-report', 'MasterReportController@getMasterReport')->name('api.master.report');
+        Route::get('master-turnover', 'MasterReportController@getMasterTurnover')->name('api.master.turnover');
 
         // DK API route
         Route::get('external-summary', 'BetReportController@getExternalSummary')->name('api.external.summary');

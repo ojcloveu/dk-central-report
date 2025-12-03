@@ -25,8 +25,8 @@ class MasterReportController extends Controller
         return Inertia::render('MasterReport', []);
     }
 
-    /**
-     * Get master report data grouped by channel and master
+    /*
+     * Fet master report
      */
     public function getMasterReport(Request $request)
     {
@@ -34,58 +34,70 @@ class MasterReportController extends Controller
         $lastMonthRange = $this->getStartDate('1m');
         $thisMonthRange = $this->getStartDate('tm');
 
-        // Get channels
+        // Get channels (Query 1)
         $channels = Channel::where('is_active', true)
             ->orderBy('channel_name')
             ->pluck('channel_name');
 
-        // Get masters
+        // Get masters (Query 2)
         $masters = Master::where('is_active', true)
             ->orderBy('name')
             ->pluck('name');
 
+        // Get all last month stats in one query (Query 3)
+        $lastMonthStats = Bet::query()
+            ->whereDate('trandate', '>=', $lastMonthRange->start_date)
+            ->whereDate('trandate', '<=', $lastMonthRange->end_date)
+            ->whereIn('channel', $channels)
+            ->whereIn('master', $masters)
+            ->select(
+                'channel',
+                'master',
+                DB::raw('SUM(winlose) as total_winlose'),
+                DB::raw('SUM(turnover) as total_turnover')
+            )
+            ->groupBy('channel', 'master')
+            ->get()
+            ->keyBy(fn($item) => $item->channel . '|' . $item->master);
+
+        // Get all this month stats in one query (Query 4)
+        $thisMonthStats = Bet::query()
+            ->whereDate('trandate', '>=', $thisMonthRange->start_date)
+            ->whereDate('trandate', '<=', $thisMonthRange->end_date)
+            ->whereIn('channel', $channels)
+            ->whereIn('master', $masters)
+            ->select(
+                'channel',
+                'master',
+                DB::raw('SUM(winlose) as total_winlose'),
+                DB::raw('SUM(turnover) as total_turnover')
+            )
+            ->groupBy('channel', 'master')
+            ->get()
+            ->keyBy(fn($item) => $item->channel . '|' . $item->master);
+
         // Initialize result structure
         $data = [];
         $totals = [];
-        $turnover = [];
 
-        // Calculate data for each channel and master combination
+        // Build data structure from cached results
         foreach ($channels as $channel) {
-            $channelData = [
-                'channel' => $channel,
-            ];
+            $channelData = ['channel' => $channel];
 
             foreach ($masters as $master) {
-                // Last month data
-                $lastMonthStats = Bet::where('channel', $channel)
-                    ->where('master', $master)
-                    ->whereDate('trandate', '>=', $lastMonthRange->start_date)
-                    ->whereDate('trandate', '<=', $lastMonthRange->end_date)
-                    ->select(
-                        DB::raw('SUM(winlose) as total_winlose'),
-                        DB::raw('SUM(turnover) as total_turnover')
-                    )
-                    ->first();
+                $key = $channel . '|' . $master;
 
-                // This month data
-                $thisMonthStats = Bet::where('channel', $channel)
-                    ->where('master', $master)
-                    ->whereDate('trandate', '>=', $thisMonthRange->start_date)
-                    ->whereDate('trandate', '<=', $thisMonthRange->end_date)
-                    ->select(
-                        DB::raw('SUM(winlose) as total_winlose'),
-                        DB::raw('SUM(turnover) as total_turnover')
-                    )
-                    ->first();
+                $lastMonth = $lastMonthStats->get($key);
+                $thisMonth = $thisMonthStats->get($key);
 
                 $channelData[$master] = [
                     'last_month' => [
-                        'winlose' => (float) ($lastMonthStats->total_winlose ?? 0),
-                        'turnover' => (float) ($lastMonthStats->total_turnover ?? 0),
+                        'winlose' => (float) ($lastMonth->total_winlose ?? 0),
+                        'turnover' => (float) ($lastMonth->total_turnover ?? 0),
                     ],
                     'this_month' => [
-                        'winlose' => (float) ($thisMonthStats->total_winlose ?? 0),
-                        'turnover' => (float) ($thisMonthStats->total_turnover ?? 0),
+                        'winlose' => (float) ($thisMonth->total_winlose ?? 0),
+                        'turnover' => (float) ($thisMonth->total_turnover ?? 0),
                     ],
                 ];
 
@@ -106,28 +118,9 @@ class MasterReportController extends Controller
             $data[] = $channelData;
         }
 
-        // Calculate overall turnover for each master
-        foreach ($masters as $master) {
-            $lastMonthTurnover = Bet::where('master', $master)
-                ->whereDate('trandate', '>=', $lastMonthRange->start_date)
-                ->whereDate('trandate', '<=', $lastMonthRange->end_date)
-                ->sum('turnover');
-
-            $thisMonthTurnover = Bet::where('master', $master)
-                ->whereDate('trandate', '>=', $thisMonthRange->start_date)
-                ->whereDate('trandate', '<=', $thisMonthRange->end_date)
-                ->sum('turnover');
-
-            $turnover[$master] = [
-                'last_month' => (float) $lastMonthTurnover,
-                'this_month' => (float) $thisMonthTurnover,
-            ];
-        }
-
         return response()->json([
             'data' => $data,
             'totals' => $totals,
-            'turnover' => $turnover,
             'channels' => $channels,
             'masters' => $masters,
             'date_ranges' => [
@@ -142,4 +135,109 @@ class MasterReportController extends Controller
             ],
         ]);
     }
+
+    /**
+     * Get master turnover totals (Pure Eloquent)
+     */
+    public function getMasterTurnover(Request $request)
+    {
+        // Get date ranges using the trait
+        $lastMonthRange = $this->getStartDate('1m');
+        $thisMonthRange = $this->getStartDate('tm');
+
+        // Get masters
+        $masters = Master::where('is_active', true)
+            ->orderBy('name')
+            ->pluck('name');
+
+        // Get last month turnover
+        $lastMonthStats = Bet::whereIn('master', $masters)
+            ->whereBetween('trandate', [$lastMonthRange->start_date, $lastMonthRange->end_date])
+            ->selectRaw('master, SUM(turnover) as total_turnover')
+            ->groupBy('master')
+            ->pluck('total_turnover', 'master');
+
+        // Get this month turnover
+        $thisMonthStats = Bet::whereIn('master', $masters)
+            ->whereBetween('trandate', [$thisMonthRange->start_date, $thisMonthRange->end_date])
+            ->selectRaw('master, SUM(turnover) as total_turnover')
+            ->groupBy('master')
+            ->pluck('total_turnover', 'master');
+
+        // Build turnover array
+        $turnover = [];
+        foreach ($masters as $master) {
+            $turnover[$master] = [
+                'last_month' => (float) ($lastMonthStats->get($master) ?? 0),
+                'this_month' => (float) ($thisMonthStats->get($master) ?? 0),
+            ];
+        }
+
+        return response()->json([
+            'turnover' => $turnover,
+            'masters' => $masters,
+            'date_ranges' => [
+                'last_month' => [
+                    'start' => $lastMonthRange->start_date,
+                    'end' => $lastMonthRange->end_date,
+                ],
+                'this_month' => [
+                    'start' => $thisMonthRange->start_date,
+                    'end' => $thisMonthRange->end_date,
+                ],
+            ],
+        ]);
+    }
+
+    /**
+     * Alternative: Using Eloquent Relationships (if you have Master model relationship)
+     */
+    // public function getMasterTurnoverWithRelationships(Request $request)
+    // {
+    //     // Get date ranges using the trait
+    //     $lastMonthRange = $this->getStartDate('1m');
+    //     $thisMonthRange = $this->getStartDate('tm');
+
+    //     // Get masters with their bets aggregated
+    //     $masters = Master::where('is_active', true)
+    //         ->orderBy('name')
+    //         ->withSum([
+    //             'bets as last_month_turnover' => function ($query) use ($lastMonthRange) {
+    //                 $query->whereBetween('trandate', [$lastMonthRange->start_date, $lastMonthRange->end_date]);
+    //             }
+    //         ], 'turnover')
+    //         ->withSum([
+    //             'bets as this_month_turnover' => function ($query) use ($thisMonthRange) {
+    //                 $query->whereBetween('trandate', [$thisMonthRange->start_date, $thisMonthRange->end_date]);
+    //             }
+    //         ], 'turnover')
+    //         ->get();
+
+    //     // Build turnover array
+    //     $turnover = [];
+    //     $masterNames = [];
+
+    //     foreach ($masters as $master) {
+    //         $masterNames[] = $master->name;
+    //         $turnover[$master->name] = [
+    //             'last_month' => (float) ($master->last_month_turnover ?? 0),
+    //             'this_month' => (float) ($master->this_month_turnover ?? 0),
+    //         ];
+    //     }
+
+    //     return response()->json([
+    //         'turnover' => $turnover,
+    //         'masters' => $masterNames,
+    //         'date_ranges' => [
+    //             'last_month' => [
+    //                 'start' => $lastMonthRange->start_date,
+    //                 'end' => $lastMonthRange->end_date,
+    //             ],
+    //             'this_month' => [
+    //                 'start' => $thisMonthRange->start_date,
+    //                 'end' => $thisMonthRange->end_date,
+    //             ],
+    //         ],
+    //     ]);
+    // }
 }
