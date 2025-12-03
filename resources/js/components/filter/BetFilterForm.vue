@@ -115,7 +115,25 @@ const handleLoadMoreChannels = (page, query) => {
     filterStore.loadMoreChannels(page, query);
 };
 
-const dummyPriceRange = ref({
+/*
+ * Range filter refs
+ */
+const winLoseRangeRef = ref({
+    min: null,
+    max: null,
+});
+
+const turnoverRangeRef = ref({
+    min: null,
+    max: null,
+});
+
+const lPRangeRef = ref({
+    min: null,
+    max: null,
+});
+
+const countRangeRef = ref({
     min: null,
     max: null,
 });
@@ -220,11 +238,36 @@ const dummyPriceRange = ref({
                 <!-- Win/Lose Range filter -->
                 <div class="col-md-3 col-sm-6">
                     <RangeFilterModal
-                        v-model="dummyPriceRange"
+                        v-model="winLoseRangeRef"
                         label="Win/Lose Range"
-                        :min="0"
-                        :max="1000"
                         :step="1"
+                        :placeholder="{ min: 'Min', max: 'Max' }"
+                    />
+                </div>
+
+                <!-- Turnover Range filter -->
+                <div class="col-md-3 col-sm-6">
+                    <RangeFilterModal
+                        v-model="turnoverRangeRef"
+                        label="Turnover Range"
+                        :placeholder="{ min: 'Min', max: 'Max' }"
+                    />
+                </div>
+
+                <!-- LP Range filter -->
+                <div class="col-md-3 col-sm-6">
+                    <RangeFilterModal
+                        v-model="lPRangeRef"
+                        label="LP Range"
+                        :placeholder="{ min: 'Min', max: 'Max' }"
+                    />
+                </div>
+
+                <!-- Count Range filter -->
+                <div class="col-md-3 col-sm-6">
+                    <RangeFilterModal
+                        v-model="countRangeRef"
+                        label="Count Range"
                         :placeholder="{ min: 'Min', max: 'Max' }"
                     />
                 </div>
