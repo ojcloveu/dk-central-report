@@ -7,6 +7,7 @@ import SingleSelectFilter from './SingleSelectFilter.vue';
 import MultiSelectFilter from './MultiSelectFilter.vue';
 import DateRangeFilter from './DateRangeFilter.vue';
 import ActionButton from '../buttons/ActionButton.vue';
+import RangeFilterModal from './RangeFilterModal.vue';
 
 /*
  * Props & emits
@@ -113,6 +114,11 @@ const handleLoadMoreAccounts = (page, query) => {
 const handleLoadMoreChannels = (page, query) => {
     filterStore.loadMoreChannels(page, query);
 };
+
+const dummyPriceRange = ref({
+    min: null,
+    max: null,
+});
 </script>
 
 <template>
@@ -160,7 +166,6 @@ const handleLoadMoreChannels = (page, query) => {
             <form class="row g-3 align-items-end">
                 <!-- Date Range filter -->
                 <div class="col-md-3 col-sm-6">
-                    <label class="form-label">Date Range</label>
                     <DateRangeFilter
                         v-model="localFilters.trandate"
                         :placeholder="'Select Date Range'"
@@ -169,7 +174,6 @@ const handleLoadMoreChannels = (page, query) => {
 
                 <!-- Master filter -->
                 <div class="col-md-3 col-sm-6">
-                    <label class="form-label">Master</label>
                     <MultiSelectFilter
                         v-model="localFilters.master"
                         :items="filterStore.masters"
@@ -185,7 +189,6 @@ const handleLoadMoreChannels = (page, query) => {
 
                 <!-- Account filter -->
                 <div class="col-md-3 col-sm-6">
-                    <label class="form-label">Account</label>
                     <SingleSelectFilter
                         v-model="localFilters.account"
                         :items="filterStore.accounts"
@@ -201,7 +204,6 @@ const handleLoadMoreChannels = (page, query) => {
 
                 <!-- Channel filter -->
                 <div class="col-md-3 col-sm-6">
-                    <label class="form-label">Channel</label>
                     <SingleSelectFilter
                         v-model="localFilters.channel"
                         :items="filterStore.channels"
@@ -212,6 +214,18 @@ const handleLoadMoreChannels = (page, query) => {
                         :current-page="pagination.channels.currentPage"
                         @search="handleSearchChannels"
                         @load-more="handleLoadMoreChannels"
+                    />
+                </div>
+
+                <!-- Win/Lose Range filter -->
+                <div class="col-md-3 col-sm-6">
+                    <RangeFilterModal
+                        v-model="dummyPriceRange"
+                        label="Win/Lose Range"
+                        :min="0"
+                        :max="1000"
+                        :step="1"
+                        :placeholder="{ min: 'Min', max: 'Max' }"
                     />
                 </div>
             </form>
