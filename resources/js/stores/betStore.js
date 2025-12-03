@@ -86,7 +86,9 @@ export const useBetStore = defineStore('bet', {
                     if (value.start_date) params.append('start_date', value.start_date);
                     if (value.end_date) params.append('end_date', value.end_date);
                 } else if (Array.isArray(value)) {
-                    value.forEach(v => params.append(key, v));
+                    if (value.length > 0) {
+                        params.append(key, value.join(','));
+                    }
                 } else {
                     params.append(key, value);
                 }
