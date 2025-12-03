@@ -49,9 +49,20 @@ class BetReportController extends Controller
             $query->whereDate('trandate', '<=', $request->get('end_date'));
         }
 
-        // Filter by 'master'
+        // Filter by 'master' with OR for multiple selections
         if ($request->filled('master')) {
-            $query->where('master', 'LIKE', '%' . $request->get('master') . '%');
+            $masters = $request->get('master');
+
+            // Handle both array and comma-separated string
+            if (is_array($masters)) {
+                $mastersArray = array_map('trim', $masters);
+            } else {
+                $mastersArray = array_map('trim', explode(',', $masters));
+            }
+
+            if (!empty($mastersArray)) {
+                $query->whereIn('master', $mastersArray);
+            }
         }
         // Filter by 'account'
         if ($request->filled('account')) {
