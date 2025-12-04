@@ -25,7 +25,13 @@ const props = defineProps({
 /*
  * Local reactive state
  */
-const localFilters = reactive({ ...props.initialFilters });
+const localFilters = reactive({
+    ...props.initialFilters,
+    countRange: { min: null, max: null },
+    turnoverRange: { min: null, max: null },
+    winloseRange: { min: null, max: null },
+    lPRange: { min: null, max: null },
+});
 const filterStore = useFilterStore();
 const betStore = useBetStore();
 
@@ -50,14 +56,24 @@ let skipNextWatch = ref(false);
 
 // Watch for changes in filter form
 watch(
-    () => [localFilters.trandate, localFilters.master, localFilters.account, localFilters.channel],
+    () => [
+        localFilters.trandate,
+        localFilters.master,
+        localFilters.account,
+        localFilters.channel,
+        localFilters.countRange,
+        localFilters.turnoverRange,
+        localFilters.winloseRange,
+        localFilters.lPRange,
+    ],
     () => {
         if (skipNextWatch.value) {
             skipNextWatch.value = false;
             return;
         }
         triggerFilter();
-    }
+    },
+    { deep: true }
 );
 
 // Reset filters
@@ -66,6 +82,16 @@ const handleReset = () => {
     localFilters.master = [];
     localFilters.account = '';
     localFilters.channel = '';
+    localFilters.countRange = { min: null, max: null };
+    localFilters.turnoverRange = { min: null, max: null };
+    localFilters.winloseRange = { min: null, max: null };
+    localFilters.lPRange = { min: null, max: null };
+
+    // Also reset the refs
+    countRangeRef.value = { min: null, max: null };
+    turnoverRangeRef.value = { min: null, max: null };
+    winLoseRangeRef.value = { min: null, max: null };
+    lPRangeRef.value = { min: null, max: null };
 };
 
 // Refetch bet and period data
@@ -84,7 +110,15 @@ const hasFiltersToReset = computed(() => {
         localFilters.trandate?.end_date ||
         localFilters.master.length > 0 ||
         localFilters.account !== '' ||
-        localFilters.channel !== ''
+        localFilters.channel !== '' ||
+        localFilters.countRange?.min !== null ||
+        localFilters.countRange?.max !== null ||
+        localFilters.turnoverRange?.min !== null ||
+        localFilters.turnoverRange?.max !== null ||
+        localFilters.winloseRange?.min !== null ||
+        localFilters.winloseRange?.max !== null ||
+        localFilters.lPRange?.min !== null ||
+        localFilters.lPRange?.max !== null
     );
 });
 
@@ -137,6 +171,41 @@ const countRangeRef = ref({
     min: null,
     max: null,
 });
+
+/*
+ * Sync range filter refs with localFilters
+ */
+watch(
+    countRangeRef,
+    newVal => {
+        localFilters.countRange = { ...newVal };
+    },
+    { deep: true }
+);
+
+watch(
+    turnoverRangeRef,
+    newVal => {
+        localFilters.turnoverRange = { ...newVal };
+    },
+    { deep: true }
+);
+
+watch(
+    winLoseRangeRef,
+    newVal => {
+        localFilters.winloseRange = { ...newVal };
+    },
+    { deep: true }
+);
+
+watch(
+    lPRangeRef,
+    newVal => {
+        localFilters.lPRange = { ...newVal };
+    },
+    { deep: true }
+);
 </script>
 
 <template>

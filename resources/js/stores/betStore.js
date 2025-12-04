@@ -15,6 +15,10 @@ const getInitialFilters = () => ({
     trandate: { start_date: null, end_date: null },
     master: [],
     channel: '',
+    countRange: { min: null, max: null },
+    turnoverRange: { min: null, max: null },
+    winloseRange: { min: null, max: null },
+    lPRange: { min: null, max: null },
 });
 
 // Initial state range data
@@ -85,7 +89,23 @@ export const useBetStore = defineStore('bet', {
                 if (key === 'trandate' && typeof value === 'object') {
                     if (value.start_date) params.append('start_date', value.start_date);
                     if (value.end_date) params.append('end_date', value.end_date);
-                } else if (Array.isArray(value)) {
+                }
+                // Handle range filter objects (count, turnover, winlose, lp)
+                else if (key === 'countRange' && typeof value === 'object') {
+                    if (value.min !== null) params.append('count_min', value.min);
+                    if (value.max !== null) params.append('count_max', value.max);
+                } else if (key === 'turnoverRange' && typeof value === 'object') {
+                    if (value.min !== null) params.append('turnover_min', value.min);
+                    if (value.max !== null) params.append('turnover_max', value.max);
+                } else if (key === 'winloseRange' && typeof value === 'object') {
+                    if (value.min !== null) params.append('winlose_min', value.min);
+                    if (value.max !== null) params.append('winlose_max', value.max);
+                } else if (key === 'lPRange' && typeof value === 'object') {
+                    if (value.min !== null) params.append('lp_min', value.min);
+                    if (value.max !== null) params.append('lp_max', value.max);
+                }
+                // Handle arrays (master filter)
+                else if (Array.isArray(value)) {
                     if (value.length > 0) {
                         params.append(key, value.join(','));
                     }
