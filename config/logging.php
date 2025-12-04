@@ -127,6 +127,20 @@ return [
             'path' => storage_path('logs/laravel.log'),
         ],
 
+        'bet_sync_start' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/bet-sync-start.log'),
+            'level' => 'info',
+            'days' => 3,
+        ],
+
+        'bet_sync_complete' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/bet-sync-complete.log'),
+            'level' => 'info',
+            'days' => 3,
+        ],
+
     ],
 
 ];

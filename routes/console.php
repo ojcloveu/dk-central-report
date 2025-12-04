@@ -15,7 +15,7 @@ Schedule::command('sync:bets --days-back=0')
     ->runInBackground()
     ->appendOutputTo(storage_path('logs/bet-sync-scheduler.log'))
     ->before(function () {
-        \Log::info('Scheduled bet sync started', [
+        \Log::channel('bet_sync_start')->info('Scheduled bet sync started', [
             'command' => 'sync:bets --days-back=0',
             'start_time' => now()->toDateTimeString(),
             'start_timestamp' => now()->timestamp
@@ -29,7 +29,7 @@ Schedule::command('sync:bets --days-back=0')
             $logContent = implode("\n", array_slice($lines, -20)); // Get last 20 lines
         }
         
-        \Log::info('Scheduled bet sync completed successfully', [
+        \Log::channel('bet_sync_complete')->info('Scheduled bet sync completed successfully', [
             'command' => 'sync:bets --days-back=0',
             'end_time' => now()->toDateTimeString(),
             'end_timestamp' => now()->timestamp,
@@ -44,8 +44,8 @@ Schedule::command('sync:bets --days-back=0')
             $lines = file($logFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
             $logContent = implode("\n", array_slice($lines, -20)); // Get last 20 lines
         }
-        
-        \Log::error('Scheduled bet sync failed', [
+
+        \Log::channel('bet_sync_complete')->error('Scheduled bet sync failed', [
             'command' => 'sync:bets --days-back=0',
             'end_time' => now()->toDateTimeString(),
             'end_timestamp' => now()->timestamp,
