@@ -73,6 +73,48 @@ class BetReportController extends Controller
             $query->where('channel', $request->get('channel'));
         }
 
+        // Filter by "count" range
+        if ($request->filled('count_min')) {
+            $query->where('count', '>=', $request->get('count_min'));
+        }
+        if ($request->filled('count_max')) {
+            $query->where('count', '<=', $request->get('count_max'));
+        }
+
+        // Filter by "turnover" range
+        if ($request->filled('turnover_min')) {
+            $query->where('turnover', '>=', $request->get('turnover_min'));
+        }
+        if ($request->filled('turnover_max')) {
+            $query->where('turnover', '<=', $request->get('turnover_max'));
+        }
+
+        // Filter by "winlose" range
+        if ($request->filled('winlose_min')) {
+            $winloseMin = $request->get('winlose_min');
+            if ($winloseMin < 0) {
+                $winloseMin = $winloseMin - 0.99;
+            }
+            $query->where('winlose', '>=', $winloseMin);
+        }
+        if ($request->filled('winlose_max')) {
+            $winloseMax = $request->get('winlose_max');
+            if ($winloseMax > 0) {
+                $winloseMax = $winloseMax + 0.99;
+            }
+            $query->where('winlose', '<=', $winloseMax);
+        }
+
+        // Filter by "lp" range
+        if ($request->filled('lp_min')) {
+            $lpMin = $request->get('lp_min') / 100;
+            $query->where('lp', '>=', $lpMin);
+        }
+        if ($request->filled('lp_max')) {
+            $lpMax = $request->get('lp_max') / 100;
+            $query->where('lp', '<=', $lpMax);
+        }
+
         // Filter out ignored accounts
         $ignoreAccount = config('settings.ignore_account');
         if (!empty($ignoreAccount)) {
