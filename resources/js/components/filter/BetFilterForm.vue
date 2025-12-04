@@ -123,6 +123,14 @@ const hasFiltersToReset = computed(() => {
 });
 
 /*
+ * Toggle filters visibility
+ */
+const showFilters = ref(false);
+const toggleFilters = () => {
+    showFilters.value = !showFilters.value;
+};
+
+/*
  * Filter search and pagination handlers
  */
 const handleSearchMasters = query => {
@@ -246,109 +254,138 @@ watch(
                     :iconOnly="true"
                     @click="handleRefetchBetAndPeriod"
                 />
+
+                <!-- Toggle Filters Button -->
+                <ActionButton
+                    variant="outline-secondary"
+                    :iconClass="showFilters ? 'las la-angle-up' : 'las la-angle-down'"
+                    label="Toggle Filters"
+                    title="Toggle filters"
+                    :iconOnly="true"
+                    @click="toggleFilters"
+                />
             </div>
         </div>
 
-        <div class="card-body">
-            <form class="row g-3 align-items-end">
-                <!-- Date Range filter -->
-                <div class="col-md-3 col-sm-6">
-                    <label for="trandate">Date Range</label>
-                    <DateRangeFilter
-                        v-model="localFilters.trandate"
-                        :placeholder="'Select Date Range'"
-                    />
-                </div>
+        <transition name="fade">
+            <div v-if="showFilters" class="card-body">
+                <form class="row g-3 align-items-end">
+                    <!-- Date Range filter -->
+                    <div class="col-md-3 col-sm-6">
+                        <label for="trandate">Date Range</label>
+                        <DateRangeFilter
+                            v-model="localFilters.trandate"
+                            :placeholder="'Select Date Range'"
+                        />
+                    </div>
 
-                <!-- Master filter -->
-                <div class="col-md-3 col-sm-6">
-                    <label for="master">Master</label>
-                    <MultiSelectFilter
-                        v-model="localFilters.master"
-                        :items="filterStore.masters"
-                        :placeholder="'Select Master(s)'"
-                        :loading="filterLoading.masters"
-                        :fetch-items="() => filterStore.fetchMasters({ page: 1 })"
-                        :has-next-page="pagination.masters.hasNextPage"
-                        :current-page="pagination.masters.currentPage"
-                        @search="handleSearchMasters"
-                        @load-more="handleLoadMoreMasters"
-                    />
-                </div>
+                    <!-- Master filter -->
+                    <div class="col-md-3 col-sm-6">
+                        <label for="master">Master</label>
+                        <MultiSelectFilter
+                            v-model="localFilters.master"
+                            :items="filterStore.masters"
+                            :placeholder="'Select Master(s)'"
+                            :loading="filterLoading.masters"
+                            :fetch-items="() => filterStore.fetchMasters({ page: 1 })"
+                            :has-next-page="pagination.masters.hasNextPage"
+                            :current-page="pagination.masters.currentPage"
+                            @search="handleSearchMasters"
+                            @load-more="handleLoadMoreMasters"
+                        />
+                    </div>
 
-                <!-- Account filter -->
-                <div class="col-md-3 col-sm-6">
-                    <label for="account">Account</label>
-                    <SingleSelectFilter
-                        v-model="localFilters.account"
-                        :items="filterStore.accounts"
-                        :placeholder="'Select Account'"
-                        :loading="filterLoading.accounts"
-                        :fetch-items="() => filterStore.fetchAccounts({ page: 1 })"
-                        :has-next-page="pagination.accounts.hasNextPage"
-                        :current-page="pagination.accounts.currentPage"
-                        @search="handleSearchAccounts"
-                        @load-more="handleLoadMoreAccounts"
-                    />
-                </div>
+                    <!-- Account filter -->
+                    <div class="col-md-3 col-sm-6">
+                        <label for="account">Account</label>
+                        <SingleSelectFilter
+                            v-model="localFilters.account"
+                            :items="filterStore.accounts"
+                            :placeholder="'Select Account'"
+                            :loading="filterLoading.accounts"
+                            :fetch-items="() => filterStore.fetchAccounts({ page: 1 })"
+                            :has-next-page="pagination.accounts.hasNextPage"
+                            :current-page="pagination.accounts.currentPage"
+                            @search="handleSearchAccounts"
+                            @load-more="handleLoadMoreAccounts"
+                        />
+                    </div>
 
-                <!-- Channel filter -->
-                <div class="col-md-3 col-sm-6">
-                    <label for="channel">Channel</label>
-                    <SingleSelectFilter
-                        v-model="localFilters.channel"
-                        :items="filterStore.channels"
-                        :placeholder="'Select Channel'"
-                        :loading="filterLoading.channels"
-                        :fetch-items="() => filterStore.fetchChannels({ page: 1 })"
-                        :has-next-page="pagination.channels.hasNextPage"
-                        :current-page="pagination.channels.currentPage"
-                        @search="handleSearchChannels"
-                        @load-more="handleLoadMoreChannels"
-                    />
-                </div>
+                    <!-- Channel filter -->
+                    <div class="col-md-3 col-sm-6">
+                        <label for="channel">Channel</label>
+                        <SingleSelectFilter
+                            v-model="localFilters.channel"
+                            :items="filterStore.channels"
+                            :placeholder="'Select Channel'"
+                            :loading="filterLoading.channels"
+                            :fetch-items="() => filterStore.fetchChannels({ page: 1 })"
+                            :has-next-page="pagination.channels.hasNextPage"
+                            :current-page="pagination.channels.currentPage"
+                            @search="handleSearchChannels"
+                            @load-more="handleLoadMoreChannels"
+                        />
+                    </div>
 
-                <!-- Count Range filter -->
-                <div class="col-md-3 col-sm-6">
-                    <label for="countRange">Count Range</label>
-                    <RangeFilterModal
-                        v-model="countRangeRef"
-                        label="Count Range"
-                        :placeholder="{ min: 'Min', max: 'Max' }"
-                    />
-                </div>
+                    <!-- Count Range filter -->
+                    <div class="col-md-3 col-sm-6">
+                        <label for="countRange">Count Range</label>
+                        <RangeFilterModal
+                            v-model="countRangeRef"
+                            label="Count Range"
+                            :step="1"
+                            :placeholder="{ min: 'Min', max: 'Max' }"
+                        />
+                    </div>
 
-                <!-- Turnover Range filter -->
-                <div class="col-md-3 col-sm-6">
-                    <label for="turnoverRange">Turnover Range</label>
-                    <RangeFilterModal
-                        v-model="turnoverRangeRef"
-                        label="Turnover Range"
-                        :placeholder="{ min: 'Min', max: 'Max' }"
-                    />
-                </div>
+                    <!-- Turnover Range filter -->
+                    <div class="col-md-3 col-sm-6">
+                        <label for="turnoverRange">Turnover Range</label>
+                        <RangeFilterModal
+                            v-model="turnoverRangeRef"
+                            label="Turnover Range"
+                            :step="1"
+                            :placeholder="{ min: 'Min', max: 'Max' }"
+                        />
+                    </div>
 
-                <!-- Win/Lose Range filter -->
-                <div class="col-md-3 col-sm-6">
-                    <label for="winLoseRange">Win/Lose Range</label>
-                    <RangeFilterModal
-                        v-model="winLoseRangeRef"
-                        label="Win/Lose Range"
-                        :step="1"
-                        :placeholder="{ min: 'Min', max: 'Max' }"
-                    />
-                </div>
+                    <!-- Win/Lose Range filter -->
+                    <div class="col-md-3 col-sm-6">
+                        <label for="winLoseRange">Win/Lose Range</label>
+                        <RangeFilterModal
+                            v-model="winLoseRangeRef"
+                            label="Win/Lose Range"
+                            :step="1"
+                            :placeholder="{ min: 'Min', max: 'Max' }"
+                        />
+                    </div>
 
-                <!-- LP Range filter -->
-                <div class="col-md-3 col-sm-6">
-                    <label for="lPRange">LP Range</label>
-                    <RangeFilterModal
-                        v-model="lPRangeRef"
-                        label="LP Range"
-                        :placeholder="{ min: 'Min', max: 'Max' }"
-                    />
-                </div>
-            </form>
-        </div>
+                    <!-- LP Range filter -->
+                    <div class="col-md-3 col-sm-6">
+                        <label for="lPRange">LP Range</label>
+                        <RangeFilterModal
+                            v-model="lPRangeRef"
+                            label="LP Range"
+                            :step="1"
+                            :placeholder="{ min: 'Min', max: 'Max' }"
+                        />
+                    </div>
+                </form>
+            </div>
+        </transition>
     </div>
 </template>
+
+<style scoped>
+/* Smooth transition for filter collapse */
+.fade-enter-active,
+.fade-leave-active {
+    transition: all 0.2s ease;
+    overflow: hidden;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+    opacity: 0;
+}
+</style>
