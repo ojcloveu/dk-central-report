@@ -44,15 +44,15 @@ class DkApiService
 
     try {
       // Build query param - DK API expects comma-separated string
-      // $usernameString = implode(',', array_map('urlencode', $usernames));
-      // $url = rtrim($this->baseUrl, '/') . '/api/report/summary?username=' . $usernameString;
-      $queryParams = [];
-      foreach ($usernames as $username) {
-        $queryParams[] = 'username[]=' . urlencode($username);
-      }
+      $usernameString = implode(',', array_map('urlencode', $usernames));
+      $url = rtrim($this->baseUrl, '/') . '/api/report/summary?username=' . $usernameString;
+      // $queryParams = [];
+      // foreach ($usernames as $username) {
+      //   $queryParams[] = 'username[]=' . urlencode($username);
+      // }
 
-      $queryString = implode('&', $queryParams);
-      $url = rtrim($this->baseUrl, '/') . '/api/report/summary?' . $queryString;
+      // $queryString = implode('&', $queryParams);
+      // $url = rtrim($this->baseUrl, '/') . '/api/report/summary?' . $queryString;
 
       // Make HTTP request with authorization header
       $response = Http::withHeaders([
