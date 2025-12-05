@@ -426,7 +426,6 @@ onUnmounted(() => {
 }
 
 .input-icons i {
-    font-size: 1rem;
     color: var(--tblr-secondary);
     transition: color 0.2s;
 }

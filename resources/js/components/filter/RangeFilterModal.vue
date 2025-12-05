@@ -127,7 +127,19 @@ const hasValue = computed(() => {
             @click="toggleDropdown"
         >
             <span class="filter-text text-muted">{{ displayText }}</span>
-            <i :class="{ rotated: isOpen }" class="la la-angle-down dropdown-arrow"></i>
+
+            <div class="icons_form_input d-flex align-items-center justify-content-end gap-2">
+                <!-- Clear icon -->
+                <i
+                    v-if="hasValue"
+                    class="la la-times-circle text-muted"
+                    @click.stop="clearFilter"
+                    title="Clear filter"
+                ></i>
+
+                <!-- Toggle icon -->
+                <i :class="{ rotated: isOpen }" class="la la-angle-down dropdown-arrow"></i>
+            </div>
         </button>
 
         <!-- Dropdown Content -->
@@ -215,9 +227,12 @@ const hasValue = computed(() => {
     white-space: nowrap;
 }
 
-.dropdown-arrow {
+.icons_form_input {
     position: absolute;
     right: 0.75rem;
+}
+
+.dropdown-arrow {
     transition: transform 0.2s ease;
     pointer-events: none;
 }
