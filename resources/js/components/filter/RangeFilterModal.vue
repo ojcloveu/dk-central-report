@@ -148,8 +148,6 @@ const hasValue = computed(() => {
                         <input
                             type="number"
                             class="form-control py-1"
-                            :min="min"
-                            :max="maxValue"
                             :step="step"
                             v-model.number="minValue"
                             :placeholder="placeholder.min"
@@ -160,8 +158,6 @@ const hasValue = computed(() => {
                         <input
                             type="number"
                             class="form-control py-1"
-                            :min="minValue"
-                            :max="max"
                             :step="step"
                             v-model.number="maxValue"
                             :placeholder="placeholder.max"
@@ -305,17 +301,5 @@ const hasValue = computed(() => {
     color: #6c757d;
     font-weight: 500;
     flex-shrink: 0;
-}
-
-/* Remove spinner from number input */
-.range-input-group input[type='number']::-webkit-inner-spin-button,
-.range-input-group input[type='number']::-webkit-outer-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
-}
-
-.range-input-group input[type='number'] {
-    -moz-appearance: textfield;
-    appearance: textfield;
 }
 </style>
