@@ -302,7 +302,7 @@ export const useBetStore = defineStore('bet', {
 
                 try {
                     const params = {
-                        accounts: uncachedAccounts.join(','),
+                        accounts: uncachedAccounts,
                         period: period,
                     };
 
@@ -359,7 +359,7 @@ export const useBetStore = defineStore('bet', {
             for (const period of periods) {
                 try {
                     const params = {
-                        accounts: accountsArray.join(','),
+                        accounts: accountsArray,
                         period: period,
                     };
 
@@ -454,7 +454,7 @@ export const useBetStore = defineStore('bet', {
 
             try {
                 const params = {
-                    accounts: uncachedAccounts.join(','),
+                    accounts: uncachedAccounts,
                     period: period,
                 };
 

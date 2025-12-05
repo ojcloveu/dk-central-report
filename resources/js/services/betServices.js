@@ -24,9 +24,8 @@ const betServices = {
             throw new Error('Accounts and period are required for fetchRangePeriodData.');
         }
 
-        const response = await axios.get('/admin/api/bet-period', {
-            params: params,
-        });
+        // Use POST to send accounts array in request body
+        const response = await axios.post('/admin/api/bet-period', params);
 
         return response.data;
     },

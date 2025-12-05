@@ -95,11 +95,11 @@ class BetReportController extends Controller
     public function betReportPeriod(Request $request)
     {
         // Set default sorting to total_turnover DESC
-        $sortBy = $request->get('sort_by', 'total_turnover');
-        $sortDir = $request->get('sort_dir', 'desc');
+        $sortBy = $request->input('sort_by', 'total_turnover');
+        $sortDir = $request->input('sort_dir', 'desc');
 
         $startDate = null;
-        $period = $request->get('period');
+        $period = $request->input('period');
 
         $getStartDate = $this->getStartDate($period);
         $startDate = $getStartDate->start_date;
@@ -113,9 +113,16 @@ class BetReportController extends Controller
             $query->whereDate('trandate', '<=', $startEnd);
         }
 
+        // Handle accounts from POST body
         if ($request->filled('accounts')) {
-            $accountsString = $request->get('accounts');
-            $accountsArray = array_map('trim', explode(',', $accountsString));
+            $accounts = $request->input('accounts');
+
+            // Handle both array JSON body and string query params
+            if (is_array($accounts)) {
+                $accountsArray = array_map('trim', $accounts);
+            } else {
+                $accountsArray = array_map('trim', explode(',', $accounts));
+            }
 
             if (!empty($accountsArray)) {
                 $query->whereIn('account', $accountsArray);
