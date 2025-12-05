@@ -86,7 +86,11 @@ class BetReportController extends Controller
             $query->where('turnover', '>=', $request->get('turnover_min'));
         }
         if ($request->filled('turnover_max')) {
-            $query->where('turnover', '<=', $request->get('turnover_max'));
+            $turnoverMax = $request->get('turnover_max');
+            if ($turnoverMax > 0) {
+                $turnoverMax = $turnoverMax + 0.99;
+            }
+            $query->where('turnover', '<=', $turnoverMax);
         }
 
         // Filter by "winlose" range
