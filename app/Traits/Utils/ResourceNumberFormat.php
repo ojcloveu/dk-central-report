@@ -55,11 +55,14 @@ trait ResourceNumberFormat
         // Convert the string back to a float for numerical operations
         return (float) $amountStr;
     }
-    public function formatAmount($amount)
+    public function formatAmount(int|float|string|null $amount): string
     {
-        return $amount < 0
-            ? '-$' . number_format(abs($this->rnfRemoveNumber($amount)), 0)
-            : '$' . number_format($this->rnfRemoveNumber($amount), 0);
+        $number = $this->rnfRemoveNumber($amount, 0);
+        $formattedNumber = number_format(abs($number), 0);
+
+        return $number < 0
+            ? '-$' . $formattedNumber
+            : '$' . $formattedNumber;
     }
 
     /**
