@@ -272,8 +272,8 @@ watch(
                 <form class="d-flex flex-column gap-2">
                     <!-- Basic Filters Section -->
                     <div class="filter-section">
-                        <h5 class="fs-3"><i class="las la-filter me-2"></i>Basic Filters</h5>
-                        <div class="row g-3 align-items-end">
+                        <h5 class="fs-3 mb-2"><i class="las la-filter me-2"></i>Basic Filters</h5>
+                        <div class="row g-2 align-items-end">
                             <!-- Date Range filter -->
                             <div class="col-md-3 col-sm-6">
                                 <label class="fs-5" for="trandate">Date</label>
@@ -335,8 +335,8 @@ watch(
 
                     <!-- Range Filters Section -->
                     <div class="filter-section">
-                        <h5 class="fs-3"><i class="las la-sliders-h me-2"></i>Range Filters</h5>
-                        <div class="row g-3 align-items-end">
+                        <h5 class="fs-3 mb-2"><i class="las la-sliders-h me-2"></i>Range Filters</h5>
+                        <div class="row g-2 align-items-end">
                             <!-- Count Range filter -->
                             <div class="col-md-3 col-sm-6">
                                 <label class="fs-5" for="countRange">Count</label>
