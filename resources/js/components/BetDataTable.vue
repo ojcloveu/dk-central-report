@@ -85,9 +85,6 @@ const sortableColumns = [
 
 <template>
     <div>
-        <!-- Page Header -->
-        <BetPageHeader />
-
         <!-- Filter Form -->
         <BetFilterForm
             :initialFilters="localFilters"
