@@ -15,6 +15,8 @@ const getInitialFilters = () => ({
     trandate: { start_date: null, end_date: null },
     master: [],
     channel: '',
+    minRange: { min: null, max: null },
+    maxRange: { min: null, max: null },
     countRange: { min: null, max: null },
     turnoverRange: { min: null, max: null },
     winloseRange: { min: null, max: null },
@@ -90,8 +92,14 @@ export const useBetStore = defineStore('bet', {
                     if (value.start_date) params.append('start_date', value.start_date);
                     if (value.end_date) params.append('end_date', value.end_date);
                 }
-                // Handle range filter objects (count, turnover, winlose, lp)
-                else if (key === 'countRange' && typeof value === 'object') {
+                // Handle range filter objects (min, max, count, turnover, winlose, lp)
+                else if (key === 'minRange' && typeof value === 'object') {
+                    if (value.min !== null) params.append('min_min', value.min);
+                    if (value.max !== null) params.append('min_max', value.max);
+                } else if (key === 'maxRange' && typeof value === 'object') {
+                    if (value.min !== null) params.append('max_min', value.min);
+                    if (value.max !== null) params.append('max_max', value.max);
+                } else if (key === 'countRange' && typeof value === 'object') {
                     if (value.min !== null) params.append('count_min', value.min);
                     if (value.max !== null) params.append('count_max', value.max);
                 } else if (key === 'turnoverRange' && typeof value === 'object') {

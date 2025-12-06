@@ -73,6 +73,22 @@ class BetReportController extends Controller
             $query->where('channel', $request->get('channel'));
         }
 
+        // Filter by "min" range
+        if ($request->filled('min_min')) {
+            $query->where('min', '>=', $request->get('min_min'));
+        }
+        if ($request->filled('min_max')) {
+            $query->where('min', '<=', $request->get('min_max'));
+        }
+
+        // Filter by "max" range
+        if ($request->filled('max_min')) {
+            $query->where('max', '>=', $request->get('max_min'));
+        }
+        if ($request->filled('max_max')) {
+            $query->where('max', '<=', $request->get('max_max'));
+        }
+
         // Filter by "count" range
         if ($request->filled('count_min')) {
             $query->where('count', '>=', $request->get('count_min'));

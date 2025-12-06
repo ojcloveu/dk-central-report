@@ -27,6 +27,8 @@ const props = defineProps({
  */
 const localFilters = reactive({
     ...props.initialFilters,
+    minRange: { min: null, max: null },
+    maxRange: { min: null, max: null },
     countRange: { min: null, max: null },
     turnoverRange: { min: null, max: null },
     winloseRange: { min: null, max: null },
@@ -61,6 +63,8 @@ watch(
         localFilters.master,
         localFilters.account,
         localFilters.channel,
+        localFilters.minRange,
+        localFilters.maxRange,
         localFilters.countRange,
         localFilters.turnoverRange,
         localFilters.winloseRange,
@@ -82,12 +86,16 @@ const handleReset = () => {
     localFilters.master = [];
     localFilters.account = '';
     localFilters.channel = '';
+    localFilters.minRange = { min: null, max: null };
+    localFilters.maxRange = { min: null, max: null };
     localFilters.countRange = { min: null, max: null };
     localFilters.turnoverRange = { min: null, max: null };
     localFilters.winloseRange = { min: null, max: null };
     localFilters.lPRange = { min: null, max: null };
 
     // Also reset the refs
+    minRangeRef.value = { min: null, max: null };
+    maxRangeRef.value = { min: null, max: null };
     countRangeRef.value = { min: null, max: null };
     turnoverRangeRef.value = { min: null, max: null };
     winLoseRangeRef.value = { min: null, max: null };
@@ -111,6 +119,10 @@ const hasFiltersToReset = computed(() => {
         localFilters.master.length > 0 ||
         localFilters.account !== '' ||
         localFilters.channel !== '' ||
+        localFilters.minRange?.min !== null ||
+        localFilters.minRange?.max !== null ||
+        localFilters.maxRange?.min !== null ||
+        localFilters.maxRange?.max !== null ||
         localFilters.countRange?.min !== null ||
         localFilters.countRange?.max !== null ||
         localFilters.turnoverRange?.min !== null ||
@@ -160,6 +172,16 @@ const handleLoadMoreChannels = (page, query) => {
 /*
  * Range filter refs
  */
+const minRangeRef = ref({
+    min: null,
+    max: null,
+});
+
+const maxRangeRef = ref({
+    min: null,
+    max: null,
+});
+
 const winLoseRangeRef = ref({
     min: null,
     max: null,
@@ -183,6 +205,22 @@ const countRangeRef = ref({
 /*
  * Sync range filter refs with localFilters
  */
+watch(
+    minRangeRef,
+    newVal => {
+        localFilters.minRange = { ...newVal };
+    },
+    { deep: true }
+);
+
+watch(
+    maxRangeRef,
+    newVal => {
+        localFilters.maxRange = { ...newVal };
+    },
+    { deep: true }
+);
+
 watch(
     countRangeRef,
     newVal => {
@@ -272,7 +310,7 @@ watch(
                 <form class="d-flex flex-column gap-2">
                     <!-- Basic Filters Section -->
                     <div class="filter-section">
-                        <h5 class="fs-3 mb-2"><i class="las la-filter me-2"></i>Basic Filters</h5>
+                        <h5 class="fs-4 mb-2"><i class="las la-filter me-2"></i>Basic Filters</h5>
                         <div class="row g-2 align-items-end">
                             <!-- Date Range filter -->
                             <div class="col-md-3 col-sm-6">
@@ -335,8 +373,32 @@ watch(
 
                     <!-- Range Filters Section -->
                     <div class="filter-section">
-                        <h5 class="fs-3 mb-2"><i class="las la-sliders-h me-2"></i>Range Filters</h5>
+                        <h5 class="fs-4 mb-2">
+                            <i class="las la-sliders-h me-2"></i>Range Filters
+                        </h5>
                         <div class="row g-2 align-items-end">
+                            <!-- MIN Range filter -->
+                            <div class="col-md-3 col-sm-6">
+                                <label class="fs-5" for="minRange">MIN</label>
+                                <RangeFilterModal
+                                    v-model="minRangeRef"
+                                    label="MIN Range"
+                                    :step="1"
+                                    :placeholder="{ min: 'Min', max: 'Max' }"
+                                />
+                            </div>
+
+                            <!-- MAX Range filter -->
+                            <div class="col-md-3 col-sm-6">
+                                <label class="fs-5" for="maxRange">MAX</label>
+                                <RangeFilterModal
+                                    v-model="maxRangeRef"
+                                    label="MAX Range"
+                                    :step="1"
+                                    :placeholder="{ min: 'Min', max: 'Max' }"
+                                />
+                            </div>
+
                             <!-- Count Range filter -->
                             <div class="col-md-3 col-sm-6">
                                 <label class="fs-5" for="countRange">Count</label>
